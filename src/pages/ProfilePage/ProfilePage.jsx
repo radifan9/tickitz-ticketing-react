@@ -1,6 +1,6 @@
 import React from "react";
 
-function ProfilePage() {
+export default function ProfilePage() {
   return (
     <>
       <div class="md:grid-cols-[1fr 3fr] container mx-auto grid gap-y-8 md:grid md:py-8">
@@ -205,5 +205,3 @@ function ProfilePage() {
     </>
   );
 }
-
-export default ProfilePage;

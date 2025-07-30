@@ -69,7 +69,7 @@ export default function SignUp() {
 
   return (
     <>
-      <div className="container">
+      <div className="container body-signup">
         <div className="logo">
           <img src="/tickitz-white.png" alt="" width="276px" />
         </div>

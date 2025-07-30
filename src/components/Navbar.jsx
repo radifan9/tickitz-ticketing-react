@@ -1,31 +1,43 @@
-import React from "react";
+import ListItem from "./ListItem";
 
 function Navbar() {
-  return (
-    <header class="flex items-center justify-between bg-white px-8 py-5 md:px-16">
-      <img src="/tickitz-blue.png" alt="" />
+  const navBtn = [
+    { text: "Home", route: "/" },
+    { text: "Movies", route: "/" },
+    { text: "Buy Ticket", route: "/" },
+  ];
 
-      <nav class="ml-auto">
-        <ul class="hidden gap-12 text-sm md:flex">
-          <li class="">
-            <a href="#">Home</a>
-          </li>
-          <li class="">
-            <a href="#">Movie</a>
-          </li>
-          <li class="">
-            <a href="#">Buy Ticket</a>
-          </li>
+  return (
+    <header className="flex px-8 items-center  py-5 md:px-16">
+      <img className="" src="/tickitz-blue.png" alt="" />
+
+      <nav className="ml-auto">
+        <ul className="hidden gap-16 text-sm md:flex">
+          {navBtn.map((nav, idx) => {
+            return <ListItem key={idx} to={nav.route} listText={nav.text} />;
+          })}
         </ul>
       </nav>
-      <div class="ml-auto hidden items-center gap-4 text-base md:flex">
-        <div>Location</div>
-        <img src="/arrow-down.png" alt="" />
-        <img src="/search.png" alt="" />
-        <img src="/profile-pic-small.png" alt="" />
+
+      <div className="hidden">
+        <button className="py-4 border-[1px] border-solid rounded-md ">
+          Sign In
+        </button>
+        <button>Sign Up</button>
       </div>
 
-      <img class="md:hidden" src="../assets/icons/hamburger-menu.png" alt="" />
+      <div className="ml-auto hidden items-center gap-4 text-base md:flex">
+        <div>Location</div>
+        <img src="/arrow-down.png" alt="Arrow Down Button" />
+        <img src="/search.png" alt="Seach Button" />
+        <img src="/profile-pic-small.png" alt="Small Profile Picture" />
+      </div>
+
+      <img
+        className="md:hidden"
+        src="/hamburger-menu.png"
+        alt="Hamburger Menu"
+      />
     </header>
   );
 }

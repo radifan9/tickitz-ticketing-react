@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import "./HomeMovieList.css";
+// import "./HomeMovieList.css";
 
 const NOW_PLAYING_API =
   "https://api.themoviedb.org/3/movie/now_playing?language=en-US&page=1";
@@ -60,41 +60,6 @@ export default function HomeMovieList() {
 
   return (
     <>
-      <nav className="nav-container">
-        <ul className="navbar">
-          <li>
-            <a href="./home.html">
-              <img src="/tickitz-blue.png" alt="" />
-            </a>
-          </li>
-          <li className="home">
-            <a href="./home.html">Home</a>
-          </li>
-          <li className="movie">
-            <a href="./home-movie-list-new.html">Movie</a>
-          </li>
-          <li className="buy-ticket">
-            <a href="./order-page.html">Buy Ticket</a>
-          </li>
-          <li className="sign-in">
-            <a className="btn-signin" href="./login.html">
-              Sign In
-            </a>
-          </li>
-          <li className="sign-up">
-            <a className="btn-signup" href="./register.html">
-              Sign Up
-            </a>
-          </li>
-          {/* <li>Location</li>
-        <li><img src="../assets/icons/arrow-negative.png" alt="" /></li>
-        <li><img src="../assets/icons/search.png" alt="" /></li>
-        <li><img src="../assets/images/profile-pic-small.png" alt="" /></li> */}
-          <li className="hamburger-menu">
-            <img src="/hamburger-menu.png" alt="" />
-          </li>
-        </ul>
-      </nav>
       <div className="container">
         <section className="f-hero-section">
           <div className="title-list">LIST MOVIE OF THE WEEK</div>
@@ -159,87 +124,8 @@ export default function HomeMovieList() {
             </button>
           </div>
 
-          {/* <!-- Subscribe --> */}
-          <section className="subscribe">
-            <div className="subscribe-text">Subscribe to our newsletter</div>
-            <div className="subscribe-input">
-              <input type="text" placeholder="First Name" />
-              <input type="email" placeholder="Email address" />
-              <button className="subscribe-button">Subscribe Now</button>
-            </div>
-          </section>
+          
         </main>
-        <footer>
-          <div className="footer-side-side">
-            <span className="logo-slogan">
-              <img src="../assets/images/tickitz_large.png" alt="" />
-              <div>Stop waiting in line. Buy tickets</div>
-              <div>conveniently, watch movies quietly.</div>
-            </span>
-            <span>
-              <div className="explore">Explore</div>
-              <ul className="explore-list">
-                <li>
-                  <a href="#">Cinemas</a>
-                </li>
-                <li>
-                  <a href="#">Movies List</a>
-                </li>
-                <li>
-                  <a href="./order-history.html">My Ticket</a>
-                </li>
-                <li>
-                  <a href="#">Notification</a>
-                </li>
-              </ul>
-            </span>
-            <span>
-              <div className="sponsor">Our Sponsor</div>
-              <ul className="sponsor-list">
-                <li>
-                  <img src="../assets/images/ebv.id 2.png" alt="" />
-                </li>
-                <li>
-                  <img src="../assets/images/CineOne21-fitted.png" alt="" />
-                </li>
-                <li>
-                  <img src="../assets/images/hiflix 2.png" alt="" />
-                </li>
-              </ul>
-            </span>
-            <span>
-              <div className="follow">Follow us</div>
-              <ul className="follow-list">
-                <li>
-                  <a href="#">
-                    <img src="../assets/icons/facebook.png" alt="Facebook" />
-                    <span>Tickitz Cinema id</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <img src="../assets/icons/instagram.png" alt="Instagram" />
-                    <span>tickitz.id</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <img src="../assets/icons/twitter.png" alt="Twitter" />
-                    <span>tickitz.id</span>
-                  </a>
-                </li>
-                <li>
-                  <a href="#">
-                    <img src="../assets/icons/youtube.png" alt="Youtube" />
-                    <span>Tickitz Cinema id</span>
-                  </a>
-                </li>
-              </ul>
-            </span>
-          </div>
-
-          <div className="copyright">© 2020 Tickitz. All Rights Reserved.</div>
-        </footer>
       </div>
     </>
   );
