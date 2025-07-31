@@ -10,13 +10,17 @@ import SignIn from "./pages/SignIn/SignIn.jsx";
 import HomeMovieList from "./pages/HomeMovieList/HomeMovieList.jsx";
 import OtherHome from "./pages/OtherHome.jsx";
 import Subscribe from "./components/Subscribe.jsx";
+import Order from "./pages/Order/Order.jsx";
+import Home from "./pages/Home/Home.jsx";
 
 function RouterPages() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<RouteHomeLayout />}>
-          <Route path="/" element={<HomeMovieList />} />
+          <Route path="/" element={<Home />} />
+          <Route path="movies" element={<HomeMovieList />} />
+          <Route path="order" element={<Order />} />
           <Route path="other" element={<OtherHome />} />
         </Route>
 
