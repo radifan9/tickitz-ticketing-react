@@ -1,19 +1,45 @@
 function Home() {
   return (
     <main>
-      <section className="hero">
-        <div>
-          <div>MOVIE TICKET PURCHASES #1 IN INDONESIA</div>
-          <div>Experience the Magic of Cinema: Book Your Tickets Today</div>
-          <div>Sign up and get the ticket with a lot of discount</div>
+      {/* Hero Section */}
+      <section className="flex flex-col gap-8">
+        <div className="flex flex-col gap-8 items-center">
+          <div className="font-semibold text-lg text-[#1D4ED8]">
+            MOVIE TICKET PURCHASES #1 IN INDONESIA
+          </div>
+          <div className="font-normal text-3xl text-center">
+            Experience the Magic of Cinema: Book Your Tickets Today
+          </div>
+          <div className="font-light text-[#A0A3BD] text-lg">
+            Sign up and get the ticket with a lot of discount
+          </div>
         </div>
-        <section className="movies-grid">
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
+
+        <section className="h-96 grid grid-cols-2 grid-rows-3 gap-2 ">
+          <img
+            className="w-full h-full object-cover object-top row-span-1 col-span-1 rounded-t-4xl"
+            src="/john-wick.png"
+            alt="John Wick Poster"
+          />
+          <img
+            className="w-full h-full object-cover object-top row-span-2 col-span-1 row-start-1 row-end-3 col-start-2 rounded-t-4xl"
+            src="/lion-king.png"
+            alt="Lion King Poster"
+          />
+          <img
+            className="w-full h-full object-cover object-top row-span-2 col-span-1 row-start-2 col-start-1 rounded-b-4xl"
+            src="/spiderman-poster.png"
+            alt="Spiderman Poster"
+          />
+          <img
+            className="w-full h-full object-cover object-bottom row-span-1 col-span-1 row-start-3 col-start-2 rounded-b-4xl"
+            src="/roblox.png"
+            alt="Roblox Poster"
+          />
         </section>
       </section>
+
+      {/*  */}
       <section className="why-us">
         <div>WHY CHOOSE US</div>
         <div>Unleashing the Ultimate Movie Experience</div>
