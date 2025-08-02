@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import "./SignUp.css";
+import { Link, useNavigate } from "react-router";
 
 // Regex for validation
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
@@ -9,6 +9,7 @@ const regexMinLarge = /[A-Z]/;
 const regexMinSpecialChar = /[!@#$%^&*/()]/;
 
 export default function SignUp() {
+  // const isCheckedTermsCon = false;
   const [isInputedEmail, setIsInputedEmail] = useState(false);
   const [isInputedPassword, setIsInputedPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -20,6 +21,9 @@ export default function SignUp() {
     isMinLarge: false,
     isMinSpecial: false,
   });
+
+  // Hooks
+  const navigate = useNavigate();
 
   // Handler functions
   const handleEmailChange = (e) => {
@@ -50,7 +54,6 @@ export default function SignUp() {
   // If there's no error
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Masuk handle submit");
     if (
       !emailError &&
       passwordErrors.isMin8 &&
@@ -58,60 +61,68 @@ export default function SignUp() {
       passwordErrors.isMinLarge &&
       passwordErrors.isMinSpecial
     ) {
-      // Save to localStorage
-      console.log("✅ Register succesful!");
-      console.log({ email, password });
       localStorage.setItem("user1", JSON.stringify({ email, password }));
-      // Redirect or show success
-      window.location.replace("./login.html");
+      // window.location.replace("./login.html");
+      navigate("/signin");
     }
   };
 
   return (
-    <>
-      <div className="container body-signup">
-        <div className="logo">
-          <img src="/tickitz-white.png" alt="" width="276px" />
-        </div>
+    <div className="relative min-h-screen bg-black bg-[url('/avengers.png')] bg-cover bg-top bg-no-repeat pb-16 font-['Mulish',Arial]">
+      {/* Masking */}
+      <div className="absolute inset-0 z-1 bg-black/40"></div>
+      <div className="flex flex-col items-center gap-6">
+        {/* Logo */}
 
-        <main className="register">
-          {/* <!-- Step --> */}
-          <div className="steps">
-            <span className="outer-steps">
-              <div className="steps-num">1</div>
-              <p className="steps-text">Fill Form</p>
+        <img
+          className="z-2 mt-20"
+          src="/tickitz-white.png"
+          alt=""
+          width="276px"
+        />
+
+        <main className="z-2 mx-auto flex w-[546px] flex-col gap-6 rounded-lg bg-white px-8 pt-12 md:p-12 md:pt-4">
+          {/* Step */}
+          <div className="my-8 hidden items-center justify-center gap-6 md:flex">
+            <span className="flex flex-col items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-700 text-white">
+                1
+              </div>
+              <p className="whitespace-nowrap text-[#4E4B66]">Fill Form</p>
             </span>
-            <span></span>
-            <span className="outer-steps">
-              <div className="steps-num steps-num-off">2</div>
-              <p className="steps-text steps-text-off">Activate</p>
+            <span className="w-16 border-b border-dashed border-[#a0a3bd]"></span>
+            <span className="flex flex-col items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#a0a3bd] text-white">
+                2
+              </div>
+              <p className="whitespace-nowrap text-[#a0a3bd]">Activate</p>
             </span>
-            <span></span>
-            <span className="outer-steps">
-              <div className="steps-num steps-num-off">3</div>
-              <p className="steps-text steps-text-off">Done</p>
+            <span className="w-16 border-b border-dashed border-[#a0a3bd]"></span>
+            <span className="flex flex-col items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#a0a3bd] text-white">
+                3
+              </div>
+              <p className="whitespace-nowrap text-[#a0a3bd]">Done</p>
             </span>
           </div>
 
-          {/* <!-- Email, Password, Button --> */}
-          <form className="form-register" onSubmit={handleSubmit}>
-            {/* <!-- Email --> */}
-            <div>
-              <label className="user-label" htmlFor="email">
+          {/* Email, Password, Button */}
+          <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+            {/* Email */}
+            <div className="flex flex-col gap-1 text-[#4E4B66]">
+              <label className="font-medium" htmlFor="email">
                 Email
-              </label>{" "}
-              <br />
+              </label>
               <input
                 onChange={handleEmailChange}
-                className="user-input"
+                className="block h-16 w-full rounded border border-[#dedede] px-6 py-2 text-base font-normal"
                 name="email"
                 type="text"
                 id="email"
                 placeholder="Enter your email"
               />
               <div
-                className="emailError"
-                style={emailError ? { color: "red" } : { color: "green" }}
+                className={`text-sm ${emailError ? "text-red-500" : "text-green-600"}`}
               >
                 {isInputedEmail &&
                   (emailError
@@ -120,40 +131,61 @@ export default function SignUp() {
               </div>
             </div>
 
-            {/*  Password  */}
-            <div>
-              <label className="user-label" htmlFor="password">
+            {/* Password */}
+            <div className="flex flex-col gap-1 text-[#4E4B66]">
+              <label className="font-medium" htmlFor="password">
                 Password
-              </label>{" "}
-              <br />
+              </label>
               <input
                 onChange={handlePasswordChange}
-                className="user-input input-password"
+                className="block h-16 w-full rounded border border-[#dedede] px-6 py-2 text-base font-normal"
                 name="password"
                 type="password"
                 id="password"
                 placeholder="Enter your password"
               />
-              <div className="passwordError">
-                <div className="min8Char">
+              <div className="text-sm">
+                <div
+                  className={
+                    passwordErrors.isMin8 ? "text-green-600" : "text-red-500"
+                  }
+                >
                   {isInputedPassword &&
                     (passwordErrors.isMin8
                       ? "✅ Minimum 8 characters"
                       : "❌ Minimum 8 characters")}
                 </div>
-                <div className="min1Small">
+                <div
+                  className={
+                    passwordErrors.isMinSmall
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
+                >
                   {isInputedPassword &&
                     (passwordErrors.isMinSmall
                       ? "✅ Minimum 1 small character"
                       : "❌ Minimum 1 small character")}
                 </div>
-                <div className="min1Large">
+                <div
+                  className={
+                    passwordErrors.isMinLarge
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
+                >
                   {isInputedPassword &&
                     (passwordErrors.isMinLarge
                       ? "✅ Minimum 1 large character"
                       : "❌ Minimum 1 large character")}
                 </div>
-                <div className="min1SpecialChar">
+                <div
+                  className={
+                    passwordErrors.isMinSpecial
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
+                >
                   {isInputedPassword &&
                     (passwordErrors.isMinSpecial
                       ? "✅ Minimum 1 special character !@#$%^&*/()"
@@ -162,55 +194,79 @@ export default function SignUp() {
               </div>
             </div>
 
-            {/*  Button & Link  */}
-            <div className="container-tAndC">
-              <input name="tAndC" id="tAndC" type="checkbox" />
-              <label htmlFor="tAndC">I agree to terms & conditions</label>
+            {/* Terms & Conditions */}
+            <div className="flex items-center gap-3">
+              <input
+                name="tAndC"
+                id="tAndC"
+                type="checkbox"
+                className="h-6 w-6"
+              />
+              <label
+                htmlFor="tAndC"
+                className="text-lg font-normal text-[#696f79]"
+              >
+                I agree to terms & conditions
+              </label>
             </div>
 
-            <button type="submit" className="btn-register">
+            <button
+              type="submit"
+              className="block h-16 w-full rounded border-none bg-blue-700 text-base font-semibold text-white"
+            >
               Join For Free Now
             </button>
           </form>
 
-          <div className="already-have">
-            <span>Already have an account?</span>
-            <a href="./login.html">Log in</a>
+          <div className="flex justify-center gap-2 text-base">
+            <span className="text-[#6E7191]">Already have an account?</span>
+            {/* <a
+              href="./login.html"
+              className="font-semibold text-blue-700 hover:underline"
+            >
+              Log in
+            </a> */}
+            <Link to="/signin">Log in</Link>
           </div>
 
-          <div className="or">
-            <span></span>
-            <span>Or</span>
-            <span></span>
+          <div className="flex items-center justify-center gap-6">
+            <span className="w-full border-b border-[#a0a3bd]"></span>
+            <span className="text-xs text-[#a0a3bd]">Or</span>
+            <span className="w-full border-b border-[#a0a3bd]"></span>
           </div>
 
-          {/* <!-- Login using other method --> */}
-          <div className="login-other">
-            <a href="#" className="login-method">
+          {/* Login using other method */}
+          <div className="mb-4 flex justify-center gap-12">
+            <a
+              href="#"
+              className="flex items-center gap-5 rounded px-8 py-4 text-[#a0a3bd] shadow-md hover:font-bold"
+            >
               <img
-                width="48"
-                height="48"
+                width="24"
+                height="24"
                 src="https://img.icons8.com/color/48/google-logo.png"
                 alt="google-logo"
-                className="login-icon"
+                className="h-6 w-6"
               />
-              <span>Google</span>
+              <span className="hidden md:inline">Google</span>
             </a>
 
-            <a href="#" className="login-method">
+            <a
+              href="#"
+              className="flex items-center gap-5 rounded px-8 py-4 text-[#a0a3bd] shadow-md hover:font-bold"
+            >
               <img
-                width="48"
-                height="48"
-                src="/facebook-circled.png
-                "
+                width="24"
+                height="24"
+                src="/facebook-circled.png"
                 alt="facebook-circled"
-                className="login-icon"
+                className="h-6 w-6"
               />
-              <span>Facebook</span>
+              <span className="hidden md:inline">Facebook</span>
             </a>
           </div>
         </main>
       </div>
-    </>
+    </div>
   );
 }
