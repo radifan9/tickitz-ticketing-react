@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import "./SignIn.css";
+import { useNavigate } from "react-router";
 
-// Regex for validation
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
 const regexMin8 = /^.{8,}$/;
 const regexMinSmall = /[a-z]/;
@@ -21,6 +20,8 @@ export default function SignIn() {
     isMinSpecial: false,
   });
   const [loginError, setLoginError] = useState("");
+
+  const navigate = useNavigate();
 
   // Handler functions
   const handleEmailChange = (e) => {
@@ -72,37 +73,46 @@ export default function SignIn() {
     ) {
       // Success
       localStorage.setItem("activeUser", JSON.stringify({ email }));
-      window.location.replace("./home.html");
+      // window.location.replace("./home.html");
+      navigate("/home");
     } else {
       setLoginError("Email atau password salah.");
     }
   };
 
   return (
-    <>
-      <div className="main-page body-sign-in">
-        <div className="logo">
-          <img src="/tickitz-white.png" alt="" width="276px" />
-        </div>
+    <div className="relative min-h-screen bg-black bg-[url('/avengers.png')] bg-cover bg-top bg-no-repeat pb-16 font-['Mulish',Arial]">
+      {/* Masking */}
+      <div className="absolute inset-0 z-1 bg-black/40"></div>
+      <div className="flex flex-col items-center gap-6">
+        {/* Logo */}
+        <img
+          className="z-2 mt-20"
+          src="/tickitz-white.png"
+          alt=""
+          width="276px"
+        />
 
-        <main className="register">
-          <div className="welcome-screen">
-            <h1>Welcome Back👋</h1>
-            <p>
+        <main className="z-2 mx-auto flex w-[546px] flex-col gap-6 rounded-lg bg-white px-8 pt-6 md:p-12">
+          {/* Welcome Back */}
+          <div className="mt-14 flex flex-col gap-4">
+            <h1 className="text-3xl font-semibold text-[#14142B]">
+              Welcome Back👋
+            </h1>
+            <p className="text-lg font-normal text-[#A0A3BD]">
               Sign in with your data that you entered during your registration
             </p>
           </div>
 
-          <form className="form-register" onSubmit={handleSubmit}>
+          <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
             {/* Email */}
-            <div>
-              <label className="user-label" htmlFor="email">
+            <div className="flex flex-col gap-1 text-[#4E4B66]">
+              <label className="font-medium" htmlFor="email">
                 Email
               </label>
-              <br />
               <input
                 onChange={handleEmailChange}
-                className="user-input"
+                className="block h-16 w-full rounded border border-[#dedede] px-6 py-2 text-base font-normal"
                 name="email"
                 type="text"
                 id="email"
@@ -110,8 +120,7 @@ export default function SignIn() {
                 value={email}
               />
               <div
-                className="emailError"
-                style={emailError ? { color: "red" } : { color: "green" }}
+                className={`text-sm ${emailError ? "text-red-500" : "text-green-600"}`}
               >
                 {isInputedEmail &&
                   (emailError
@@ -121,40 +130,61 @@ export default function SignIn() {
             </div>
 
             {/* Password */}
-            <div>
-              <label className="user-label" htmlFor="password">
+            <div className="flex flex-col gap-1 text-[#4E4B66]">
+              <label className="font-medium" htmlFor="password">
                 Password
               </label>
-              <br />
               <input
                 onChange={handlePasswordChange}
-                className="user-input input-password"
+                className="block h-16 w-full rounded border border-[#dedede] px-6 py-2 text-base font-normal"
                 name="password"
                 type="password"
                 id="password"
                 placeholder="Enter your password"
                 value={password}
               />
-              <div className="passwordError">
-                <div className="min8Char">
+              <div className="text-sm">
+                <div
+                  className={
+                    passwordErrors.isMin8 ? "text-green-600" : "text-red-500"
+                  }
+                >
                   {isInputedPassword &&
                     (passwordErrors.isMin8
                       ? "✅ Minimum 8 characters"
                       : "❌ Minimum 8 characters")}
                 </div>
-                <div className="min1Small">
+                <div
+                  className={
+                    passwordErrors.isMinSmall
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
+                >
                   {isInputedPassword &&
                     (passwordErrors.isMinSmall
                       ? "✅ Minimum 1 small character"
                       : "❌ Minimum 1 small character")}
                 </div>
-                <div className="min1Large">
+                <div
+                  className={
+                    passwordErrors.isMinLarge
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
+                >
                   {isInputedPassword &&
                     (passwordErrors.isMinLarge
                       ? "✅ Minimum 1 large character"
                       : "❌ Minimum 1 large character")}
                 </div>
-                <div className="min1SpecialChar">
+                <div
+                  className={
+                    passwordErrors.isMinSpecial
+                      ? "text-green-600"
+                      : "text-red-500"
+                  }
+                >
                   {isInputedPassword &&
                     (passwordErrors.isMinSpecial
                       ? "✅ Minimum 1 special character !@#$%^&*/()"
@@ -163,51 +193,60 @@ export default function SignIn() {
               </div>
             </div>
 
-            <div className="already-have">
-              <a href="#">Forgot your password?</a>
+            <div className="flex justify-end gap-2 text-base text-[#1D4ED8]">
+              <a href="#" className="hover:underline">
+                Forgot your password?
+              </a>
             </div>
 
-            <button className="btn-register btn-login" type="submit">
+            <button
+              className="block h-16 w-full items-center justify-center rounded border-none bg-blue-700 text-base font-semibold text-white"
+              type="submit"
+            >
               Login
             </button>
             {loginError && (
-              <div style={{ color: "red", marginTop: "10px" }}>
-                {loginError}
-              </div>
+              <div className="mt-2 text-center text-red-500">{loginError}</div>
             )}
           </form>
 
-          <div className="or">
-            <span></span>
-            <span>Or</span>
-            <span></span>
+          <div className="flex items-center justify-center gap-6">
+            <span className="w-full border-b border-[#a0a3bd]"></span>
+            <span className="text-xs text-[#a0a3bd]">Or</span>
+            <span className="w-full border-b border-[#a0a3bd]"></span>
           </div>
 
-          <div className="login-other">
-            <a href="#" className="login-method">
+          <div className="mb-4 flex justify-center gap-12">
+            <a
+              href="#"
+              className="flex items-center gap-5 rounded px-8 py-4 text-[#a0a3bd] shadow-md hover:font-bold"
+            >
               <img
-                width="48"
-                height="48"
+                width="24"
+                height="24"
                 src="https://img.icons8.com/color/48/google-logo.png"
                 alt="google-logo"
-                className="login-icon"
+                className="h-6 w-6"
               />
-              <span>Google</span>
+              <span className="hidden md:inline">Google</span>
             </a>
 
-            <a href="#" className="login-method">
+            <a
+              href="#"
+              className="flex items-center gap-5 rounded px-8 py-4 text-[#a0a3bd] shadow-md hover:font-bold"
+            >
               <img
-                width="48"
-                height="48"
+                width="24"
+                height="24"
                 src="/facebook-circled.png"
                 alt="facebook-circled"
-                className="login-icon"
+                className="h-6 w-6"
               />
-              <span>Facebook</span>
+              <span className="hidden md:inline">Facebook</span>
             </a>
           </div>
         </main>
       </div>
-    </>
+    </div>
   );
 }
