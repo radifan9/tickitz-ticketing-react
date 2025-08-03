@@ -7,7 +7,7 @@ import "./assets/styles/index.css";
 import RouterPages from "./RouterPages.jsx";
 
 createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    <RouterPages />
-  </StrictMode>
+  // <StrictMode>
+  <RouterPages />,
+  // </StrictMode>
 );

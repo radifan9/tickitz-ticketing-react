@@ -75,7 +75,7 @@ export default function SignIn() {
       // Success
       localStorage.setItem("activeUser", JSON.stringify({ email }));
       // window.location.replace("./home.html");
-      navigate("/home");
+      navigate("/");
     } else {
       setLoginError("Email atau password salah.");
     }
