@@ -42,18 +42,18 @@ function Footer() {
 
   return (
     <footer className="flex flex-col gap-10">
-      <div className="flex flex-col gap-10 md:flex-row">
+      <div className="flex flex-col gap-10 items-start md:flex-row">
         {/* Slogan */}
-        <span className="font-light text-[#6E7191] text-sm">
+        <span className="font-light text-[#6E7191] text-sm ">
           <img src="/tickitz-blue.png" alt="" />
           <div>Stop waiting in line. Buy tickets</div>
           <div>conveniently, watch movies quietly.</div>
         </span>
 
         {/* Explore Link */}
-        <span>
+        <span className="flex flex-col gap-4">
           <div className="font-medium text-base">Explore</div>
-          <ul className="grid grid-cols-3 md:grid-cols-1">
+          <ul className="grid grid-cols-4 gap-x-14 gap-y-2 md:grid-cols-1">
             {exploreList.map((el, idx) => {
               return (
                 <li className="text-sm text-[#6E7191]" key={idx}>
@@ -65,9 +65,9 @@ function Footer() {
         </span>
 
         {/* Sponsor List */}
-        <span>
+        <span className="flex flex-col gap-4">
           <div className="font-medium text-base">Our Sponsor</div>
-          <ul className="grid grid-cols-3 md:grid-cols-1">
+          <ul className="grid grid-cols-3 gap-x-14 gap-y-2 items-center  md:grid-cols-1">
             {sponsorList.map((el, idx) => {
               return (
                 <li key={idx}>
@@ -79,9 +79,9 @@ function Footer() {
         </span>
 
         {/* Follow Us */}
-        <span>
+        <span className="flex flex-col gap-4">
           <div className="font-medium text-base">Follow us</div>
-          <ul className="grid grid-cols-4  md:grid-cols-1">
+          <ul className="grid grid-cols-4 gap-x-8 gap-y-2  md:grid-cols-1 text-[#6E7191]">
             {followUsList.map((el, idx) => {
               return (
                 <li key={idx}>
