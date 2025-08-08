@@ -9,7 +9,6 @@ const regexMinLarge = /[A-Z]/;
 const regexMinSpecialChar = /[!@#$%^&*/()]/;
 
 export default function SignUp() {
-  // const isCheckedTermsCon = false;
   const [isInputedEmail, setIsInputedEmail] = useState(false);
   const [isInputedPassword, setIsInputedPassword] = useState(false);
   const [email, setEmail] = useState("");
@@ -69,8 +68,6 @@ export default function SignUp() {
   };
 
   const handleEye = () => {
-    console.log("Eye clicked!");
-    console.log(passwordEye);
     setPasswordEye((now) => {
       if (now === "closed") {
         return "opened";

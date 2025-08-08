@@ -153,116 +153,100 @@ function Order() {
             <div>Screen</div>
             <div className="h-1.5 w-2/3 rounded-md bg-[#9570FE]"></div>
             <form onSubmit={handleSubmit} className="flex flex-col gap-10">
-              <div className="flex gap-12">
-                <div className="grid grid-cols-7 grid-rows-3 gap-1">
-                  {(function () {
-                    const result = [];
-                    for (let i = 0; i < 49; i++) {
-                      result.push(
-                        <Seat
-                          key={`seat-${i}`}
-                          id={`seat-${i}`}
-                          name={`seat-${i}`}
-                          selectedSeats={selectedSeats}
-                          onChange={(e) => {
-                            setSelectedSeats((selectedSeats) => {
-                              // Cek apakah selectedSeat sudah terpilih
-                              if (selectedSeats.includes(e.target.name)) {
-                                return selectedSeats.filter(
-                                  (seat) => seat !== e.target.name,
-                                );
-                              }
-                              return [...selectedSeats, e.target.name];
-                            });
-                          }}
-                        />,
-                      );
-                    }
-                    return result;
-                  })()}
+              <div className="">
+                <div className="flex gap-12">
+                  <div className="grid grid-cols-7 grid-rows-3 gap-1">
+                    {(function () {
+                      const result = [];
+                      for (let i = 0; i < 49; i++) {
+                        result.push(
+                          <Seat
+                            key={`seat-${i}`}
+                            id={`seat-${i}`}
+                            name={`seat-${i}`}
+                            selectedSeats={selectedSeats}
+                            onChange={(e) => {
+                              setSelectedSeats((selectedSeats) => {
+                                // Cek apakah selectedSeat sudah terpilih
+                                if (selectedSeats.includes(e.target.name)) {
+                                  return selectedSeats.filter(
+                                    (seat) => seat !== e.target.name,
+                                  );
+                                }
+                                return [...selectedSeats, e.target.name];
+                              });
+                            }}
+                          />,
+                        );
+                      }
+                      return result;
+                    })()}
+                  </div>
+                  <div className="grid grid-cols-7 grid-rows-3 gap-1">
+                    {(function () {
+                      const result = [];
+                      for (let i = 49; i < 98; i++) {
+                        result.push(
+                          <Seat
+                            key={i}
+                            id={i}
+                            name={`seat-${i}`}
+                            selectedSeats={selectedSeats}
+                            onChange={(e) => {
+                              setSelectedSeats((selectedSeats) => {
+                                // Cek apakah selectedSeat sudah terpilih
+                                if (selectedSeats.includes(e.target.name)) {
+                                  return selectedSeats.filter(
+                                    (seat) => seat !== e.target.name,
+                                  );
+                                }
+                                return [...selectedSeats, e.target.name];
+                              });
+                            }}
+                          />,
+                        );
+                      }
+                      return result;
+                    })()}
+                  </div>
                 </div>
-                <div className="grid grid-cols-7 grid-rows-3 gap-1">
-                  {(function () {
-                    const result = [];
-                    for (let i = 49; i < 98; i++) {
-                      result.push(
-                        <Seat
-                          key={i}
-                          id={i}
-                          name={`seat-${i}`}
-                          selectedSeats={selectedSeats}
-                          onChange={(e) => {
-                            setSelectedSeats((selectedSeats) => {
-                              // Cek apakah selectedSeat sudah terpilih
-                              if (selectedSeats.includes(e.target.name)) {
-                                return selectedSeats.filter(
-                                  (seat) => seat !== e.target.name,
-                                );
-                              }
-                              return [...selectedSeats, e.target.name];
-                            });
-                          }}
-                        />,
-                      );
-                    }
-                    return result;
-                  })()}
-                </div>
-              </div>
 
-              {/* Seating key */}
-              <h3 className="self-start text-lg font-semibold">Seating key</h3>
-              <div className="grid grid-cols-2 gap-x-14 gap-y-4">
-                <div className="flex items-center gap-6">
-                  <img src="/down-arrow.png" alt="" />
-                  <div className="text-xl font-normal text-[#4E4B66]">
-                    A - G
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <img src="/right-arrow.png" alt="" />
-                  <div className="text-xl font-normal text-[#4E4B66]">
-                    1 - 14
-                  </div>
-                </div>
-                {seatingKey.map((key, idx) => {
-                  return (
-                    <div key={idx} className="flex items-center gap-6">
-                      <div
-                        className="h-8 w-8 rounded-md"
-                        style={{ backgroundColor: key.color }}
-                      ></div>
-                      <div className="text-xl font-normal text-[#4E4B66]">
-                        {key.text}
-                      </div>
+                {/* Seating key */}
+                <h3 className="self-start text-lg font-semibold">
+                  Seating key
+                </h3>
+                <div className="grid grid-cols-2 gap-x-14 gap-y-4">
+                  <div className="flex items-center gap-6">
+                    <img src="/down-arrow.png" alt="" />
+                    <div className="text-xl font-normal text-[#4E4B66]">
+                      A - G
                     </div>
-                  );
-                })}
+                  </div>
+                  <div className="flex items-center gap-6">
+                    <img src="/right-arrow.png" alt="" />
+                    <div className="text-xl font-normal text-[#4E4B66]">
+                      1 - 14
+                    </div>
+                  </div>
+                  {seatingKey.map((key, idx) => {
+                    return (
+                      <div key={idx} className="flex items-center gap-6">
+                        <div
+                          className="h-8 w-8 rounded-md"
+                          style={{ backgroundColor: key.color }}
+                        ></div>
+                        <div className="text-xl font-normal text-[#4E4B66]">
+                          {key.text}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <button className="h-14 w-full rounded-2xl border-[1px] border-[#1D4ED8] text-lg font-medium text-[#1D4ED8]">
+                  Add new seat
+                </button>
               </div>
-
-              {/* Choose */}
-              {/* <div>
-            <div className="flex justify-between">
-              <span className="text-lg font-medium text-[#4E4B66]">
-                Choosed
-              </span>
-              <span className="text-lg font-medium">C4</span>
-            </div>
-            <div>
-              <select
-                className="ml-2 rounded-lg bg-[#EFF0F6] px-14 py-7 text-[#14142B]"
-                name="seatRow"
-              >
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-              </select>
-            </div>
-          </div> */}
-
-              <button className="h-14 w-full rounded-2xl border-[1px] border-[#1D4ED8] text-lg font-medium text-[#1D4ED8]">
-                Add new seat
-              </button>
 
               {/*  Right Side  */}
               <span className="flex flex-col items-center">
@@ -303,7 +287,6 @@ function Order() {
                 </button>
               </span>
             </form>
-            <div></div>
           </div>
         </span>
       </section>

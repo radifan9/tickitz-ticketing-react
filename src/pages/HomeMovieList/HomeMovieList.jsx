@@ -1,41 +1,33 @@
 import React, { useEffect, useState } from "react";
+import { useSearchParams, Link } from "react-router";
+
 import fetchWithAuth from "../../utils/fetchWithAuth.jsx";
-import { useSearchParams } from "react-router";
+import getGenreNameFromID from "../../utils/getGenreNameFromID.jsx";
 
-// async function fetchWithAuth(url) {
-//   const res = await fetch(url, {
-//     headers: {
-//       Authorization: `Bearer ${BEARER_TOKEN}`,
-//     },
-//   });
-//   if (!res.ok) throw new Error("Network response was not ok");
-//   return res.json();
-// }
-
-const getGenreNameFromID = (listOfGenreID, listOfGenreName) => {
-  return listOfGenreID
-    .map((id) => {
-      const genreObj = listOfGenreName.find((el) => id === el.id);
-      return genreObj ? genreObj.name : null;
-    })
-    .filter(Boolean);
-};
+import Genres from "../../components/Genres";
+import SingleMovie from "../../components/SingleMovie.jsx";
 
 export default function HomeMovieList() {
+  // variables
+  const btnFilter = [
+    { text: "Thriller", name: "thriller" },
+    { text: "Horror", name: "horror" },
+    { text: "Romantic", name: "romantic" },
+  ];
+
+  const [checkedFilter, setCheckedFilter] = useState([]);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
 
   useEffect(() => {
     async function getMovieList() {
-      console.log(searchParams);
       try {
         const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
         const genresNamed = genresData.genres;
 
-        const moviesData = await fetchWithAuth(
-          import.meta.env.VITE_NOW_PLAYING_API,
-        );
+        const urlMovies = `${import.meta.env.VITE_API_URL}/movie/now_playing?${searchParams.toString()}&language=en-US`;
+        const moviesData = await fetchWithAuth(urlMovies);
         const results = moviesData.results;
 
         const movieList = results.map((movie) => {
@@ -55,100 +47,146 @@ export default function HomeMovieList() {
       }
     }
     getMovieList();
-  }, []);
+
+    // Jalankan useEffect jika terjadi perubahan di seachParams
+  }, [searchParams]);
+
+  // Handler Function
+  const handleFilterClick = (filterName) => {
+    setCheckedFilter((prev) => {
+      // If clicked genres already in array, remove it
+      if (prev.includes(filterName)) {
+        return prev.filter((item) => item !== filterName);
+      }
+
+      // Otherwise, add it
+      return [...prev, filterName];
+    });
+  };
 
   return (
-    <>
-      <div className="w-full">
-        <section className="f-hero-section">
-          <div className="title-list">LIST MOVIE OF THE WEEK</div>
-          <div className="title-slogan">
-            Experience the Magic of Cinema: Book Your Tickets Today
-          </div>
-        </section>
+    <div className="flex w-full flex-col gap-8">
+      {/* Hero Section */}
+      <section className="relative flex h-96 flex-col items-start justify-center bg-[url('/avengers.png')] px-12 after:absolute after:inset-0 after:bg-black/70">
+        <div className="relative z-20 text-lg font-semibold text-[#FFFFFF]">
+          LIST MOVIE OF THE WEEK
+        </div>
+        <div className="relative z-20 text-5xl font-normal text-[#FFFFFF]">
+          Experience the Magic of Cinema: Book Your Tickets Today
+        </div>
+      </section>
 
-        {/* Main */}
-        <div className="flex flex-col items-center">
-          <div className="f-search-bar">
-            <div className="f-search-key">
-              <label htmlFor="keyword">Cari Event</label>
-              <input type="text" id="keyword" placeholder="New Born Expert" />
+      {/* Main */}
+      <div className="flex flex-col items-center gap-10">
+        {/* Cari Event dan Filter */}
+        <div className="flex flex-col gap-8 md:flex-row">
+          <div className="flex items-center gap-8">
+            <label
+              htmlFor="keyword"
+              className="text-lg font-medium text-[#4E4B66]"
+            >
+              Cari Event
+            </label>
+            <div className="flex h-16 items-center gap-5 rounded-md border-[1px] border-[#DEDEDE] px-3">
+              <img src="/search.png" alt="" />
+              <input
+                className="outline-0"
+                type="text"
+                id="keyword"
+                placeholder="New Born Expert"
+              />
             </div>
-            <div className="f-select-filter">
-              <div className="title-filter">Filter</div>
-              <div className="f-filter-list">
-                <button>Thriller</button>
-                <button>Horror</button>
-                <button>Romantic</button>
-                <button>Adventure</button>
-                <button>Sci-Fi</button>
-              </div>
-            </div>
           </div>
-
-          {/* Grid Movie List */}
-          <div className="grid grid-cols-2 md:grid-cols-4">
-            {loading ? (
-              <div>Loading...</div>
-            ) : (
-              movies.map((movie) => (
-                <div className="f-singular-movie" key={movie.id}>
-                  <div className="container-image-poster">
-                    <img
-                      width="264px"
-                      src={movie.src}
-                      alt={movie.title}
-                      onClick={(e) => {
-                        e.preventDefault();
-                      }}
-                    />
-                    <div className="hover-link">
-                      {/* <a href="../pages/details.html">Details</a> */}
-                      {/* <a href="../pages/details.html">Buy Ticket</a> */}
-                    </div>
-                  </div>
-                  <h3>{movie.title}</h3>
-                  <div className="genres">
-                    <ul>
-                      {movie.genres.slice(0, 2).map((genre) => (
-                        <li key={genre}>{genre}</li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* <!-- Page Navigation --> */}
-          <div className="flex gap-2">
-            {[1, 2, 3].map((pageNumber, idx) => {
-              return (
-                <span
+          <div className="flex items-center gap-8">
+            <div className="text-lg font-medium text-[#4E4B66]">Filter</div>
+            <div className="flex gap-4">
+              {btnFilter.map((el, idx) => (
+                <div
                   key={idx}
-                  className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#2563EB] p-5 text-[#FFFFFF]"
-                  onClick={() => {
-                    // Logika paginasi
-                    setSearchParams((searchParams) => {
-                      if (searchParams.has("page")) {
-                        searchParams.set("page", pageNumber);
-                      } else {
-                        searchParams.append("page", pageNumber);
-                      }
-                      return searchParams;
-                    });
-                  }}
+                  className="flex items-center"
+                  onClick={() => handleFilterClick(el.name)}
                 >
-                  {pageNumber}
-                </span>
-              );
-            })}
-            <button className="btn-blue btn-arrow">
-              <img src="../assets/icons/white-right-arrow.png" alt="" />
-            </button>
+                  <div
+                    className={`cursor-pointer rounded-lg px-5 py-2 text-sm ${
+                      checkedFilter.includes(el.name)
+                        ? "bg-[#1D4ED8] text-white"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    {el.text}
+                  </div>
+                  <input
+                    type="checkbox"
+                    id={el.name}
+                    name={el.name}
+                    checked={checkedFilter.includes(el.name)}
+                    onChange={() => {}}
+                    className="hidden"
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
+
+        {/* Grid Movie List */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          {loading ? (
+            <div>Loading...</div>
+          ) : (
+            movies.map((movie, idx) => <SingleMovie key={idx} movie={movie} />)
+          )}
+        </div>
+
+        {/* <!-- Page Navigation --> */}
+        <div className="flex gap-2">
+          {[1, 2, 3, "/white-right-arrow.png"].map((pageNumber, idx) =>
+            searchParams.get("page") == pageNumber ? (
+              <span
+                key={idx}
+                className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#2563EB] p-5 text-[#FFFFFF]"
+                onClick={() => {
+                  setSearchParams((searchParams) => {
+                    if (searchParams.has("page")) {
+                      searchParams.set("page", pageNumber);
+                    } else {
+                      searchParams.append("page", pageNumber);
+                    }
+                    return searchParams;
+                  });
+                }}
+              >
+                {pageNumber}
+              </span>
+            ) : typeof pageNumber === "string" ? (
+              // If it's a string then show an image
+              <span
+                key={idx}
+                className="relative flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#1D4ED8] p-5"
+              >
+                <img src={pageNumber} alt="Next" className="absolute h-4 w-4" />
+              </span>
+            ) : (
+              <span
+                key={idx}
+                className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#F9FAFB] p-5 text-[#A0A3BD]"
+                onClick={() => {
+                  setSearchParams((searchParams) => {
+                    if (searchParams.has("page")) {
+                      searchParams.set("page", pageNumber);
+                    } else {
+                      searchParams.append("page", pageNumber);
+                    }
+                    return searchParams;
+                  });
+                }}
+              >
+                {pageNumber}
+              </span>
+            ),
+          )}
+        </div>
       </div>
-    </>
+    </div>
   );
 }

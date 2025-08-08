@@ -1,154 +1,177 @@
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router";
+
+import fetchWithAuth from "../../utils/fetchWithAuth.jsx";
+import getGenreNameFromID from "../../utils/getGenreNameFromID.jsx";
+
+import Genres from "../../components/Genres";
+import SingleMovie from "../../components/SingleMovie.jsx";
+
 function Home() {
+  const [excitingMovies, setExcitingMovies] = useState([]);
+  const [upcomingMovies, setUpcomingMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const whyChooseUs = [
+    {
+      titile: "Guaranteed",
+      src: "/shield.png",
+      imageAlt: "Guaranteed Icon",
+      text: "Lorem ipsum dolor sit amet, consectetur adipis elit. Sit enim nec, proin faucibus nibh et sagittis a. Lacinia purus ac amet.",
+    },
+    {
+      titile: "Affordable",
+      src: "/check-circle-fill.png",
+      imageAlt: "Affordable Icon",
+      text: "Lorem ipsum dolor sit amet, consectetur adipis elit. Sit enim nec, proin faucibus nibh et sagittis a. Lacinia purus ac amet.",
+    },
+    {
+      titile: "24/7 Customer Support",
+      src: "/bubble-speech.png",
+      imageAlt: "24/7 Customer Support Icon",
+      text: "Lorem ipsum dolor sit amet, consectetur adipis elit. Sit enim nec, proin faucibus nibh et sagittis a. Lacinia purus ac amet.",
+    },
+  ];
+
+  useEffect(() => {
+    async function fetchExcitingMovies() {
+      try {
+        const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
+        const genresNamed = genresData.genres;
+
+        const urlMovies = `${import.meta.env.VITE_API_URL}/movie/popular`;
+        const moviesData = await fetchWithAuth(urlMovies);
+        const results = moviesData.results;
+
+        const excitingMovieList = results.map((movie) => {
+          return {
+            id: movie.id,
+            title: movie.original_title,
+            genres: getGenreNameFromID(movie.genre_ids, genresNamed),
+            src: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+          };
+        });
+
+        setExcitingMovies(excitingMovieList);
+      } catch (error) {
+        console.error("Error fetching exciting movies:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchExcitingMovies();
+
+    async function upcomingMovies() {
+      try {
+        const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
+        const genresNamed = genresData.genres;
+
+        const urlMovies = `${import.meta.env.VITE_API_URL}/movie/upcoming`;
+        const moviesData = await fetchWithAuth(urlMovies);
+        const results = moviesData.results;
+
+        const upcomingMovieList = results.map((movie) => {
+          return {
+            id: movie.id,
+            title: movie.original_title,
+            releaseDate: movie.release_date,
+            genres: getGenreNameFromID(movie.genre_ids, genresNamed),
+            src: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+          };
+        });
+
+        setUpcomingMovies(upcomingMovieList);
+      } catch (error) {
+        console.error("Error fetching exciting movies:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    upcomingMovies();
+  }, []);
+
   return (
-    <main>
+    <main className="flex flex-col items-center">
       {/* Hero Section */}
-      <section className="flex flex-col gap-8">
-        <div className="flex flex-col gap-8 items-center">
-          <div className="font-semibold text-lg text-[#1D4ED8]">
+      <section className="flex flex-col gap-8 md:w-9/10 md:flex-row md:justify-center">
+        <div className="flex flex-col items-center justify-center gap-8">
+          <div className="text-center text-lg font-semibold text-[#1D4ED8]">
             MOVIE TICKET PURCHASES #1 IN INDONESIA
           </div>
-          <div className="font-normal text-3xl text-center">
+          <div className="text-center text-3xl font-normal">
             Experience the Magic of Cinema: Book Your Tickets Today
           </div>
-          <div className="font-light text-[#A0A3BD] text-lg">
+          <div className="text-center text-lg font-light text-[#A0A3BD]">
             Sign up and get the ticket with a lot of discount
           </div>
         </div>
 
-        <section className="h-96 grid grid-cols-2 grid-rows-3 gap-2 ">
+        <section className="grid h-96 grid-cols-2 grid-rows-3 gap-2 md:w-1/3">
           <img
-            className="w-full h-full object-cover object-top row-span-1 col-span-1 rounded-t-4xl"
+            className="col-span-1 row-span-1 h-full w-full rounded-t-4xl object-cover object-top"
             src="/john-wick.png"
             alt="John Wick Poster"
           />
           <img
-            className="w-full h-full object-cover object-top row-span-2 col-span-1 row-start-1 row-end-3 col-start-2 rounded-t-4xl"
+            className="col-span-1 col-start-2 row-span-2 row-start-1 row-end-3 h-full w-full rounded-t-4xl object-cover object-top"
             src="/lion-king.png"
             alt="Lion King Poster"
           />
           <img
-            className="w-full h-full object-cover object-top row-span-2 col-span-1 row-start-2 col-start-1 rounded-b-4xl"
+            className="col-span-1 col-start-1 row-span-2 row-start-2 h-full w-full rounded-b-4xl object-cover object-top"
             src="/spiderman-poster.png"
             alt="Spiderman Poster"
           />
           <img
-            className="w-full h-full object-cover object-bottom row-span-1 col-span-1 row-start-3 col-start-2 rounded-b-4xl"
+            className="col-span-1 col-start-2 row-span-1 row-start-3 h-full w-full rounded-b-4xl object-cover object-bottom"
             src="/roblox.png"
             alt="Roblox Poster"
           />
         </section>
       </section>
 
-      {/*  */}
-      <section className="why-us">
-        <div>WHY CHOOSE US</div>
-        <div>Unleashing the Ultimate Movie Experience</div>
-        <div className="why-us-multi">
-          <span>
-            <span>
-              <img
-                src="../assets/icons/Shield Done.png"
-                alt="Shield Done Icon"
-              />
-            </span>
-            <div className="choose-us-reason">Guaranteed</div>
-            <p className="choose-us-p">
-              Lorem ipsum dolor sit amet, consectetur adipis elit. Sit enim nec,
-              proin faucibus nibh et sagittis a. Lacinia purus ac amet.
-            </p>
-          </span>
-          <span>
-            <span>
-              <img
-                src="../assets/icons/check-circle-fill.png"
-                alt="Shield Done Icon"
-              />
-            </span>
-            <div className="choose-us-reason">Affordable</div>
-            <p className="choose-us-p">
-              Lorem ipsum dolor sit amet, consectetur adipis elit. Sit enim nec,
-              proin faucibus nibh et sagittis a. Lacinia purus ac amet.
-            </p>
-          </span>
-          <span>
-            <span>
-              <img
-                src="../assets/icons/icons8-speech-bubble 1.png"
-                alt="Shield Done Icon"
-              />
-            </span>
-            <div className="choose-us-reason">24/7 Customer Support</div>
-            <p className="choose-us-p">
-              Lorem ipsum dolor sit amet, consectetur adipis elit. Sit enim nec,
-              proin faucibus nibh et sagittis a. Lacinia purus ac amet.
-            </p>
-          </span>
+      {/* Why Choose Us Section */}
+      <section className="flex flex-col items-center">
+        <div className="text-xl font-semibold text-[#1D4ED8]">
+          WHY CHOOSE US
+        </div>
+        <div className="text-center text-4xl font-light">
+          Unleashing the Ultimate Movie Experience
+        </div>
+        <div className="flex flex-col gap-8 md:flex-row">
+          {whyChooseUs.map((el, idx) => {
+            return (
+              <span key={idx} className="flex flex-col items-center gap-3">
+                <img
+                  className="rounded-full bg-[#1D4ED833] p-4"
+                  src={el.src}
+                  alt={el.imageAlt}
+                />
+
+                <div className="font-semibold text-[#18181B]">{el.titile}</div>
+                <p className="w-4/5 text-center text-lg font-light text-[#52525B]">
+                  {el.text}
+                </p>
+              </span>
+            );
+          })}
         </div>
       </section>
 
       {/* <!-- Exciting Movies --> */}
-      <section className="exciting-movies">
-        <div className="blue-18">MOVIES</div>
-        <div
-        // style="
-        //   display: flex;
-        //   flex-direction: column;
-        //   align-items: center;
-        //   margin-bottom: 12px;
-        // "
-        >
-          <div>Exciting Movies That Should Be Watched Today</div>
+      <section className="flex flex-col items-center">
+        <div className="font-semibold text-[#1D4ED8]">MOVIES</div>
+        <div className="text-4xl font-light">
+          Exciting Movies That Should Be Watched Today
         </div>
 
-        {/* <!-- Grid Movies --> */}
-        <div className="g-movie-list">
-          {/* <!-- Black Widow --> */}
-          <div className="f-singular-movie">
-            <img src="../assets/images/black-widow.png" alt="" />
-            <h3>Black Widow</h3>
-            <div className="genres">
-              <ul>
-                <li>Drama</li>
-                <li>Thriller</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* <!-- The Witches --> */}
-          <div className="f-singular-movie">
-            <img src="../assets/images/the-witches.png" alt="" />
-            <h3>The Witches</h3>
-            <div className="genres">
-              <ul>
-                <li>Comedy</li>
-                <li>Adventure</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* <!-- Tenet --> */}
-          <div className="f-singular-movie">
-            <img src="../assets/images/tenet.png" alt="" />
-            <h3>Tenet</h3>
-            <div className="genres">
-              <ul>
-                <li>Action</li>
-                <li>Sci-Fi</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* <!-- Spiderman --> */}
-          <div className="f-singular-movie">
-            <img src="../assets/images/spiderman-poster.png" alt="" />
-            <h3>Spiderman</h3>
-            <div className="genres">
-              <ul>
-                <li>Action</li>
-                <li>Adventure</li>
-              </ul>
-            </div>
-          </div>
+        {/* List of Exciting Movies */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4">
+          {excitingMovies.slice(0, 4).map((movie) => (
+            <SingleMovie key={movie.id} movie={movie} />
+          ))}
         </div>
 
         <div>
@@ -160,92 +183,19 @@ function Home() {
       </section>
 
       {/* <!-- Upcoming Movies --> */}
-      <section className="upcoming-movies">
-        <div className="blue-18">UPCOMING MOVIES</div>
-
-        <div className="f-exciting-arrow">
-          <div>Exciting Movie Coming Soon</div>
-          <span className="f-left-n-right">
-            <button className="left-arrow">
-              <img
-                src="../assets/icons/white-arrow-left.png"
-                alt="Arrow Left"
-              />
-            </button>
-            <button className="right-arrow">
-              <img
-                src="../assets/icons/white-arrow-right.png"
-                alt="Arrow Right"
-              />
-            </button>
-          </span>
+      <section className="flex flex-col items-center">
+        <div className="self-start font-semibold text-[#1D4ED8]">
+          UPCOMING MOVIES
+        </div>
+        <div className="self-start text-4xl font-light">
+          Exciting Movie Coming Soon
         </div>
 
-        {/* <!-- Grid Movies --> */}
-        <div className="g-movie-list">
-          {/* <!-- Black Widow --> */}
-          <div className="f-singular-movie">
-            <img src="../assets/images/black-widow.png" alt="" />
-            <h3>Black Widow</h3>
-            <div className="blue-18-bold">December 2024</div>
-            <div className="genres">
-              <ul>
-                <li>Drama</li>
-                <li>Thriller</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* <!-- The Witches --> */}
-          <div className="f-singular-movie">
-            <img src="../assets/images/the-witches.png" alt="" />
-            <h3>The Witches</h3>
-            <div className="blue-18-bold">January 2024</div>
-            <div className="genres">
-              <ul>
-                <li>Comedy</li>
-                <li>Adventure</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* <!-- Tenet --> */}
-          <div className="f-singular-movie">
-            <img src="../assets/images/tenet.png" alt="" />
-            <h3>Tenet</h3>
-            <div className="blue-18-bold">June 2024</div>
-            <div className="genres">
-              <ul>
-                <li>Action</li>
-                <li>Sci-Fi</li>
-              </ul>
-            </div>
-          </div>
-
-          {/* <!-- Spiderman --> */}
-          <div className="f-singular-movie">
-            <img src="../assets/images/spiderman-poster.png" alt="" />
-            <h3>Spiderman</h3>
-            <div className="blue-18-bold">March 2024</div>
-            <div className="genres">
-              <ul>
-                <li>Action</li>
-                <li>Adventure</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* <!-- Subscribe --> */}
-      <section className="subscribe">
-        <div className="subscribe-text">
-          <p>Subscribe to our newsletter</p>
-        </div>
-        <div className="subscribe-input">
-          <input type="text" placeholder="First Name" />
-          <input type="email" placeholder="Email address" />
-          <button className="subscribe-button">Subscribe Now</button>
+        {/* List of Upcoming Movies */}
+        <div className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4">
+          {upcomingMovies.slice(0, 4).map((movie) => (
+            <SingleMovie key={movie.id} movie={movie} />
+          ))}
         </div>
       </section>
     </main>
