@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router";
 
 export const ProfileHeader = ({ loc }) => {
   return (
@@ -6,9 +7,16 @@ export const ProfileHeader = ({ loc }) => {
       <span
         className={`${loc === "acc" ? "after:trans relative after:absolute after:w-full after:-translate-x-32 after:translate-y-12 after:border-b-2 after:border-blue-700" : ""}`}
       >
-        Account Settings
+        <Link to="/profile" className="cursor-pointer">
+          Account Settings
+        </Link>
       </span>
-      <span>Order History</span>
+
+      <span>
+        <Link to="/history" className="cursor-pointer">
+          Order History
+        </Link>
+      </span>
     </header>
   );
 };
