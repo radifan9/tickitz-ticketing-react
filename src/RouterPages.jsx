@@ -2,16 +2,17 @@ import { BrowserRouter, Routes, Route, Outlet } from "react-router";
 
 // Component
 import Navbar from "./components/Navbar.jsx";
+import NavbarAdmin from "./components/NavbarAdmin.jsx";
+
 import Footer from "./components/Footer.jsx";
 
 // Auth
 import PrivateRoute from "./utils/PrivateRoute.jsx";
 
 // Pages
-import SignUp from "./pages/SignUp/SignUp.jsx";
-import SignIn from "./pages/SignIn/SignIn.jsx";
-import HomeMovieList from "./pages/HomeMovieList/HomeMovieList.jsx";
-import OtherHome from "./pages/OtherHome.jsx";
+import SignUp from "./pages/Auth/SignUp/SignUp.jsx";
+import SignIn from "./pages/Auth//SignIn/SignIn.jsx";
+import MovieList from "./pages/MovieList/MovieList.jsx";
 import Subscribe from "./components/Subscribe.jsx";
 import Order from "./pages/Order/Order.jsx";
 import Home from "./pages/Home/Home.jsx";
@@ -19,6 +20,9 @@ import Payment from "./pages/Payment/Payment.jsx";
 import Profile from "./pages/Profile/Profile.jsx";
 import Details from "./pages/Details/Details.jsx";
 import Result from "./pages/Result/Result.jsx";
+import History from "./pages/History/History.jsx";
+import { AdminDashboard } from "./pages/AdminDashboard/AdminDashboard.jsx";
+import { AdminMovie } from "./pages/AdminMovie/AdminMovie.jsx";
 
 function RouterPages() {
   return (
@@ -28,13 +32,13 @@ function RouterPages() {
           {/* Home, movies selection */}
           <Route element={<RouteHomeLayout />}>
             <Route index element={<Home />} />
-            <Route>
-              <Route path="movies" element={<HomeMovieList />} />
-              <Route path="details" element={<Details />} />
-            </Route>
+            <Route path="movies" element={<MovieList />} />
+          </Route>
+          <Route path="details" element={<RouteDetailsLayout />}>
+            <Route index element={<Details />} />
           </Route>
 
-          {/* Sign Up and Sign In */}
+          {/* Auth: SignUp and SignIn */}
           <Route element={<RouteAuthLayout />}>
             <Route path="signup" element={<SignUp />} />
             <Route path="signin" element={<SignIn />} />
@@ -55,7 +59,15 @@ function RouterPages() {
           <Route element={<RouteProfile />}>
             {/* <PrivateRoute redirectTo={<SignIn />}> */}
             <Route path="profile" element={<Profile />} />
+            <Route path="history" element={<History />} />
             {/* </PrivateRoute> */}
+          </Route>
+
+          {/* Admin page */}
+          {/* admin prefix */}
+          <Route path="admin" element={<AdminLayout />}>
+            <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="movie" element={<AdminMovie />} />
           </Route>
         </Route>
       </Routes>
@@ -67,8 +79,25 @@ function RouteHomeLayout() {
   return (
     <main className="flex flex-col">
       <Navbar />
+      <InsideHomeLayout />
       <div className="flex flex-col gap-8 px-8">
-        <Outlet />
+        <Subscribe />
+        <Footer />
+      </div>
+    </main>
+  );
+}
+
+function InsideHomeLayout() {
+  return <Outlet />;
+}
+
+function RouteDetailsLayout() {
+  return (
+    <main className="flex flex-col">
+      <Navbar />
+      <Outlet />
+      <div className="flex flex-col gap-8 px-8">
         <Subscribe />
         <Footer />
       </div>
@@ -112,6 +141,17 @@ function RouteProfile() {
 
 function RouteAuthLayout() {
   return <Outlet />;
+}
+
+function AdminLayout() {
+  return (
+    <>
+      <NavbarAdmin />
+      <div className="flex flex-col items-center bg-[#f5f6f8]">
+        <Outlet />
+      </div>
+    </>
+  );
 }
 
 export default RouterPages;

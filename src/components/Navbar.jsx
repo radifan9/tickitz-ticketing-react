@@ -191,11 +191,13 @@ function Navbar() {
                       alt="Search Button"
                       className="h-6 w-6"
                     />
-                    <img
-                      src="/profile-pic-small.png"
-                      alt="Small Profile Picture"
-                      className="h-8 w-8"
-                    />
+                    <Link to="/profile">
+                      <img
+                        src="/profile-pic-small.png"
+                        alt="Small Profile Picture"
+                        className="h-8 w-8"
+                      />
+                    </Link>
                   </div>
                   {/* Mobile Logout Button */}
                   <button

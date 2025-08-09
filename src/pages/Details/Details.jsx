@@ -78,13 +78,13 @@ function Details() {
         alt="${movieDetails.title}"
       />
 
-      <section className="">
+      <section className="flex flex-col gap-8">
         {/* Movie Poster + Info */}
-        <div className="-mt-72 flex flex-col items-center md:flex-row">
+        <div className="-mt-60 flex flex-col items-center gap-4 md:flex-row">
           {/* Movie Image */}
           <img
             // width="550px"
-            className="aspect-6/7 rounded-2xl object-cover md:w-[30%]"
+            className="rounded-2xl object-cover md:aspect-6/7 md:w-[30%]"
             src={`https://image.tmdb.org/t/p/w500/${movie.posterPath}`}
             alt="${movieDetails.title}"
           />
