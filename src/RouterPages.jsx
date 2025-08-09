@@ -79,7 +79,7 @@ function RouteHomeLayout() {
   return (
     <main className="flex flex-col">
       <Navbar />
-      <InsideHomeLayout />
+        <InsideHomeLayout />
       <div className="flex flex-col gap-8 px-8">
         <Subscribe />
         <Footer />

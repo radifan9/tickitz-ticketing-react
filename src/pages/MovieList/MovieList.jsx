@@ -1,36 +1,56 @@
+// Library
 import React, { useEffect, useState } from "react";
-import { useSearchParams, Link } from "react-router";
+import { useSearchParams } from "react-router";
+import { useDebounce } from "use-debounce";
 
+// Utils
 import fetchWithAuth from "../../utils/fetchWithAuth.jsx";
 import getGenreNameFromID from "../../utils/getGenreNameFromID.jsx";
 
-import Genres from "../../components/Genres.jsx";
+// Components
 import SingleMovie from "../../components/SingleMovie.jsx";
+import { Pagination } from "./Pagination.jsx";
+
+// Variables
+const FILTER_BUTTONS = [
+  { text: "Thriller", name: "thriller" },
+  { text: "Horror", name: "horror" },
+  { text: "Romantic", name: "romantic" },
+];
+
+const PAGINATION_ITEMS = [1, 2, 3, "/white-right-arrow.png"];
 
 export default function MovieList() {
-  // variables
-  const btnFilter = [
-    { text: "Thriller", name: "thriller" },
-    { text: "Horror", name: "horror" },
-    { text: "Romantic", name: "romantic" },
-  ];
-
+  // State
   const [checkedFilter, setCheckedFilter] = useState([]);
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchKeyword, setSearchKeyword] = useState("");
   const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
+  const [debouncedValue] = useDebounce(searchKeyword, 1000);
 
-  useEffect(() => {
-    async function getMovieList() {
-      try {
-        const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
-        const genresNamed = genresData.genres;
+  // API Functions
+  async function getMovieList() {
+    try {
+      let urlMovies;
+      const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
+      const genresNamed = genresData.genres;
 
-        const urlMovies = `${import.meta.env.VITE_API_URL}/movie/now_playing?${searchParams.toString()}&language=en-US`;
-        const moviesData = await fetchWithAuth(urlMovies);
-        const results = moviesData.results;
+      // If there's no keyword in the filter
+      if (searchKeyword === "") {
+        urlMovies = `${import.meta.env.VITE_API_URL}/movie/now_playing?${searchParams.toString()}&language=en-US`;
+      } else if (searchKeyword !== "") {
+        const encodedKeyword = encodeURIComponent(debouncedValue);
+        urlMovies = `${import.meta.env.VITE_API_URL}/search/movie?query=${encodedKeyword}&include_adult=false&language=en-US&${searchParams.toString()}`;
+      }
 
-        const movieList = results.map((movie) => {
+      const moviesData = await fetchWithAuth(urlMovies);
+      const results = moviesData.results;
+
+      const movieList = results
+        // Sometimes there's a movie with no picture, skip if poster_path is null
+        .filter((movie) => movie.poster_path !== null)
+        .map((movie) => {
           return {
             id: movie.id,
             title: movie.original_title,
@@ -39,19 +59,22 @@ export default function MovieList() {
           };
         });
 
-        setMovies(movieList);
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
+      setMovies(movieList);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
     }
+  }
+
+  // Effets
+  useEffect(() => {
     getMovieList();
 
     // Jalankan useEffect jika terjadi perubahan di seachParams
-  }, [searchParams]);
+  }, [searchParams, debouncedValue]);
 
-  // Handler Function
+  // Event Handlers
   const handleFilterClick = (filterName) => {
     setCheckedFilter((prev) => {
       // If clicked genres already in array, remove it
@@ -80,6 +103,7 @@ export default function MovieList() {
       <div className="flex flex-col items-center gap-10">
         {/* Cari Event dan Filter */}
         <div className="flex flex-col gap-8 md:flex-row">
+          {/* Filter Keyword */}
           <div className="flex items-center gap-8">
             <label
               htmlFor="keyword"
@@ -90,17 +114,24 @@ export default function MovieList() {
             <div className="flex h-16 items-center gap-5 rounded-md border-[1px] border-[#DEDEDE] px-3">
               <img src="/search.png" alt="" />
               <input
+                name="keyword"
                 className="outline-0"
                 type="text"
                 id="keyword"
                 placeholder="New Born Expert"
+                value={searchKeyword}
+                onChange={(e) => {
+                  setSearchKeyword(() => e.target.value);
+                }}
               />
             </div>
           </div>
+
+          {/* Filter Genre */}
           <div className="flex items-center gap-8">
             <div className="text-lg font-medium text-[#4E4B66]">Filter</div>
             <div className="flex gap-4">
-              {btnFilter.map((el, idx) => (
+              {FILTER_BUTTONS.map((el, idx) => (
                 <div
                   key={idx}
                   className="flex items-center"
@@ -139,53 +170,11 @@ export default function MovieList() {
         </div>
 
         {/*  Page Navigation  */}
-        <div className="flex gap-2">
-          {[1, 2, 3, "/white-right-arrow.png"].map((pageNumber, idx) =>
-            searchParams.get("page") == pageNumber ? (
-              <span
-                key={idx}
-                className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#2563EB] p-5 text-[#FFFFFF]"
-                onClick={() => {
-                  setSearchParams((searchParams) => {
-                    if (searchParams.has("page")) {
-                      searchParams.set("page", pageNumber);
-                    } else {
-                      searchParams.append("page", pageNumber);
-                    }
-                    return searchParams;
-                  });
-                }}
-              >
-                {pageNumber}
-              </span>
-            ) : typeof pageNumber === "string" ? (
-              // If it's a string then show an image
-              <span
-                key={idx}
-                className="relative flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#1D4ED8] p-5"
-              >
-                <img src={pageNumber} alt="Next" className="absolute h-4 w-4" />
-              </span>
-            ) : (
-              <span
-                key={idx}
-                className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#F9FAFB] p-5 text-[#A0A3BD]"
-                onClick={() => {
-                  setSearchParams((searchParams) => {
-                    if (searchParams.has("page")) {
-                      searchParams.set("page", pageNumber);
-                    } else {
-                      searchParams.append("page", pageNumber);
-                    }
-                    return searchParams;
-                  });
-                }}
-              >
-                {pageNumber}
-              </span>
-            ),
-          )}
-        </div>
+        <Pagination
+          PAGINATION_ITEMS={PAGINATION_ITEMS}
+          searchParams={searchParams}
+          setSearchParams={setSearchParams}
+        />
       </div>
     </div>
   );

@@ -20,6 +20,7 @@ const formatReleaseDate = (dateString) => {
  * @returns {}
  */
 function SingleMovie({ movie }) {
+
   return (
     <div className="flex w-[300px] flex-col gap-1" key={movie.id}>
       <div className="group relative w-[300px]">
