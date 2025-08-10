@@ -16,7 +16,7 @@ const initialState = {
   movie: {
     // movieId: null,
     // movieTitle: null,
-    // image: null, // encoded in base64
+    // image: null, // url 
     // genres: null,
     // releaseDate: null,
     // directedBy: null,

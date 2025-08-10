@@ -1,15 +1,35 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router";
+import { convertDate } from "../../utils/convertDate";
 
-const paymentInfo = [
-  { title: "DATE & TIME", text: "Tuesday, 07 July 2020 at 02:00pm" },
-  { title: "MOVIE TITLE", text: "Spider-Man: Homecoming" },
-  { title: "CINEMA NAME", text: "Cineone21 Cinema" },
-  { title: "NUMBER OF TICKETS", text: "3 Pieces" },
-  { title: "TOTAL PAYMENT", text: "$30.00" },
-];
+// let paymentInfo = [
+//   { title: "DATE & TIME", text: "Tuesday, 07 July 2020 at 02:00pm" },
+//   { title: "MOVIE TITLE", text: "Spider-Man: Homecoming" },
+//   { title: "CINEMA NAME", text: "Cineone21 Cinema" },
+//   { title: "NUMBER OF TICKETS", text: "3 Pieces" },
+//   { title: "TOTAL PAYMENT", text: "$30.00" },
+// ];
 
 function Payment() {
+  // Redux
+  const movieState = useSelector((state) => state.movie);
+  const orderState = useSelector((state) => state.order);
+  const dispatch = useDispatch();
+
+  const [paymentInfo, setPaymentInfo] = useState([
+    {
+      title: "DATE & TIME",
+      text: `${convertDate(orderState.order.date)} at ${orderState.order.time}`,
+    },
+    { title: "MOVIE TITLE", text: `${movieState.movie.originalTitle}` },
+    { title: "CINEMA NAME", text: `${orderState.order.cinema}` },
+    {
+      title: "NUMBER OF TICKETS",
+      text: `${orderState.order.seats.length} Pieces`,
+    },
+    { title: "TOTAL PAYMENT", text: `$${orderState.order.totalPayment}.00` },
+  ]);
   const [selectedPayment, setSelectedPayment] = useState("");
   const [personalInfo, setPersonalInfo] = useState({
     fullName: "",
@@ -68,7 +88,6 @@ function Payment() {
     if (selectedPayment) {
       setShowModal(true);
       setIsMaskVisible(true);
-      // document.body.style.overflow = "hidden"; // Prevent scrolling when modal is open
     }
 
     console.log(errorInput);
@@ -138,7 +157,7 @@ function Payment() {
             <input
               className="mt-2 h-16 w-full rounded-md border border-[#DEDEDE] px-6 text-lg text-[#4E4B66]"
               type="text"
-              placeholder="Jonas El Rodriguez"
+              placeholder="Enter your name"
               name="fullName"
             />
           </div>
@@ -149,7 +168,7 @@ function Payment() {
             <input
               className="mt-2 h-16 w-full rounded-md border border-[#DEDEDE] px-6 text-lg text-[#4E4B66]"
               type="email"
-              placeholder="jonasrodri123@gmail.com"
+              placeholder="Enter your email"
               name="email"
             />
           </div>
@@ -160,7 +179,7 @@ function Payment() {
             <input
               className="mt-2 h-16 w-full rounded-md border border-[#DEDEDE] px-6 text-lg text-[#4E4B66]"
               type="tel"
-              placeholder="+62 | 81445687121"
+              placeholder="+62 | Enter Your Phone Number"
               name="phoneNumber"
             />
           </div>
@@ -173,7 +192,7 @@ function Payment() {
             {paymentMethods.map((method) => (
               <label
                 key={method.id}
-                className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-4 transition-all ${
+                className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-4 transition-all select-none ${
                   selectedPayment === method.id
                     ? "border-blue-600 bg-blue-50"
                     : "border-[#DEDEDE] bg-white hover:shadow-md"
@@ -187,11 +206,7 @@ function Payment() {
                   onChange={() => handlePaymentChange(method.id)}
                   className="hidden"
                 />
-                <img
-                  src={method.image}
-                  alt={method.name}
-                  className="h-auto w-full"
-                />
+                <img src={method.image} alt={method.name} className="" />
               </label>
             ))}
           </div>
@@ -222,14 +237,18 @@ function Payment() {
         <h2 className="mb-6 text-center text-2xl font-bold">Payment Info</h2>
         <div className="mb-6 flex items-center">
           <span className="text-sm text-[#8692A6]">No. Rekening Virtual :</span>
-          <span className="ml-auto font-bold">12321328913829724</span>
+          <span className="ml-auto font-bold">
+            {parseInt(Math.random() * 100000000000000)}
+          </span>
           <button className="ml-2 rounded border border-[#1D4ED8] px-3 py-1 text-sm text-[#1D4ED8]">
             Copy
           </button>
         </div>
         <div className="mb-6 flex items-center justify-between">
           <span className="text-sm text-[#8692A6]">Total Payment :</span>
-          <span className="text-lg font-bold text-[#1D4ED8]">$30.00</span>
+          <span className="text-lg font-bold text-[#1D4ED8]">
+            ${orderState.order.totalPayment}
+          </span>
         </div>
         <p className="mb-6 text-sm text-[#A0A3BD]">
           Pay this payment bill before it is due,

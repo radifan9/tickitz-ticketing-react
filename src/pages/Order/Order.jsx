@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router";
-import { format, parseISO } from "date-fns";
+
+// Utils
+import { convertDate } from "../../utils/convertDate";
 
 // --- Components
 import Genres from "../../components/Genres";
@@ -137,8 +139,11 @@ function Order() {
 
     const convertedSeats = selectedSeats.map((seat) => seatConverter(seat));
 
-    dispatch(addSeats({ convertedSeats }));
+    dispatch(addSeats({ seats: convertedSeats }));
     dispatch(addTotalPayment({ totalPayment }));
+
+    console.log("--- Order State di Order");
+    console.log(orderState);
 
     // Navigate to payment page
     navigate("/payment");
@@ -147,8 +152,7 @@ function Order() {
   // --- --- Effects
   // Effect when component is loaded
   useEffect(() => {
-    const dateObject = parseISO(orderState.order.date);
-    const formattedDate = format(dateObject, "EEEE, dd MMMM yyyy");
+    const formattedDate = convertDate(orderState.order.date);
 
     setPaymentInfo((prev) =>
       prev.map((item, idx) =>

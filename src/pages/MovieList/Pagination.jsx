@@ -31,7 +31,7 @@ export const Pagination = ({
             key={idx}
             className="relative flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#1D4ED8] p-5"
             onClick={() => {
-              setSearchParams((now) => {
+              setSearchParams(() => {
                 if (searchParams.has("page")) {
                   const pageNow = searchParams.get("page");
                   searchParams.set("page", parseInt(pageNow) + 1);

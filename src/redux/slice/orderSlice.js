@@ -11,6 +11,7 @@ const initialState = {
     cityLocation: null,
     cinema: null,
     seats: null,
+    totalPayment: null,
   },
 };
 
@@ -29,16 +30,18 @@ const orderSlice = createSlice({
   name: "order",
   reducers: {
     addOrder: (state, { payload }) => {
-      console.log("Payload dari order");
-      console.log(payload);
       state.order = payload;
     },
 
     addSeats: (state, { payload }) => {
-      state.order.seats = payload;
+      state.order.seats = payload.seats;
+    },
+
+    addTotalPayment: (state, { payload }) => {
+      state.order.totalPayment = payload.totalPayment;
     },
   },
 });
 
 export default orderSlice.reducer;
-export const { addOrder, addSeats } = orderSlice.actions;
+export const { addOrder, addSeats, addTotalPayment } = orderSlice.actions;

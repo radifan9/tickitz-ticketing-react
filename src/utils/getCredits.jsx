@@ -6,7 +6,7 @@ function getCredits(rawCredits) {
     castList.push(el.original_name);
   });
 
-  return castList;
+  return {castList};
 }
 
 export default getCredits;

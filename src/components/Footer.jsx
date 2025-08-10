@@ -96,7 +96,7 @@ function Footer() {
         </span>
       </div>
 
-      <div className="text-[#6E7191]">
+      <div className="md:ml-28 text-[#6E7191]">
         © 2020 Tickitz. All Rights Reserved.
       </div>
     </footer>

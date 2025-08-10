@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 // --- Redux actions
 import { movieActions } from "../../redux/slice/movieSlice";
 import { addOrder } from "../../redux/slice/orderSlice";
+import Genres from "../../components/Genres";
 
 // --- Constants
 const CINEMA_LIST = [
@@ -52,7 +53,6 @@ function Details() {
   const movieState = useSelector((state) => state.movie);
 
   // --- --- Effects
-
   // Fetch movie data when component mounts
   useEffect(() => {
     dispatch(movieActions.getMovieThunk({ movieId: id }));
@@ -112,11 +112,10 @@ function Details() {
 
                 {/* <!-- Genres --> */}
                 <div className="genres md:self-start">
-                  <ul className="flex gap-4">
-                    {movieState.movie.genres.map((el, idx) => {
-                      return <li key={idx}>{el}</li>;
-                    })}
+                  <ul className="flex flex-wrap items-center gap-2">
+                    <Genres genres={movieState.movie.genres} />
                   </ul>
+                 
                 </div>
 
                 {/* <!-- About Movie --> */}

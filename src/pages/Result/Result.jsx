@@ -2,19 +2,19 @@ import React from "react";
 
 function Result() {
   return (
-    <div className="flex justify-between bg-stone-200">
+    <div className="flex flex-col md:flex-row justify-between bg-[#f5f5f5]">
       {/* Left Side */}
-      <div className="relative z-0 flex flex-col items-start justify-center gap-6 bg-[url('/avengers.png')] px-[124px]">
+      <div className="relative z-0 py-40 flex flex-col items-center md:items-start justify-center gap-6 bg-[url('/avengers.png')] px-[124px]">
         {/* Logo */}
-        <img src="../assets/images/tickitz-white.png" alt="" />
+        <img className="h-16" src="/tickitz-white.png" alt="" />
 
         {/* Thank */}
-        <h1 className="text-5xl font-bold text-white">
+        <h1 className="text-5xl font-bold text-center md:text-left text-white">
           Thankyou For Purchasing
         </h1>
 
         {/* Paragraf */}
-        <p className="text-2xl font-normal text-white/70">
+        <p className="text-2xl font-normal text-center md:text-left text-white/70">
           Lorem ipsum dolor sit amet consectetur. Quam pretium pretium tempor
           integer sed magna et.
         </p>
@@ -42,9 +42,9 @@ function Result() {
           {/* Horizontal line and circles */}
           <div className="relative mb-6 w-full border-b border-[#dedede]">
             {/* Left circle */}
-            <div className="absolute -bottom-3 left-0 h-6 w-6 -translate-x-1/2 rounded-full bg-stone-200"></div>
+            <div className="absolute -bottom-3 left-0 h-6 w-6 -translate-x-1/2 rounded-full bg-[#f5f5f5]"></div>
             {/* Right circle */}
-            <div className="absolute right-0 -bottom-3 h-6 w-6 translate-x-1/2 rounded-full bg-stone-200"></div>
+            <div className="absolute right-0 -bottom-3 h-6 w-6 translate-x-1/2 rounded-full bg-[#f5f5f5]"></div>
           </div>
 
           {/* Ticket Information (Grid) */}

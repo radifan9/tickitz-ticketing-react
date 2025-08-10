@@ -93,14 +93,14 @@ function Home() {
   }, []);
 
   return (
-    <main className="flex flex-col items-center">
+    <main className="mt-12 flex flex-col items-center gap-8 px-8">
       {/* Hero Section */}
-      <section className="flex flex-col gap-8 md:w-9/10 md:flex-row md:justify-center">
-        <div className="flex flex-col items-center justify-center gap-8">
-          <div className="text-center text-lg font-semibold text-[#1D4ED8]">
+      <section className="flex flex-col gap-8 md:w-9/10 md:flex-row md:justify-center md:px-72">
+        <div className="flex flex-col items-center justify-center gap-8 md:items-start">
+          <div className="text-center text-2xl font-semibold text-[#1D4ED8] md:text-lg">
             MOVIE TICKET PURCHASES #1 IN INDONESIA
           </div>
-          <div className="text-center text-3xl font-normal">
+          <div className="text-center text-4xl font-normal md:text-3xl">
             Experience the Magic of Cinema: Book Your Tickets Today
           </div>
           <div className="text-center text-lg font-light text-[#A0A3BD]">
@@ -133,7 +133,7 @@ function Home() {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="flex flex-col items-center">
+      <section className="flex flex-col items-center gap-8 md:px-72">
         <div className="text-xl font-semibold text-[#1D4ED8]">
           WHY CHOOSE US
         </div>
@@ -161,9 +161,9 @@ function Home() {
       </section>
 
       {/* <!-- Exciting Movies --> */}
-      <section className="flex flex-col items-center">
-        <div className="font-semibold text-[#1D4ED8]">MOVIES</div>
-        <div className="text-4xl font-light">
+      <section className="flex flex-col items-center gap-4">
+        <div className="text-xl font-semibold text-[#1D4ED8]">MOVIES</div>
+        <div className="text-center text-4xl font-light">
           Exciting Movies That Should Be Watched Today
         </div>
 
@@ -183,8 +183,8 @@ function Home() {
       </section>
 
       {/* <!-- Upcoming Movies --> */}
-      <section className="flex flex-col items-center">
-        <div className="self-start font-semibold text-[#1D4ED8]">
+      <section className="mb-8 flex flex-col items-center gap-4">
+        <div className="self-start text-xl font-semibold text-[#1D4ED8]">
           UPCOMING MOVIES
         </div>
         <div className="self-start text-4xl font-light">

@@ -90,7 +90,7 @@ export default function MovieList() {
   return (
     <div className="flex w-full flex-col gap-8">
       {/* Hero Section */}
-      <section className="relative flex h-96 flex-col items-start justify-center bg-[url('/avengers.png')] px-12 after:absolute after:inset-0 after:bg-black/70">
+      <section className="relative flex h-96 flex-col items-start justify-center bg-[url('/avengers.png')] px-12 after:absolute after:inset-0 after:bg-black/70 md:px-72 bg-cover bg-center">
         <div className="relative z-20 text-lg font-semibold text-[#FFFFFF]">
           LIST MOVIE OF THE WEEK
         </div>

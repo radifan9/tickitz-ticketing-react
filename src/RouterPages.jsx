@@ -25,7 +25,6 @@ import { AdminDashboard } from "./pages/AdminDashboard/AdminDashboard.jsx";
 import { AdminMovie } from "./pages/AdminMovie/AdminMovie.jsx";
 
 // Lib
-import { Toaster, toast } from "sonner";
 
 function RouterPages() {
   return (
@@ -125,7 +124,9 @@ function RouteResultLayout() {
     <>
       <Navbar />
       <Outlet />
-      <Footer />
+      <div className="px-8 py-4 md:px-72">
+        <Footer />
+      </div>
     </>
   );
 }
