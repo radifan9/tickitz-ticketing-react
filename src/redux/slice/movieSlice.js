@@ -44,16 +44,14 @@ const getMovieThunk = createAsyncThunk(
       // Get Movie Details
       const movieData = await fetchWithAuth(urlMovie);
       const movieDetails = getDetails(movieData);
-      // setMovie(movieDetails);
       Object.assign(obj, movieDetails);
 
       // Get Credits Information
       const movieCredits = await fetchWithAuth(urlCredits);
       const creditsInfo = getCredits(movieCredits);
-      // setCredits(creditsInfo);
       Object.assign(obj, creditsInfo);
 
-      console.log(obj);
+      // console.log(obj);
       return obj;
     } catch (err) {
       // const error = new Error(
@@ -99,6 +97,7 @@ const movieSlice = createSlice({
         state.error = null;
       })
       .addCase(getMovieThunk.fulfilled, (state, { payload }) => {
+        state.movie = payload;
         state.isLoading = false;
         state.isSuccess = true;
       })

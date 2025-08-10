@@ -1,16 +1,18 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 
-//
+// Slice
 import movieReducer from "./slice/movieSlice";
+import orderReducer from "./slice/orderSlice";
+
 import {
   persistStore,
   persistReducer,
+  PERSIST,
+  REHYDRATE,
+  REGISTER,
   FLUSH,
   PAUSE,
-  PERSIST,
   PURGE,
-  REGISTER,
-  REHYDRATE,
 } from "redux-persist";
 
 import storage from "redux-persist/lib/storage";
@@ -25,6 +27,7 @@ const persistedReducer = persistReducer(
   persistConfig,
   combineReducers({
     movie: movieReducer,
+    order: orderReducer,
   }),
 );
 
