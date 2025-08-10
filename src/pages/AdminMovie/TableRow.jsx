@@ -10,22 +10,24 @@ export const TableRow = ({
 }) => {
   return (
     <tr className="">
-      <td>{idx + 1}</td>
-      <td>
+      <td className="px-5 py-2 text-center text-sm">{idx + 1}</td>
+      <td className="px-5 py-2 text-center text-sm">
         <img
-          className="h-10 w-10 rounded-xl object-cover"
+          className="mx-auto h-10 w-10 rounded-xl object-cover"
           src={thumbnail}
           alt={movieName}
         />
       </td>
-      <td>{movieName}</td>
-      <td>{cat}</td>
-      <td>{releasedDate}</td>
-      <td>{duration}</td>
-      <td className="flex gap-1">
-        <img src="/action-view.png" alt="" />
-        <img src="/action-edit.png" alt="" />
-        <img src="/action-delete.png" alt="" />
+      <td className="px-5 py-2 text-center text-sm">{movieName}</td>
+      <td className="px-5 py-2 text-center text-sm">{cat}</td>
+      <td className="px-5 py-2 text-center text-sm">{releasedDate}</td>
+      <td className="px-5 py-2 text-center text-sm">{duration}</td>
+      <td className="gap-1 px-5 py-2 text-center text-sm">
+        <div className="flex items-center justify-center gap-1">
+          <img src="/action-view.png" alt="view" />
+          <img src="/action-edit.png" alt="edit" />
+          <img src="/action-delete.png" alt="delete" />
+        </div>
       </td>
     </tr>
   );

@@ -29,12 +29,12 @@ export const AdminMovie = () => {
   return (
     <div className="mt-8 mb-12 flex w-fit flex-col items-center justify-center rounded-3xl bg-white pt-6 pr-14 pb-6 pl-14">
       {/* Header */}
-      <div className="grid w-full grid-cols-2 items-center md:grid-cols-3 md:justify-start">
+      <div className="grid w-full grid-cols-2 items-center md:flex md:gap-3">
         {/* Title */}
         <h1 className="text-2xl font-medium text-[#14142B]">List Movie</h1>
 
         {/* Filter */}
-        <span className="col-span-2 row-start-2 flex h-14 w-2/3 items-center justify-center gap-2 rounded-lg bg-[#EFF0F6] md:col-span-1 md:col-start-2 md:row-start-1">
+        <span className="col-span-2 row-start-2 flex h-14 w-fit items-center justify-center gap-2 rounded-lg bg-[#EFF0F6] px-6 md:ml-auto">
           <img src="/calender.png" alt="" />
           <select name="" id="">
             <option value="">Juni 2025</option>
@@ -44,44 +44,60 @@ export const AdminMovie = () => {
         </span>
 
         {/* Button */}
-        <button className="h-10 w-fit cursor-pointer rounded-md bg-[#1D4ED8] px-8 text-base text-white">
+        <button className="h-14 w-fit cursor-pointer rounded-md bg-[#1D4ED8] px-8 text-base text-white">
           + Add
         </button>
       </div>
 
       {/* Table */}
-      <table className="">
-        {/* Table Head */}
-        <thead>
-          <tr className="">
-            <th className="text-sm font-medium text-[#1F4173]">No</th>
-            <th className="text-sm font-medium text-[#1F4173]">Thumbnail</th>
-            <th className="text-sm font-medium text-[#1F4173]">Movie Name</th>
-            <th className="text-sm font-medium text-[#1F4173]">Category</th>
-            <th className="text-sm font-medium text-[#1F4173]">
-              Released Date
-            </th>
-            <th className="text-sm font-medium text-[#1F4173]">Duration</th>
-            <th className="text-sm font-medium text-[#1F4173]"> Action</th>
-          </tr>
-        </thead>
+      <div className="w-full overflow-x-scroll">
+        <table className="w-min-[56rem] table-fixed">
+          {/* Table Head */}
+          <thead>
+            <tr className="">
+              <th className="px-5 py-2 text-center text-sm font-medium text-[#1F4173]">
+                No
+              </th>
 
-        {/* Table Body */}
-        <tbody className="">
-          {listMovie.map((movie, idx) => {
-            return (
-              <TableRow
-                idx={idx}
-                thumbnail={movie.thumbnail}
-                movieName={movie.movieName}
-                cat={movie.cat}
-                releasedDate={movie.releasedDate}
-                duration={movie.duration}
-              />
-            );
-          })}
-        </tbody>
-      </table>
+              <th className="px-5 py-2 text-center text-sm font-medium text-[#1F4173]">
+                Thumbnail
+              </th>
+              <th className="px-5 py-2 text-center text-sm font-medium text-[#1F4173]">
+                Movie Name
+              </th>
+              <th className="px-5 py-2 text-center text-sm font-medium text-[#1F4173]">
+                Category
+              </th>
+              <th className="px-5 py-2 text-center text-sm font-medium text-[#1F4173]">
+                Released Date
+              </th>
+              <th className="px-5 py-2 text-center text-sm font-medium text-[#1F4173]">
+                Duration
+              </th>
+              <th className="px-5 py-2 text-center text-sm font-medium text-[#1F4173]">
+                {" "}
+                Action
+              </th>
+            </tr>
+          </thead>
+
+          {/* Table Body */}
+          <tbody className="">
+            {listMovie.map((movie, idx) => {
+              return (
+                <TableRow
+                  idx={idx}
+                  thumbnail={movie.thumbnail}
+                  movieName={movie.movieName}
+                  cat={movie.cat}
+                  releasedDate={movie.releasedDate}
+                  duration={movie.duration}
+                />
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* Pagination */}
       <div></div>
