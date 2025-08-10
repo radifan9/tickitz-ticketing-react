@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 
-// Redux actions
+// --- Redux actions
 import { movieActions } from "../../redux/slice/movieSlice";
 import { addOrder } from "../../redux/slice/orderSlice";
 
-// Constants
+// --- Constants
 const CINEMA_LIST = [
   {
     name: "ebv",
@@ -33,24 +33,36 @@ const LOCATION_OPTIONS = [
   { value: "surabaya", label: "Surabaya" },
 ];
 
+// --- MAIN COMPONENT
 function Details() {
-  // Hooks
+  // --- --- State & Hooks
   const [selectedCinema, setSelectedCinema] = useState();
   const [cinemaPagination, _] = useState(1);
   const [searchParams] = useSearchParams();
-  const id = searchParams.get("id");
-  let navigate = useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // Redux Thunk
+  // Get movie ID from search params and redirect if missing
+  const id = searchParams.get("id");
+  if (id === null) {
+    navigate("/movies");
+  }
+
+  // --- --- Redux state
+  const movieState = useSelector((state) => state.movie);
+
+  // --- --- Effects
+
+  // Fetch movie data when component mounts
   useEffect(() => {
-    dispatch(movieActions.getMovieThunk());
+    dispatch(movieActions.getMovieThunk({ movieId: id }));
   }, []);
 
-  // Handler function
+  // Handle form submission for booking tickets
   function handleSubmit(e) {
     e.preventDefault();
 
-    // Add form data to redux
+    // Add form data to redux store
     dispatch(
       addOrder({
         movieId: id,
@@ -61,13 +73,9 @@ function Details() {
       }),
     );
 
-    // Go to order page
+    // Navigate to order page
     navigate("/order");
   }
-
-  // Redux
-  const dispatch = useDispatch();
-  const movieState = useSelector((state) => state.movie);
 
   return (
     <main className="flex flex-col items-center">
@@ -86,7 +94,7 @@ function Details() {
             <div className="absolute inset-0 bg-black/50" />
           </div>
 
-          <section className="relative mb-8 flex flex-col gap-8 px-8 md:px-52">
+          <section className="relative mb-8 flex flex-col gap-8 px-8 md:px-72">
             {/* Movie Poster + Info */}
             <div className="-mt-80 flex flex-col items-center gap-4 md:-mt-60 md:flex-row">
               {/* Movie Image */}
@@ -159,7 +167,9 @@ function Details() {
               className="flex flex-col items-center gap-8"
               onSubmit={handleSubmit}
             >
-              <h2 className="text-3xl font-light">Book Tickets</h2>
+              <h2 className="text-3xl font-light md:self-start">
+                Book Tickets
+              </h2>
               <div className="grid w-full grid-cols-2 gap-x-6 gap-y-2 md:grid-cols-4">
                 {/* Choose Date */}
                 <span className="flex flex-col gap-2">

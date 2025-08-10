@@ -24,6 +24,9 @@ import History from "./pages/History/History.jsx";
 import { AdminDashboard } from "./pages/AdminDashboard/AdminDashboard.jsx";
 import { AdminMovie } from "./pages/AdminMovie/AdminMovie.jsx";
 
+// Lib
+import { Toaster, toast } from "sonner";
+
 function RouterPages() {
   return (
     <BrowserRouter>
@@ -80,7 +83,7 @@ function RouteHomeLayout() {
     <main className="flex flex-col">
       <Navbar />
       <InsideHomeLayout />
-      <div className="flex flex-col gap-8 px-8">
+      <div className="flex flex-col gap-8 px-8 md:px-72">
         <Subscribe />
         <Footer />
       </div>
@@ -97,7 +100,7 @@ function RouteDetailsLayout() {
     <main className="flex flex-col">
       <Navbar />
       <Outlet />
-      <div className="flex flex-col gap-8 px-8 md:px-52">
+      <div className="flex flex-col gap-8 px-8 md:px-72">
         <Subscribe />
         <Footer />
       </div>
@@ -109,7 +112,7 @@ function RouteOrderLayout() {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center bg-[#A0A3BD33] px-8 py-4">
+      <div className="flex flex-col items-center bg-[#A0A3BD33] px-8 py-4 md:px-72">
         <Outlet />
       </div>
       <Footer />

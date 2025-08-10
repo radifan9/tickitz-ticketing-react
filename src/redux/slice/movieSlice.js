@@ -1,5 +1,4 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { useSearchParams } from "react-router";
 
 //
 import fetchWithAuth from "../../utils/fetchWithAuth";
@@ -11,8 +10,6 @@ import getCredits from "../../utils/getCredits";
 
 // const urlMovie = `${import.meta.env.VITE_API_URL}/movie/${id}`;
 // const urlCredits = `${import.meta.env.VITE_API_URL}/movie/${id}/credits`;
-const urlMovie = `${import.meta.env.VITE_API_URL}/movie/1106289`;
-const urlCredits = `${import.meta.env.VITE_API_URL}/movie/1106289/credits`;
 
 // Movie information
 const initialState = {
@@ -37,8 +34,17 @@ const initialState = {
 
 const getMovieThunk = createAsyncThunk(
   "movie/get_data",
-  async (_, { rejectWithValue }) => {
+  async ({ movieId }, { rejectWithValue }) => {
     try {
+      const urlMovie = `${import.meta.env.VITE_API_URL}/movie/${movieId}`;
+      const urlCredits = `${import.meta.env.VITE_API_URL}/movie/${movieId}/credits`;
+
+      console.log("movieId");
+      console.log(movieId);
+
+      console.log(`urlMovie`);
+      console.log(urlMovie);
+
       const obj = {};
 
       // Get Movie Details
@@ -66,27 +72,6 @@ const getMovieThunk = createAsyncThunk(
 const movieSlice = createSlice({
   initialState,
   name: "movie",
-  // reducers: {
-  //   addMovie: (state, { payload }) => {
-  //     Object.assign(state.movie, {
-  //       movieId: payload.movieId,
-  //       movieTitle: payload.movieTitle,
-  //       image: payload.image, // encoded in base64
-  //       genres: payload.genres,
-  //       releaseDate: payload.releaseDate,
-  //       directedBy: payload.directedBy,
-  //       duration: payload.duration,
-  //       casts: payload.casts,
-  //       synopsis: payload.synopsis,
-  //     });
-  //   },
-
-  //   removeMovie: (state, { _ }) => {
-  //     Object.assign(state.movie, {
-  //       initialState,
-  //     });
-  //   },
-  // },
 
   extraReducers: (builder) =>
     builder
