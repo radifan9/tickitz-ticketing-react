@@ -65,7 +65,7 @@ function Navbar() {
     <>
       {activeUser ? (
         // When there's a user
-        <header className="relative z-50 flex items-center px-8 py-4 md:px-16">
+        <header className="relative z-50 flex items-center px-8 py-4 md:px-16 shadow-sm">
           <img className="" src="/tickitz-blue.png" alt="" />
           <nav className="ml-auto">
             <ul className="hidden gap-16 text-sm md:flex">
@@ -118,7 +118,7 @@ function Navbar() {
         </header>
       ) : (
         // When there's no user
-        <header className="relative z-50 flex items-center px-8 py-4 md:px-16">
+        <header className="relative z-50 flex items-center px-8 py-4 md:px-16 shadow-sm">
           <img className="" src="/tickitz-blue.png" alt="" />
           <nav className="ml-auto">
             <ul className="hidden gap-16 text-sm md:flex">

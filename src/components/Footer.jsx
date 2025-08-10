@@ -41,10 +41,10 @@ function Footer() {
   ];
 
   return (
-    <footer className="flex flex-col gap-10">
-      <div className="flex flex-col gap-10 items-start md:flex-row">
+    <footer className="flex flex-col gap-10 md:mt-12">
+      <div className="flex flex-col items-start gap-8 md:flex-row md:justify-evenly">
         {/* Slogan */}
-        <span className="font-light text-[#6E7191] text-sm ">
+        <span className="text-sm font-light text-[#6E7191]">
           <img src="/tickitz-blue.png" alt="" />
           <div>Stop waiting in line. Buy tickets</div>
           <div>conveniently, watch movies quietly.</div>
@@ -52,7 +52,7 @@ function Footer() {
 
         {/* Explore Link */}
         <span className="flex flex-col gap-4">
-          <div className="font-medium text-base">Explore</div>
+          <div className="text-base font-medium">Explore</div>
           <ul className="grid grid-cols-4 gap-x-14 gap-y-2 md:grid-cols-1">
             {exploreList.map((el, idx) => {
               return (
@@ -66,8 +66,8 @@ function Footer() {
 
         {/* Sponsor List */}
         <span className="flex flex-col gap-4">
-          <div className="font-medium text-base">Our Sponsor</div>
-          <ul className="grid grid-cols-3 gap-x-14 gap-y-2 items-center  md:grid-cols-1">
+          <div className="text-base font-medium">Our Sponsor</div>
+          <ul className="grid grid-cols-3 items-center gap-x-14 gap-y-2 md:grid-cols-1">
             {sponsorList.map((el, idx) => {
               return (
                 <li key={idx}>
@@ -80,14 +80,14 @@ function Footer() {
 
         {/* Follow Us */}
         <span className="flex flex-col gap-4">
-          <div className="font-medium text-base">Follow us</div>
-          <ul className="grid grid-cols-4 gap-x-8 gap-y-2  md:grid-cols-1 text-[#6E7191]">
+          <div className="text-base font-medium">Follow us</div>
+          <ul className="grid grid-cols-4 gap-x-8 gap-y-2 text-[#6E7191] md:grid-cols-1">
             {followUsList.map((el, idx) => {
               return (
                 <li key={idx}>
                   <a className="flex gap-6" href={el.link}>
                     <img src={el.src} alt="Youtube" />
-                    <span className="hidden md:inline ">{el.text}</span>
+                    <span className="hidden md:inline">{el.text}</span>
                   </a>
                 </li>
               );
@@ -96,7 +96,9 @@ function Footer() {
         </span>
       </div>
 
-      <div className="text-[#6E7191]">© 2020 Tickitz. All Rights Reserved.</div>
+      <div className="text-[#6E7191]">
+        © 2020 Tickitz. All Rights Reserved.
+      </div>
     </footer>
   );
 }

@@ -1,15 +1,62 @@
-import React, { useState } from "react";
-import { Navigate, useLocation, useNavigate } from "react-router";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router";
+import { format, parseISO } from "date-fns";
+
+// --- Components
 import Genres from "../../components/Genres";
 
+// --- Redux actions
+import { addSeats, addTotalPayment } from "../../redux/slice/orderSlice";
+
+// --- CONSTANTS
+const TICKET_PRICE = 10;
+
+const SEATING_KEY = [
+  { text: "Available", color: "#D6D8E7" },
+  { text: "Selected", color: "#1D4ED8" },
+  { text: "Love nest", color: "#F589D7" },
+  { text: "Sold", color: "#6E7191" },
+];
+
+const SEAT_ROWS = ["A", "B", "C", "D", "E", "F", "G"];
+
+// --- Utility functions
+
 /**
- *
+ * Convert seat ID to readable seat notation ("seat-0" -> "A1")
+ * @param {string} id - Seat ID in format "seat-X"
+ * @returns {string|null} - Seat notation like "A1" or null if invalid
+ */
+function seatConverter(id) {
+  // id: "seat-0" to "seat-97"
+  const seatNum = parseInt(id.replace("seat-", ""), 10);
+  let row, col;
+
+  if (seatNum >= 0 && seatNum < 49) {
+    // First grid: A1 to G7
+    row = SEAT_ROWS[Math.floor(seatNum / 7)];
+    col = (seatNum % 7) + 1;
+  } else if (seatNum >= 49 && seatNum < 98) {
+    // Second grid: A8 to G14
+    row = SEAT_ROWS[Math.floor((seatNum - 49) / 7)];
+    col = ((seatNum - 49) % 7) + 8;
+  } else {
+    return null;
+  }
+
+  return `${row}${col}`;
+}
+
+// --- Components
+
+/**
+ * Individual seat component with selection functionality
  * @param {Object} props
- * @param {any} props.id
- * @param {string} props.name
- * @param {(e: Event) => void} props.onChange
- * @param {string[]} props.selectedSeats
- * @returns
+ * @param {string} props.id - Unique identifier for the seat
+ * @param {string} props.name - Name attribute for the seat input
+ * @param {string[]} props.selectedSeats - Array of currently selected seats
+ * @param {Function} props.onChange - Callback function when seat selection changes
  */
 function Seat({ id, name, selectedSeats, onChange }) {
   return (
@@ -31,65 +78,95 @@ function Seat({ id, name, selectedSeats, onChange }) {
   );
 }
 
-function seatConverter(id) {
-  // id: "seat-0" to "seat-97"
-  const seatNum = parseInt(id.replace("seat-", ""), 10);
-  const rows = ["A", "B", "C", "D", "E", "F", "G"];
-  let row, col;
-
-  if (seatNum >= 0 && seatNum < 49) {
-    // First grid: A1 to G7
-    row = rows[Math.floor(seatNum / 7)];
-    col = (seatNum % 7) + 1;
-  } else if (seatNum >= 49 && seatNum < 98) {
-    // Second grid: A8 to G14
-    row = rows[Math.floor((seatNum - 49) / 7)];
-    col = ((seatNum - 49) % 7) + 8;
-  } else {
-    return null;
-  }
-
-  return `${row}${col}`;
-}
-
-const seatingKey = [
-  { text: "Available", color: "#D6D8E7" },
-  { text: "Selected", color: "#1D4ED8" },
-  { text: "Love nest", color: "#F589D7" },
-  { text: "Sold", color: "#6E7191" },
-];
-
+// --- MAIN COMPONENTS
 function Order() {
+  // --- --- State
   const genres = ["Drama", "Thriller"];
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [paymentInfo, setPaymentInfo] = useState([
-    ["Movie selected", "Spider-Man: Homecoming"],
+    ["Movie selected", ""],
     ["Tuesday, 07 July 2020", "13:00pm"],
-    ["One ticket price", "$10"],
-    ["Seat choosed", "C4, C5, C6"],
+    ["One ticket price", `$${TICKET_PRICE}`],
+    ["Seat choosed", ""],
   ]);
-  let navigate = useNavigate();
+  const [totalPayment, setTotalPayment] = useState("0");
 
-  function handleSubmit(event) {
-    event.preventDefault();
+  // --- --- Hooks
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // --- --- Redux state
+  const movieState = useSelector((state) => state.movie);
+  const orderState = useSelector((state) => state.order);
+
+  /*
+   *  Update movie information in payment details
+   */
+  function updateOrderMovie() {
+    setPaymentInfo((prevInfo) => {
+      return prevInfo.map((item) =>
+        item[0] === "Movie selected"
+          ? ["Movie selected", movieState.movie.originalTitle]
+          : item,
+      );
+    });
+  }
+
+  /*
+   * Update selected seats information in payment details
+   */
+  function updateSeatInfo() {
     const convertedSeats = selectedSeats.map((seat) => seatConverter(seat));
-    const seatString = convertedSeats.join(", ");
+    const seatString = convertedSeats.sort().join(", ");
 
-    // Update paymentInfo with the new seat information
     setPaymentInfo((prevInfo) => {
       return prevInfo.map((item) =>
         item[0] === "Seat choosed" ? ["Seat choosed", seatString] : item,
       );
     });
+  }
 
-    console.log(convertedSeats);
+  // --- --- Event Handlers
+
+  /**
+   * Handle form submission for checkout
+   * @param {Event} event - Form submit event
+   */
+  function handleSubmit(event) {
+    event.preventDefault();
+
+    const convertedSeats = selectedSeats.map((seat) => seatConverter(seat));
+
+    dispatch(addSeats({ convertedSeats }));
+    dispatch(addTotalPayment({ totalPayment }));
+
+    // Navigate to payment page
     navigate("/payment");
   }
 
-  const location = useLocation();
-  const data = location.state;
-  console.log(`Data yang ditangkap : `);
-  console.log(data);
+  // --- --- Effects
+  // Effect when component is loaded
+  useEffect(() => {
+    const dateObject = parseISO(orderState.order.date);
+    const formattedDate = format(dateObject, "EEEE, dd MMMM yyyy");
+
+    setPaymentInfo((prev) =>
+      prev.map((item, idx) =>
+        idx === 1 ? [formattedDate, orderState?.order?.time] : item,
+      ),
+    );
+  }, []);
+
+  // Effect when selectedSeats changed
+  useEffect(() => {
+    updateOrderMovie();
+    updateSeatInfo();
+
+    // Update total price
+    setTotalPayment(() => {
+      return selectedSeats.length * 10;
+    });
+  }, [selectedSeats]);
 
   return (
     <main>
@@ -114,182 +191,173 @@ function Order() {
       </div>
 
       {/* <!-- Order Page --> */}
-      <section className="mb-8 flex flex-col gap-8">
+      <form
+        onSubmit={handleSubmit}
+        className="mb-8 grid gap-8 md:grid-cols-[3fr_2fr]"
+      >
         {/* <!-- Left Side --> */}
-        <span className="flex flex-col items-center gap-8">
+        <span className="flex w-full flex-col gap-8 rounded-md bg-white px-20 py-8">
           {/* <!-- Top Information --> */}
-          <div className="flex flex-col items-center gap-5 rounded-lg border-[1px] border-[#DEDEDE] px-3.5 py-8">
+          <div className="grid items-center gap-5 rounded-lg border-[1px] border-[#DEDEDE] px-3.5 py-8 md:grid-cols-[2fr_3fr_1fr]">
             {/*  Movie Poster  */}
             <img
-              className="aspect-[1.6/1] w-full rounded-lg object-cover object-bottom"
-              src="src/assets/images/dune.jpg"
+              className="aspect-[1.6/1] w-full rounded-lg object-cover object-top"
+              src={`https://image.tmdb.org/t/p/w500/${movieState.movie.posterPath}`}
               alt=""
             />
             {/*  Information  */}
-            <span className="flex flex-col items-center gap-4">
+            <span className="flex flex-col items-center gap-4 md:items-start">
               <div className="text-xl font-semibold">
-                Spider-Man: Homecoming
+                {movieState.movie.originalTitle}
               </div>
               {/*  Genres  */}
               <ul className="flex gap-2.5">{<Genres genres={genres} />}</ul>
 
               <div className="font-normal text-[#121212]">
-                Regular - {data.time}
+                Regular - {orderState.order.time}
               </div>
             </span>
 
             {/* <!-- Change Button --> */}
-            <button className="rounded-2xl bg-[#1D4ED833] px-6 py-1 text-[#1D4ED8]">
+            <button className="rounded-md bg-[#1D4ED8] px-6 py-1 text-white md:w-fit md:self-end">
               Change
             </button>
           </div>
 
+          {/* Choose Your Seat Text */}
           <div className="self-start text-xl font-medium text-[#14142B]">
             Choose Your Seat
           </div>
 
           {/*  Choose seat buttons  */}
-          <div className="flex w-5/6 flex-col items-center gap-8">
+          <div className="flex w-full flex-col items-center gap-4">
             <div>Screen</div>
-            <div className="h-1.5 w-2/3 rounded-md bg-[#9570FE]"></div>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-10">
-              <div className="">
-                <div className="flex gap-12">
-                  <div className="grid grid-cols-7 grid-rows-3 gap-1">
-                    {(function () {
-                      const result = [];
-                      for (let i = 0; i < 49; i++) {
-                        result.push(
-                          <Seat
-                            key={`seat-${i}`}
-                            id={`seat-${i}`}
-                            name={`seat-${i}`}
-                            selectedSeats={selectedSeats}
-                            onChange={(e) => {
-                              setSelectedSeats((selectedSeats) => {
-                                // Cek apakah selectedSeat sudah terpilih
-                                if (selectedSeats.includes(e.target.name)) {
-                                  return selectedSeats.filter(
-                                    (seat) => seat !== e.target.name,
-                                  );
-                                }
-                                return [...selectedSeats, e.target.name];
-                              });
-                            }}
-                          />,
-                        );
-                      }
-                      return result;
-                    })()}
-                  </div>
-                  <div className="grid grid-cols-7 grid-rows-3 gap-1">
-                    {(function () {
-                      const result = [];
-                      for (let i = 49; i < 98; i++) {
-                        result.push(
-                          <Seat
-                            key={i}
-                            id={i}
-                            name={`seat-${i}`}
-                            selectedSeats={selectedSeats}
-                            onChange={(e) => {
-                              setSelectedSeats((selectedSeats) => {
-                                // Cek apakah selectedSeat sudah terpilih
-                                if (selectedSeats.includes(e.target.name)) {
-                                  return selectedSeats.filter(
-                                    (seat) => seat !== e.target.name,
-                                  );
-                                }
-                                return [...selectedSeats, e.target.name];
-                              });
-                            }}
-                          />,
-                        );
-                      }
-                      return result;
-                    })()}
-                  </div>
+            <div className="h-1.5 w-97/100 rounded-md bg-[#9570FE]"></div>
+            <div className="flex w-full flex-col gap-10">
+              <div className="flex justify-between">
+                <div className="grid grid-cols-7 grid-rows-3 gap-1">
+                  {(function () {
+                    const result = [];
+                    for (let i = 0; i < 49; i++) {
+                      result.push(
+                        <Seat
+                          key={`seat-${i}`}
+                          id={`seat-${i}`}
+                          name={`seat-${i}`}
+                          selectedSeats={selectedSeats}
+                          onChange={(e) => {
+                            setSelectedSeats((selectedSeats) => {
+                              // Cek apakah selectedSeat sudah terpilih
+                              if (selectedSeats.includes(e.target.name)) {
+                                return selectedSeats.filter(
+                                  (seat) => seat !== e.target.name,
+                                );
+                              }
+                              return [...selectedSeats, e.target.name];
+                            });
+                            updateSeatInfo();
+                          }}
+                        />,
+                      );
+                    }
+                    return result;
+                  })()}
                 </div>
-
-                {/* Seating key */}
-                <h3 className="self-start text-lg font-semibold">
-                  Seating key
-                </h3>
-                <div className="grid grid-cols-2 gap-x-14 gap-y-4">
-                  <div className="flex items-center gap-6">
-                    <img src="/down-arrow.png" alt="" />
-                    <div className="text-xl font-normal text-[#4E4B66]">
-                      A - G
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-6">
-                    <img src="/right-arrow.png" alt="" />
-                    <div className="text-xl font-normal text-[#4E4B66]">
-                      1 - 14
-                    </div>
-                  </div>
-                  {seatingKey.map((key, idx) => {
-                    return (
-                      <div key={idx} className="flex items-center gap-6">
-                        <div
-                          className="h-8 w-8 rounded-md"
-                          style={{ backgroundColor: key.color }}
-                        ></div>
-                        <div className="text-xl font-normal text-[#4E4B66]">
-                          {key.text}
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="grid grid-cols-7 grid-rows-3 gap-1">
+                  {(function () {
+                    const result = [];
+                    for (let i = 49; i < 98; i++) {
+                      result.push(
+                        <Seat
+                          key={i}
+                          id={i}
+                          name={`seat-${i}`}
+                          selectedSeats={selectedSeats}
+                          onChange={(e) => {
+                            setSelectedSeats((selectedSeats) => {
+                              // Cek apakah selectedSeat sudah terpilih
+                              if (selectedSeats.includes(e.target.name)) {
+                                return selectedSeats.filter(
+                                  (seat) => seat !== e.target.name,
+                                );
+                              }
+                              return [...selectedSeats, e.target.name];
+                            });
+                          }}
+                        />,
+                      );
+                    }
+                    return result;
+                  })()}
                 </div>
-
-                <button className="h-14 w-full rounded-2xl border-[1px] border-[#1D4ED8] text-lg font-medium text-[#1D4ED8]">
-                  Add new seat
-                </button>
               </div>
 
-              {/*  Right Side  */}
-              <span className="flex flex-col items-center">
-                <div className="flex w-4/5 flex-col gap-3 rounded-lg border-[1px] p-6">
-                  <img
-                    className="self-center"
-                    src="/CineOne21-fitted.png"
-                    alt=""
-                  />
-                  <h2 className="self-center text-2xl font-medium text-[#14142B]">
-                    CineOne21 Cinema
-                  </h2>
-                  <div className="flex flex-col gap-2">
-                    {paymentInfo.map((el, idx) => (
-                      <div className="flex justify-between" key={idx}>
-                        <span className="font-light text-[#6B6B6B]">
-                          {el[0]}
-                        </span>
-                        <span className="font-medium">{el[1]}</span>
-                      </div>
-                    ))}
-
-                    <div className="full-hr-line"></div>
-                    <div className="flex justify-between">
-                      <span className="text-lg font-medium">Total Payment</span>
-                      <span className="text-xl font-medium text-[#1D4ED8]">
-                        $30
-                      </span>
-                    </div>
+              {/* Seating key */}
+              <h3 className="self-start text-lg font-semibold">Seating key</h3>
+              <div className="grid grid-cols-2 gap-x-14 gap-y-4">
+                <div className="flex items-center gap-6">
+                  <img src="/down-arrow.png" alt="" />
+                  <div className="text-xl font-normal text-[#4E4B66]">
+                    A - G
                   </div>
                 </div>
-
-                <button
-                  className="h-14 w-full rounded-md bg-[#1D4ED8] font-bold text-[#F7F7FC]"
-                  type="submit"
-                >
-                  Checkout now
-                </button>
-              </span>
-            </form>
+                <div className="flex items-center gap-6">
+                  <img src="/right-arrow.png" alt="" />
+                  <div className="text-xl font-normal text-[#4E4B66]">
+                    1 - 14
+                  </div>
+                </div>
+                {SEATING_KEY.map((key, idx) => {
+                  return (
+                    <div key={idx} className="flex items-center gap-6">
+                      <div
+                        className="h-8 w-8 rounded-md"
+                        style={{ backgroundColor: key.color }}
+                      ></div>
+                      <div className="text-xl font-normal text-[#4E4B66]">
+                        {key.text}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </span>
-      </section>
+
+        {/*  Right Side (desktop)  */}
+        <span className="flex flex-col items-center gap-4">
+          <div className="flex w-full flex-col gap-3 rounded-md bg-white p-6 shadow-md">
+            <img className="self-center" src="/CineOne21-fitted.png" alt="" />
+            <h2 className="self-center text-2xl font-medium text-[#14142B]">
+              CineOne21 Cinema
+            </h2>
+            <div className="flex flex-col gap-2">
+              {paymentInfo.map((el, idx) => (
+                <div className="flex justify-between" key={idx}>
+                  <span className="font-light text-[#6B6B6B]">{el[0]}</span>
+                  <span className="font-medium">{el[1]}</span>
+                </div>
+              ))}
+
+              <div className="full-hr-line"></div>
+              <div className="flex justify-between">
+                <span className="text-lg font-medium">Total Payment</span>
+                <span className="text-xl font-medium text-[#1D4ED8]">
+                  ${totalPayment}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <button
+            className="h-14 w-full rounded-md bg-[#1D4ED8] font-bold text-[#F7F7FC] shadow-md"
+            type="submit"
+          >
+            Checkout now
+          </button>
+        </span>
+      </form>
     </main>
   );
 }

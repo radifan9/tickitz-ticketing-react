@@ -1,6 +1,6 @@
 function Subscribe() {
   return (
-    <section className="relative w-full px-8 pt-24 pb-32 bg-[#1D4ED8] rounded-2xl flex  flex-col items-center gap-8 after:absolute  after:border-8 after:w-48 after:h-48 after:rounded-full after:border-white after:right-0 after:bottom-0 after:translate-1/2">
+    <section className="relative w-full px-8 pt-24 pb-32 bg-[#1D4ED8] rounded-2xl flex  flex-col items-center gap-8 after:absolute  after:border-8 after:w-48 after:h-48 after:rounded-full after:border-white after:right-0 after:bottom-0 after:translate-1/2 overflow-hidden">
       <h2 className="text-white text-3xl">Subscribe to our newsletter</h2>
       <div className="text-white flex flex-col w-full gap-3 md:flex-row">
         <input
