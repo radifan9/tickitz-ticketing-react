@@ -1,5 +1,6 @@
 import React from "react";
 import { TableRow } from "./TableRow";
+import { useNavigate } from "react-router";
 
 const listMovie = [
   {
@@ -26,6 +27,8 @@ const listMovie = [
 ];
 
 export const AdminMovie = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="mt-8 mb-12 flex w-fit flex-col items-center justify-center rounded-3xl bg-white pt-6 pr-14 pb-6 pl-14">
       {/* Header */}
@@ -44,7 +47,12 @@ export const AdminMovie = () => {
         </span>
 
         {/* Button */}
-        <button className="h-14 w-fit cursor-pointer rounded-md bg-[#1D4ED8] px-8 text-base text-white">
+        <button
+          className="h-14 w-fit cursor-pointer rounded-md bg-[#1D4ED8] px-8 text-base text-white"
+          onClick={() => {
+            navigate("/admin/add");
+          }}
+        >
           + Add
         </button>
       </div>

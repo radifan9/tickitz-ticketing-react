@@ -23,6 +23,7 @@ import Result from "./pages/Result/Result.jsx";
 import History from "./pages/History/History.jsx";
 import { AdminDashboard } from "./pages/AdminDashboard/AdminDashboard.jsx";
 import { AdminMovie } from "./pages/AdminMovie/AdminMovie.jsx";
+import { AdminAddMovie } from "./pages/AdminAddMovie/AdminAddMovie.jsx";
 
 // Lib
 
@@ -70,6 +71,7 @@ function RouterPages() {
           <Route path="admin" element={<AdminLayout />}>
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="movie" element={<AdminMovie />} />
+            <Route path="add" element={<AdminAddMovie />} />
           </Route>
         </Route>
       </Routes>
@@ -151,7 +153,7 @@ function AdminLayout() {
   return (
     <>
       <NavbarAdmin />
-      <div className="flex flex-col items-center bg-[#f5f6f8]">
+      <div className="flex flex-col items-center bg-[#f5f6f8] px-8 md:px-72">
         <Outlet />
       </div>
     </>
