@@ -23,6 +23,25 @@ const SEATING_KEY = [
 
 const SEAT_ROWS = ["A", "B", "C", "D", "E", "F", "G"];
 
+const CINEMA_LIST = [
+  {
+    name: "ebv",
+    src: "/ebv-id.png",
+  },
+  {
+    name: "hiflix",
+    src: "/hiflix-red.png",
+  },
+  {
+    name: "CineOne21",
+    src: "/CineOne21-fitted.png",
+  },
+  {
+    name: "Cinepolis",
+    src: "/cinepolis.png",
+  },
+];
+
 // --- Utility functions
 
 /**
@@ -332,9 +351,19 @@ function Order() {
         {/*  Right Side (desktop)  */}
         <span className="flex flex-col items-center gap-4">
           <div className="flex w-full flex-col gap-3 rounded-md bg-white p-6 shadow-md">
-            <img className="self-center" src="/CineOne21-fitted.png" alt="" />
+            <img
+              className="self-center"
+              src={
+                CINEMA_LIST.find(
+                  (el) =>
+                    el.name.toLowerCase() ===
+                    String(orderState.order.cinema).toLowerCase(),
+                )?.src || "/CineOne21-fitted.png"
+              }
+              alt=""
+            />
             <h2 className="self-center text-2xl font-medium text-[#14142B]">
-              CineOne21 Cinema
+              {orderState.order.cinema}
             </h2>
             <div className="flex flex-col gap-2">
               {paymentInfo.map((el, idx) => (
