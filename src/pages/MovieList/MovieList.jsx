@@ -26,7 +26,9 @@ export default function MovieList() {
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchKeyword, setSearchKeyword] = useState("");
-  const [searchParams, setSearchParams] = useSearchParams({ page: 1 });
+  const [searchParams, setSearchParams] = useSearchParams({
+    page: 1,
+  });
   const [debouncedValue] = useDebounce(searchKeyword, 1000);
 
   // API Functions
@@ -38,9 +40,26 @@ export default function MovieList() {
 
       // If there's no keyword in the filter
       if (searchKeyword === "") {
+        setSearchParams((searchParams) => {
+          searchParams.delete("keyword");
+        });
+
+        // Fetch using now playing API
         urlMovies = `${import.meta.env.VITE_API_URL}/movie/now_playing?${searchParams.toString()}&language=en-US`;
       } else if (searchKeyword !== "") {
+        // Filter movie based on keyword
         const encodedKeyword = encodeURIComponent(debouncedValue);
+
+        // Set encoded keyword to search params
+        setSearchParams((searchParams) => {
+          if (searchParams.has("keyword")) {
+            searchParams.set("keyword", encodedKeyword);
+          } else {
+            searchParams.append("keyword", encodedKeyword);
+          }
+          return searchParams;
+        });
+
         urlMovies = `${import.meta.env.VITE_API_URL}/search/movie?query=${encodedKeyword}&include_adult=false&language=en-US&${searchParams.toString()}`;
       }
 
@@ -90,7 +109,7 @@ export default function MovieList() {
   return (
     <div className="flex w-full flex-col gap-8">
       {/* Hero Section */}
-      <section className="relative flex h-96 flex-col items-start justify-center bg-[url('/avengers.png')] px-12 after:absolute after:inset-0 after:bg-black/70 md:px-72 bg-cover bg-center">
+      <section className="relative flex h-96 flex-col items-start justify-center bg-[url('/avengers.png')] bg-cover bg-center px-12 after:absolute after:inset-0 after:bg-black/70 md:px-72">
         <div className="relative z-20 text-lg font-semibold text-[#FFFFFF]">
           LIST MOVIE OF THE WEEK
         </div>
