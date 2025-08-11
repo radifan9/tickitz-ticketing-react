@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import ListItem from "./ListItem";
 import { useEffect, useState } from "react";
 
@@ -13,6 +13,7 @@ function Navbar() {
   const [activeUser, setActiveUser] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const userFromStorage = window.localStorage.getItem("activeUser");
@@ -65,7 +66,7 @@ function Navbar() {
     <>
       {activeUser ? (
         // When there's a user
-        <header className="relative z-50 flex items-center px-8 py-4 md:px-16 shadow-sm">
+        <header className="relative z-50 flex items-center px-8 py-4 shadow-sm md:px-16">
           <img className="" src="/tickitz-blue.png" alt="" />
           <nav className="ml-auto">
             <ul className="hidden gap-16 text-sm md:flex">
@@ -99,6 +100,15 @@ function Navbar() {
               {isProfileDropdownOpen && (
                 <div className="absolute right-0 z-50 mt-2 w-48 rounded-md border border-gray-200 bg-white py-2 shadow-lg">
                   <button
+                    onClick={() => {
+                      // Go to profile
+                      navigate("/profile");
+                    }}
+                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
+                  >
+                    Profile
+                  </button>
+                  <button
                     onClick={handleLogout}
                     className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900"
                   >
@@ -118,7 +128,7 @@ function Navbar() {
         </header>
       ) : (
         // When there's no user
-        <header className="relative z-50 flex items-center px-8 py-4 md:px-16 shadow-sm">
+        <header className="relative z-50 flex items-center px-8 py-4 shadow-sm md:px-16">
           <img className="" src="/tickitz-blue.png" alt="" />
           <nav className="ml-auto">
             <ul className="hidden gap-16 text-sm md:flex">
