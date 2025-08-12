@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { movieActions } from "../../redux/slice/movieSlice";
 import { addOrder } from "../../redux/slice/orderSlice";
 import Genres from "../../components/Genres";
+import Loader from "../../components/Loader";
 
 // --- Constants
 const CINEMA_LIST = [
@@ -78,8 +79,10 @@ function Details() {
   }
 
   return (
-    <main className="flex flex-col items-center">
-      {movieState.isLoading && <div>Loading...</div>}
+    <main
+      className={`${movieState.isLoading ? "my-12 flex justify-center" : "flex flex-col items-center"}`}
+    >
+      {movieState.isLoading && <Loader />}
 
       {/* When movie is loaded */}
       {movieState?.isSuccess && (
