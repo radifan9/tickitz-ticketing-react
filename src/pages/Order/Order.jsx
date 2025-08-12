@@ -358,7 +358,7 @@ function Order() {
                   (el) =>
                     el.name.toLowerCase() ===
                     String(orderState.order.cinema).toLowerCase(),
-                )?.src || "/CineOne21-fitted.png"
+                )?.src
               }
               alt=""
             />

@@ -70,26 +70,77 @@ export default function MovieList() {
   }
 
   /**
+   * Updates URL search params for search query
+   * @param {string} encodedQuery - URL-encoded search query
+   */
+  const updateQueryInSearchParams = (encodedQuery) => {
+    // If empty, remove query param instead of setting it to empty string
+    if (!encodedQuery) {
+      setSearchParams((sp) => {
+        sp.delete("query");
+        return sp;
+      });
+      return;
+    }
+
+    setSearchParams((searchParams) => {
+      if (searchParams.has("query")) {
+        searchParams.set("query", encodedQuery);
+      } else {
+        searchParams.append("query", encodedQuery);
+      }
+      return searchParams;
+    });
+  };
+
+  /**
    * Removes specific parameter from search params
    * @param {string} paramName - Parameter name to remove
    */
   function removeFromSearchParams(paramName) {
-    console.log(`Removed param ${paramName}`);
+    // console.log(`Removed param ${paramName}`);
     setSearchParams((sp) => {
       sp.delete(paramName);
       return sp;
     });
-    console.log(`Param now ${searchParams.get(paramName)}`);
+    // console.log(`Param now ${searchParams.get(paramName)}`);
   }
 
-  // Recompute selected genre IDs whenever checkedFilter changes
-  useEffect(() => {
-    const ids = checkedFilter
-      .map((name) => FILTER_BUTTONS.find((g) => g.name === name)?.id)
-      .filter(Boolean)
-      .join(",");
-    setSelectedGenreIds(ids);
-  }, [checkedFilter]);
+  /**
+   * Constructs API URL based on current filters and search state
+   * @returns {string} API URL for fetching movies
+   */
+  const buildApiUrl = () => {
+    const baseUrl = import.meta.env.VITE_API_URL;
+    const searchParamsString = searchParams.toString();
+
+    // If there's a selected genres
+    if (selectedGenreIds) {
+      removeFromSearchParams("query");
+      updateGenresInSearchParams(selectedGenreIds);
+
+      // Discover
+      return `${baseUrl}/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${selectedGenreIds}&${searchParamsString}`;
+    }
+
+    // Default, if no search query or genre inputted
+    if (searchQuery === "") {
+      removeFromSearchParams("query");
+      removeFromSearchParams("genres");
+
+      // Now Playing
+      return `${baseUrl}/movie/now_playing?${searchParamsString}&language=en-US`;
+    }
+
+    // Search movies based on search query
+    if (searchQuery !== "") {
+      const encodedQuery = encodeURIComponent(debouncedValue);
+      updateQueryInSearchParams(encodedQuery);
+
+      // Search Query
+      return `${baseUrl}/search/movie?query=${encodedQuery}&include_adult=false&language=en-US&${searchParamsString}`;
+    }
+  };
 
   // --- --- API Functions
   /**
@@ -100,43 +151,14 @@ export default function MovieList() {
       // Every time try to fetch, set the isLoading to true
       setLoading(true);
 
-      let urlMovies;
+      // Fetch genres data
       const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
       const genresNamed = genresData.genres;
 
-      // If any genre filter is selected, disable query search and use discover endpoint
-      if (selectedGenreIds) {
-        removeFromSearchParams("query");
-        updateGenresInSearchParams(selectedGenreIds);
-
-        urlMovies = `${import.meta.env.VITE_API_URL}/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${selectedGenreIds}&${searchParams.toString()}`;
-      } else if (searchQuery === "") {
-        setSearchParams((searchParams) => {
-          searchParams.delete("query");
-        });
-
-        // Fetch using now playing API
-        urlMovies = `${import.meta.env.VITE_API_URL}/movie/now_playing?${searchParams.toString()}&language=en-US`;
-      } else if (searchQuery !== "") {
-        // Filter movie based on query
-        const encodedQuery = encodeURIComponent(debouncedValue);
-
-        // Set encoded query to search params
-        setSearchParams((searchParams) => {
-          if (searchParams.has("query")) {
-            searchParams.set("query", encodedQuery);
-          } else {
-            searchParams.append("query", encodedQuery);
-          }
-          return searchParams;
-        });
-
-        urlMovies = `${import.meta.env.VITE_API_URL}/search/movie?query=${encodedQuery}&include_adult=false&language=en-US&${searchParams.toString()}`;
-      }
-
+      // Build API URL and fetch movies
+      const urlMovies = buildApiUrl();
       const moviesData = await fetchWithAuth(urlMovies);
       const results = moviesData.results;
-
       const movieList = results
         // Sometimes there's a movie with no picture, skip if poster_path is null
         .filter((movie) => movie.poster_path !== null)
@@ -151,7 +173,7 @@ export default function MovieList() {
 
       setMovies(movieList);
     } catch (error) {
-      console.error(error);
+      console.error(`Error fetching movies: ${error}`);
     } finally {
       setLoading(false);
     }
@@ -176,10 +198,33 @@ export default function MovieList() {
   };
 
   // --- --- Effects
+
+  // Update selected genre IDs when filter changes
+  useEffect(() => {
+    const ids = checkedFilter
+      .map((name) => FILTER_BUTTONS.find((g) => g.name === name)?.id)
+      .filter(Boolean)
+      .join(",");
+    setSelectedGenreIds(ids);
+  }, [checkedFilter]);
+
+  // Update searchParams every debounced value changed
+  useEffect(() => {
+    const encodedQuery = encodeURIComponent((debouncedValue || "").trim());
+
+    if (!encodedQuery) {
+      removeFromSearchParams("query");
+      return; // prevent re-adding `query` with an empty value below
+    }
+
+    updateQueryInSearchParams(encodedQuery);
+  }, [debouncedValue]);
+
   // Fetch movies when search parameters, search query, or genres change
   useEffect(() => {
+    console.log(searchParams);
     getMovieList();
-  }, [searchParams, debouncedValue, selectedGenreIds]);
+  }, [searchParams, selectedGenreIds]);
 
   return (
     <div className="flex w-full flex-col gap-8">

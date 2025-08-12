@@ -93,17 +93,17 @@ function Home() {
   }, []);
 
   return (
-    <main className="mt-12 flex flex-col items-center gap-8 px-8">
+    <main className="mt-12 flex flex-col items-center gap-8 ">
       {/* Hero Section */}
       <section className="flex flex-col gap-8 md:w-9/10 md:flex-row md:justify-center md:px-72">
         <div className="flex flex-col items-center justify-center gap-8 md:items-start">
-          <div className="text-center text-2xl font-semibold text-[#1D4ED8] md:text-lg">
+          <div className="text-center text-2xl font-semibold text-[#1D4ED8] md:text-3xl">
             MOVIE TICKET PURCHASES #1 IN INDONESIA
           </div>
-          <div className="text-center text-4xl font-normal md:text-3xl">
+          <div className="text-center text-4xl font-normal md:text-left md:text-5xl">
             Experience the Magic of Cinema: Book Your Tickets Today
           </div>
-          <div className="text-center text-lg font-light text-[#A0A3BD]">
+          <div className="text-center text-lg md:text-xl font-light text-[#A0A3BD]">
             Sign up and get the ticket with a lot of discount
           </div>
         </div>

@@ -2,19 +2,19 @@ import React from "react";
 
 function Result() {
   return (
-    <div className="flex flex-col md:flex-row justify-between bg-[#f5f5f5]">
+    <div className="flex flex-col justify-between bg-[#f5f5f5] md:flex-row">
       {/* Left Side */}
-      <div className="relative z-0 py-40 flex flex-col items-center md:items-start justify-center gap-6 bg-[url('/avengers.png')] px-[124px]">
+      <div className="relative z-0 flex flex-col items-center justify-center gap-6 bg-[url('/avengers.png')] px-[124px] py-40 md:items-start">
         {/* Logo */}
         <img className="h-16" src="/tickitz-white.png" alt="" />
 
         {/* Thank */}
-        <h1 className="text-5xl font-bold text-center md:text-left text-white">
+        <h1 className="text-center text-5xl font-bold text-white md:text-left">
           Thankyou For Purchasing
         </h1>
 
         {/* Paragraf */}
-        <p className="text-2xl font-normal text-center md:text-left text-white/70">
+        <p className="text-center text-2xl font-normal text-white/70 md:text-left">
           Lorem ipsum dolor sit amet consectetur. Quam pretium pretium tempor
           integer sed magna et.
         </p>
@@ -48,7 +48,7 @@ function Result() {
           </div>
 
           {/* Ticket Information (Grid) */}
-          <div className="mb-5 grid grid-cols-2 gap-x-[60px] gap-y-6">
+          <div className="mb-5 ml-5 grid grid-cols-2 gap-x-[60px] gap-y-6">
             {/* Movie */}
             <div className="flex flex-col gap-1">
               <span className="text-xs font-semibold text-[#aaaaaa]">

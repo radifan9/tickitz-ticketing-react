@@ -5,24 +5,18 @@ import fetchWithAuth from "../../utils/fetchWithAuth";
 import getDetails from "../../utils/getDetails";
 import getCredits from "../../utils/getCredits";
 
-// const [searchParams] = useSearchParams();
-// const id = useSearchParams.get("id");
-
-// const urlMovie = `${import.meta.env.VITE_API_URL}/movie/${id}`;
-// const urlCredits = `${import.meta.env.VITE_API_URL}/movie/${id}/credits`;
-
 // Movie information
 const initialState = {
   movie: {
-    // movieId: null,
-    // movieTitle: null,
-    // image: null, // url 
-    // genres: null,
-    // releaseDate: null,
-    // directedBy: null,
-    // duration: null,
-    // casts: null,
-    // synopsis: null,
+    movieId: null,
+    movieTitle: null,
+    image: null, // url
+    genres: null,
+    releaseDate: null,
+    directedBy: null,
+    duration: null,
+    casts: null,
+    synopsis: null,
   },
 
   // status
@@ -39,12 +33,6 @@ const getMovieThunk = createAsyncThunk(
       const urlMovie = `${import.meta.env.VITE_API_URL}/movie/${movieId}`;
       const urlCredits = `${import.meta.env.VITE_API_URL}/movie/${movieId}/credits`;
 
-      console.log("movieId");
-      console.log(movieId);
-
-      console.log(`urlMovie`);
-      console.log(urlMovie);
-
       const obj = {};
 
       // Get Movie Details
@@ -54,10 +42,15 @@ const getMovieThunk = createAsyncThunk(
 
       // Get Credits Information
       const movieCredits = await fetchWithAuth(urlCredits);
+
+      // Get Director Name
+      const director = movieCredits.crew.find(
+        (element) => element.job === "Director",
+      ).name;
+
       const creditsInfo = getCredits(movieCredits);
       Object.assign(obj, creditsInfo);
 
-      // console.log(obj);
       return obj;
     } catch (err) {
       // const error = new Error(
@@ -101,7 +94,6 @@ const movieSlice = createSlice({
 export default movieSlice.reducer;
 
 // Export actions
-// export const { addMovie, removeMovie } = movieSlice.actions;
 export const movieActions = {
   ...movieSlice.actions,
   getMovieThunk,

@@ -5,7 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // Usefull in order & payment
 const initialState = {
   order: {
-    movieId: null,
+    movieId: null, // tidak perlu
     date: null,
     time: null,
     cityLocation: null,
