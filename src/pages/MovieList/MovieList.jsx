@@ -1,66 +1,137 @@
-// Library
+// --- Library
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useDebounce } from "use-debounce";
 
-// Utils
+// --- Utils
 import fetchWithAuth from "../../utils/fetchWithAuth.jsx";
 import getGenreNameFromID from "../../utils/getGenreNameFromID.jsx";
 
-// Components
+// --- Components
 import SingleMovie from "../../components/SingleMovie.jsx";
 import { Pagination } from "./Pagination.jsx";
+import Loader from "../../components/Loader.jsx";
 
-// Variables
+// --- Constants
 const FILTER_BUTTONS = [
-  { text: "Thriller", name: "thriller" },
-  { text: "Horror", name: "horror" },
-  { text: "Romantic", name: "romantic" },
+  { id: 28, name: "Action" },
+  { id: 12, name: "Adventure" },
+  { id: 16, name: "Animation" },
+  { id: 35, name: "Comedy" },
+  { id: 80, name: "Crime" },
+  { id: 99, name: "Documentary" },
+  { id: 18, name: "Drama" },
+  { id: 10751, name: "Family" },
+  { id: 14, name: "Fantasy" },
+  { id: 36, name: "History" },
+  { id: 27, name: "Horror" },
+  { id: 10402, name: "Music" },
+  { id: 9648, name: "Mystery" },
+  { id: 10749, name: "Romance" },
+  { id: 878, name: "Science Fiction" },
+  { id: 10770, name: "TV Movie" },
+  { id: 53, name: "Thriller" },
+  { id: 10752, name: "War" },
+  { id: 37, name: "Western" },
 ];
 
 const PAGINATION_ITEMS = [1, 2, 3, "/white-right-arrow.png"];
 
+// --- MAIN COMPONENT
 export default function MovieList() {
-  // State
+  // --- --- State Management
   const [checkedFilter, setCheckedFilter] = useState([]);
   const [movies, setMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [searchKeyword, setSearchKeyword] = useState("");
+  const [isLoading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchParams, setSearchParams] = useSearchParams({
     page: 1,
   });
-  const [debouncedValue] = useDebounce(searchKeyword, 1000);
+  const [debouncedValue] = useDebounce(searchQuery, 1000);
+  const [selectedGenreIds, setSelectedGenreIds] = useState("");
 
-  // API Functions
+  // --- --- Helper Functions
+  /**
+   * Updates URL search params for genres
+   * @param {string} genreIds - Comma-separated genre IDs
+   */
+  function updateGenresInSearchParams(genreIds) {
+    setSearchParams((searchParams) => {
+      if (searchParams.has("genres")) {
+        // If genres exists, replace existing value for genres
+        searchParams.set("genres", genreIds);
+      } else {
+        // If genres doesn't exists, add new genres param
+        searchParams.append("genres", genreIds);
+      }
+      // Returns updated params
+      return searchParams;
+    });
+  }
+
+  /**
+   * Removes specific parameter from search params
+   * @param {string} paramName - Parameter name to remove
+   */
+  function removeFromSearchParams(paramName) {
+    console.log(`Removed param ${paramName}`);
+    setSearchParams((sp) => {
+      sp.delete(paramName);
+      return sp;
+    });
+    console.log(`Param now ${searchParams.get(paramName)}`);
+  }
+
+  // Recompute selected genre IDs whenever checkedFilter changes
+  useEffect(() => {
+    const ids = checkedFilter
+      .map((name) => FILTER_BUTTONS.find((g) => g.name === name)?.id)
+      .filter(Boolean)
+      .join(",");
+    setSelectedGenreIds(ids);
+  }, [checkedFilter]);
+
+  // --- --- API Functions
+  /**
+   * Fetches movie list from API based on current filters and search parameters
+   */
   async function getMovieList() {
     try {
+      // Every time try to fetch, set the isLoading to true
+      setLoading(true);
+
       let urlMovies;
       const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
       const genresNamed = genresData.genres;
 
-      // If there's no keyword in the filter
-      if (searchKeyword === "") {
+      // If any genre filter is selected, disable query search and use discover endpoint
+      if (selectedGenreIds) {
+        removeFromSearchParams("query");
+        updateGenresInSearchParams(selectedGenreIds);
+
+        urlMovies = `${import.meta.env.VITE_API_URL}/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${selectedGenreIds}&${searchParams.toString()}`;
+      } else if (searchQuery === "") {
         setSearchParams((searchParams) => {
-          searchParams.delete("keyword");
+          searchParams.delete("query");
         });
 
         // Fetch using now playing API
         urlMovies = `${import.meta.env.VITE_API_URL}/movie/now_playing?${searchParams.toString()}&language=en-US`;
-      } else if (searchKeyword !== "") {
-        // Filter movie based on keyword
-        const encodedKeyword = encodeURIComponent(debouncedValue);
+      } else if (searchQuery !== "") {
+        // Filter movie based on query
+        const encodedQuery = encodeURIComponent(debouncedValue);
 
-        // Set encoded keyword to search params
+        // Set encoded query to search params
         setSearchParams((searchParams) => {
-          if (searchParams.has("keyword")) {
-            searchParams.set("keyword", encodedKeyword);
+          if (searchParams.has("query")) {
+            searchParams.set("query", encodedQuery);
           } else {
-            searchParams.append("keyword", encodedKeyword);
+            searchParams.append("query", encodedQuery);
           }
           return searchParams;
         });
 
-        urlMovies = `${import.meta.env.VITE_API_URL}/search/movie?query=${encodedKeyword}&include_adult=false&language=en-US&${searchParams.toString()}`;
+        urlMovies = `${import.meta.env.VITE_API_URL}/search/movie?query=${encodedQuery}&include_adult=false&language=en-US&${searchParams.toString()}`;
       }
 
       const moviesData = await fetchWithAuth(urlMovies);
@@ -86,14 +157,12 @@ export default function MovieList() {
     }
   }
 
-  // Effets
-  useEffect(() => {
-    getMovieList();
+  // --- --- Event Handlers
 
-    // Jalankan useEffect jika terjadi perubahan di seachParams
-  }, [searchParams, debouncedValue]);
-
-  // Event Handlers
+  /**
+   * Handles filter button clicks for genre selection
+   * @param {string} filterName - Name of the genre to toggle
+   */
   const handleFilterClick = (filterName) => {
     setCheckedFilter((prev) => {
       // If clicked genres already in array, remove it
@@ -105,6 +174,12 @@ export default function MovieList() {
       return [...prev, filterName];
     });
   };
+
+  // --- --- Effects
+  // Fetch movies when search parameters, search query, or genres change
+  useEffect(() => {
+    getMovieList();
+  }, [searchParams, debouncedValue, selectedGenreIds]);
 
   return (
     <div className="flex w-full flex-col gap-8">
@@ -121,26 +196,23 @@ export default function MovieList() {
       {/* Main */}
       <div className="flex flex-col items-center gap-10">
         {/* Cari Event dan Filter */}
-        <div className="flex flex-col gap-8 md:flex-row">
-          {/* Filter Keyword */}
+        <div className="flex w-2/3 flex-col gap-8 md:flex-row">
+          {/* Filter query */}
           <div className="flex items-center gap-8">
-            <label
-              htmlFor="keyword"
-              className="text-lg font-medium text-[#4E4B66]"
-            >
+            <label htmlFor="query" className="font-medium text-[#4E4B66]">
               Cari Event
             </label>
             <div className="flex h-16 items-center gap-5 rounded-md border-[1px] border-[#DEDEDE] px-3">
               <img src="/search.png" alt="" />
               <input
-                name="keyword"
+                name="query"
                 className="outline-0"
                 type="text"
-                id="keyword"
+                id="query"
                 placeholder="New Born Expert"
-                value={searchKeyword}
+                value={searchQuery}
                 onChange={(e) => {
-                  setSearchKeyword(() => e.target.value);
+                  setSearchQuery(() => e.target.value);
                 }}
               />
             </div>
@@ -148,8 +220,8 @@ export default function MovieList() {
 
           {/* Filter Genre */}
           <div className="flex items-center gap-8">
-            <div className="text-lg font-medium text-[#4E4B66]">Filter</div>
-            <div className="flex gap-4">
+            <div className="font-medium text-[#4E4B66]">Filter</div>
+            <div className="flex w-fit flex-wrap gap-1.5">
               {FILTER_BUTTONS.map((el, idx) => (
                 <div
                   key={idx}
@@ -163,7 +235,7 @@ export default function MovieList() {
                         : "bg-gray-200 text-gray-700"
                     }`}
                   >
-                    {el.text}
+                    {el.name}
                   </div>
                   <input
                     type="checkbox"
@@ -180,9 +252,11 @@ export default function MovieList() {
         </div>
 
         {/* Grid Movie List */}
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-          {loading ? (
-            <div>Loading...</div>
+        <div
+          className={`${isLoading ? "" : "grid grid-cols-2 gap-4 md:grid-cols-4"}`}
+        >
+          {isLoading ? (
+            <Loader />
           ) : (
             movies.map((movie, idx) => <SingleMovie key={idx} movie={movie} />)
           )}
