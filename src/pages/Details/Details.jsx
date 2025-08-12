@@ -115,7 +115,6 @@ function Details() {
                   <ul className="flex flex-wrap items-center gap-2">
                     <Genres genres={movieState.movie.genres} />
                   </ul>
-                 
                 </div>
 
                 {/* <!-- About Movie --> */}
@@ -128,7 +127,7 @@ function Details() {
                   </span>
                   <span>
                     <div className="font-light text-[#8692A6]">Directed by</div>
-                    <div className="">Jon Watss</div>
+                    <div className="">{movieState.movie.director}</div>
                   </span>
                   <span>
                     <div className="font-light text-[#8692A6]">Duration</div>

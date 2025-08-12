@@ -6,7 +6,12 @@ function getCredits(rawCredits) {
     castList.push(el.original_name);
   });
 
-  return {castList};
+  // Get director
+  const director = rawCredits.crew.find(
+    (element) => element.job === "Director",
+  ).name;
+
+  return { castList, director };
 }
 
 export default getCredits;

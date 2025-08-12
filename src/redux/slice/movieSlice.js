@@ -43,11 +43,6 @@ const getMovieThunk = createAsyncThunk(
       // Get Credits Information
       const movieCredits = await fetchWithAuth(urlCredits);
 
-      // Get Director Name
-      const director = movieCredits.crew.find(
-        (element) => element.job === "Director",
-      ).name;
-
       const creditsInfo = getCredits(movieCredits);
       Object.assign(obj, creditsInfo);
 
