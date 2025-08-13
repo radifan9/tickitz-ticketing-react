@@ -10,6 +10,7 @@ import Genres from "../../components/Genres";
 
 // --- Redux actions
 import { addSeats, addTotalPayment } from "../../redux/slice/orderSlice";
+import { toast } from "sonner";
 
 // --- CONSTANTS
 const TICKET_PRICE = 10;
@@ -155,6 +156,12 @@ function Order() {
    */
   function handleSubmit(event) {
     event.preventDefault();
+
+    // Validation, if there's no seat choosed
+    if (selectedSeats.length == 0) {
+      toast.error("Please choose a 💺 seat");
+      return;
+    }
 
     const convertedSeats = selectedSeats.map((seat) => seatConverter(seat));
 

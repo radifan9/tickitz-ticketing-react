@@ -23,6 +23,9 @@ function getDetails(rawData) {
   // releaseDate
   Object.assign(movieDetails, { releaseDate: rawData.release_date });
 
+  // runtime
+  Object.assign(movieDetails, { runtime: rawData.runtime });
+
   return movieDetails;
 }
 

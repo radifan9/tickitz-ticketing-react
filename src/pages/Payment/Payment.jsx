@@ -1,22 +1,35 @@
 import { useState, Fragment, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { convertDate } from "../../utils/convertDate";
 
-// let paymentInfo = [
-//   { title: "DATE & TIME", text: "Tuesday, 07 July 2020 at 02:00pm" },
-//   { title: "MOVIE TITLE", text: "Spider-Man: Homecoming" },
-//   { title: "CINEMA NAME", text: "Cineone21 Cinema" },
-//   { title: "NUMBER OF TICKETS", text: "3 Pieces" },
-//   { title: "TOTAL PAYMENT", text: "$30.00" },
-// ];
+// External Lib
+import { toast } from "sonner";
+import { addHistory } from "../../redux/slice/historySlice";
+import { v4 as uuidv4 } from "uuid";
+
+// Collect error messages and show them sequentially
+let messages = [];
+
+const PAYMENT_METHODS = [
+  { id: "gpay", name: "GPay", image: "/gpay.png" },
+  { id: "visa", name: "Visa", image: "/logos_visa.png" },
+  { id: "gopay", name: "Gopay", image: "/gopay.png" },
+  { id: "paypal", name: "Paypal", image: "/paypal.png" },
+  { id: "dana", name: "Dana", image: "/dana.png" },
+  { id: "bca", name: "BCA", image: "/bca.png" },
+  { id: "bri", name: "BRI", image: "/bri.png" },
+  { id: "ovo", name: "OVO", image: "/ovo.png" },
+];
 
 function Payment() {
-  // Redux
+  // --- Redux
   const movieState = useSelector((state) => state.movie);
   const orderState = useSelector((state) => state.order);
+  const historyState = useSelector((state) => state.history);
   const dispatch = useDispatch();
 
+  // --- State
   const [paymentInfo, setPaymentInfo] = useState([
     {
       title: "DATE & TIME",
@@ -38,58 +51,60 @@ function Payment() {
   });
   const [showModal, setShowModal] = useState(false);
   const [isMaskVisible, setIsMaskVisible] = useState(false);
-  const [errorInput, setErrorInput] = useState({
-    fullNameInputted: false,
-    correctEmailUsed: false,
-    phoneNumberStartWithCodeArea: false,
-  });
+  const navigate = useNavigate();
 
-  const paymentMethods = [
-    { id: "gpay", name: "GPay", image: "/gpay.png" },
-    { id: "visa", name: "Visa", image: "/logos_visa.png" },
-    { id: "gopay", name: "Gopay", image: "/gopay.png" },
-    { id: "paypal", name: "Paypal", image: "/paypal.png" },
-    { id: "dana", name: "Dana", image: "/dana.png" },
-    { id: "bca", name: "BCA", image: "/bca.png" },
-    { id: "bri", name: "BRI", image: "/bri.png" },
-    { id: "ovo", name: "OVO", image: "/ovo.png" },
-  ];
+  // Regex for validation
+  const nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
+  const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
+  const phoneRegex = /^(?:\+62|62|0)[2-9]\d{7,11}$/;
+  // source of regex : https://medium.com/@lelianto.eko/indonesian-usefull-regex-formatter-function-41e3c541fcb3
+
+  // Assume initialize with error first (true), then set to false if validation is passed
+  const [errorInput, setErrorInput] = useState({
+    incorrectFullName: true,
+    incorrectEmail: true,
+    incorrectPhoneNum: true,
+  });
 
   const handlePaymentChange = (paymentId) => {
     setSelectedPayment(paymentId);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Clicked Submit");
 
-    // Check if personal information is inputted
-    const fullName = e.target.fullName.value;
-    const email = e.target.email.value;
-    const phoneNumber = e.target.phoneNumber.value;
+    if (errorInput.incorrectFullName)
+      messages.push("Incorrect  Full Name is Inputted");
+    if (errorInput.incorrectEmail)
+      messages.push("Incorrect 📧 email is Inputted");
+    if (errorInput.incorrectPhoneNum)
+      messages.push("Incorrect 📱 phone number is Inputted");
 
-    // Validation
-    if (fullName !== "") {
-      // If there's a character inputted
-      setErrorInput((now) => {
-        return Object.assign(now, {
-          fullNameInputted: true,
-        });
-      });
-    } else {
-      // If no character is inputted
-      setErrorInput((now) => {
-        return Object.assign(now, {
-          fullNameInputted: false,
-        });
-      });
+    if (messages.length) {
+      for (const msg of messages) {
+        toast.error(msg, { duration: 1500 });
+        // Wait slightly longer than duration to avoid overlap
+        await new Promise((res) => setTimeout(res, 1800));
+      }
+      // After showing the error message, empty it
+      messages = [];
     }
 
-    if (selectedPayment) {
-      setShowModal(true);
-      setIsMaskVisible(true);
+    // If theres no error
+    if (
+      !errorInput.incorrectFullName &&
+      !errorInput.incorrectEmail &&
+      !errorInput.incorrectPhoneNum
+    ) {
+      console.log("Validasi betul semua");
+      if (selectedPayment) {
+        setShowModal(true);
+        setIsMaskVisible(true);
+      }
     }
 
+    console.log(personalInfo);
     console.log(errorInput);
   };
 
@@ -98,6 +113,34 @@ function Payment() {
     setIsMaskVisible(false);
     document.body.style.overflow = "unset";
   };
+
+  function handleCheckPayment() {
+    const { movieId, movieTitle, cat = "PG-13" } = movieState.movie;
+    const { date, time, cityLocation, cinema, seats, totalPayment } =
+      orderState.order;
+
+    dispatch(
+      addHistory({
+        // orderId: Math.floor(Math.random() * 1000) + 1,
+        orderId: uuidv4(),
+        movieId,
+        movieTitle,
+        cat,
+        date,
+        time,
+        cityLocation,
+        cinema,
+        seats,
+        totalPayment,
+        ticketStatus: {
+          isActive: true,
+          isPaid: true,
+        },
+      }),
+    );
+
+    navigate("/result");
+  }
 
   const handlePayLater = (e) => {
     e.preventDefault();
@@ -128,8 +171,8 @@ function Payment() {
 
           {paymentInfo.map((el, index) => (
             <Fragment key={index}>
-              <div className="mb-4 flex w-full flex-col gap-2">
-                <div className="text-sm font-normal text-[#8692A6]">
+              <div className="flex w-full flex-col gap-2">
+                <div className="mt-3 text-sm font-normal text-[#8692A6]">
                   {el.title}
                 </div>
                 <div className="text-base font-normal">
@@ -159,6 +202,16 @@ function Payment() {
               type="text"
               placeholder="Enter your name"
               name="fullName"
+              value={personalInfo.fullName}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPersonalInfo((now) => ({ ...now, fullName: value }));
+
+                setErrorInput((prev) => ({
+                  ...prev,
+                  incorrectFullName: !nameRegex.test(value),
+                }));
+              }}
             />
           </div>
 
@@ -170,6 +223,16 @@ function Payment() {
               type="email"
               placeholder="Enter your email"
               name="email"
+              value={personalInfo.email}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPersonalInfo((now) => ({ ...now, email: value }));
+
+                setErrorInput((prev) => ({
+                  ...prev,
+                  incorrectEmail: !emailRegex.test(value),
+                }));
+              }}
             />
           </div>
 
@@ -181,6 +244,16 @@ function Payment() {
               type="tel"
               placeholder="+62 | Enter Your Phone Number"
               name="phoneNumber"
+              value={personalInfo.phoneNumber}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPersonalInfo((now) => ({ ...now, phoneNumber: value }));
+
+                setErrorInput((prev) => ({
+                  ...prev,
+                  incorrectPhoneNum: !phoneRegex.test(value),
+                }));
+              }}
             />
           </div>
         </div>
@@ -189,7 +262,7 @@ function Payment() {
         <div className="mb-6">
           <h2 className="mb-[18px] text-xl font-semibold">Payment Method</h2>
           <div className="grid grid-cols-4 gap-[14px]">
-            {paymentMethods.map((method) => (
+            {PAYMENT_METHODS.map((method) => (
               <label
                 key={method.id}
                 className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 p-4 transition-all select-none ${
@@ -216,7 +289,12 @@ function Payment() {
         <button
           type="submit"
           className="cursor-pointer rounded-md bg-[#1D4ED8] py-[18px] font-bold text-[#F7F7FC] transition-all hover:bg-[#1d4fd8e3] hover:shadow-md"
-          disabled={!selectedPayment}
+          onClick={() => {
+            if (!selectedPayment) {
+              // toast.warning("Please select a payment method");
+              messages.push("Please select a 💳 payment method");
+            }
+          }}
         >
           Pay your order
         </button>
@@ -256,12 +334,19 @@ function Payment() {
           bill has not been paid by the specified time, it will be forfeited
         </p>
         <div className="flex flex-col gap-4">
-          <Link
+          {/* <Link
             to="/result"
             className="rounded-md bg-[#1D4ED8] py-3 text-center font-bold text-white shadow-md hover:bg-[#1d4fd8e3]"
           >
             Check Payment
-          </Link>
+          </Link> */}
+
+          <button
+            className="rounded-md bg-[#1D4ED8] py-3 text-center font-bold text-white shadow-md hover:bg-[#1d4fd8e3]"
+            onClick={handleCheckPayment}
+          >
+            Check Payment
+          </button>
           <button
             onClick={handlePayLater}
             className="font-bold text-[#1D4ED8] hover:underline"

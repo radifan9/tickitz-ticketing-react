@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { AuthOtherMethod } from "../AuthOtherMethod";
+import { toast } from "sonner";
 
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
 const regexMin8 = /^.{8,}$/;
@@ -75,6 +76,7 @@ export default function SignIn() {
     ) {
       // Success
       localStorage.setItem("activeUser", JSON.stringify({ email }));
+      toast.success("Login successful");
       // window.location.replace("./home.html");
       navigate("/");
     } else {

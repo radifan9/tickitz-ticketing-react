@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router";
 // Component
 import { StepOne } from "./StepOne";
 import { AuthOtherMethod } from "../AuthOtherMethod";
+import { toast } from "sonner";
 
 // Regex for validation
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
@@ -67,6 +68,7 @@ export default function SignUp() {
     ) {
       localStorage.setItem("user1", JSON.stringify({ email, password }));
       // window.location.replace("./login.html");
+      toast.success("Register successful")
       navigate("/signin");
     }
   };

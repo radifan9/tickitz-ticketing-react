@@ -61,6 +61,16 @@ const movieSlice = createSlice({
   initialState,
   name: "movie",
 
+  reducers: {
+    clearMovie(state) {
+      state.movie = initialState.movie;
+      state.isLoading = false;
+      state.isSuccess = false;
+      state.isFailed = false;
+      state.error = null;
+    },
+  },
+
   extraReducers: (builder) =>
     builder
       .addCase(getMovieThunk.pending, (state) => {

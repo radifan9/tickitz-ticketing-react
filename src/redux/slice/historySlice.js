@@ -3,18 +3,25 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   history: [
     {
+      // Create orderId randomly
       orderId: null,
+
+      // From movie slice
       movieId: null,
       movieTitle: null,
-      date: null,
       cat: null, // PG-13
+
+      // From order slice
+      date: null,
       time: null,
       cityLocation: null,
       cinema: null,
       seats: null,
       totalPayment: null,
-      isTicketActive: null,
-      isPaid: null,
+      ticketStatus: {
+        isActive: null,
+        isPaid: null,
+      },
     },
   ],
 };
@@ -28,3 +35,7 @@ const historySlice = createSlice({
     },
   },
 });
+
+export default historySlice.reducer;
+
+export const { addHistory } = historySlice.actions;

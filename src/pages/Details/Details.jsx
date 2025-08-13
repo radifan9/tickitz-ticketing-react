@@ -7,6 +7,18 @@ import { movieActions } from "../../redux/slice/movieSlice";
 import { addOrder } from "../../redux/slice/orderSlice";
 import Genres from "../../components/Genres";
 import Loader from "../../components/Loader";
+import { getDuration } from "../../utils/getDuration";
+import { toast } from "sonner";
+
+// --- Variables
+const orderInputted = {
+  isDateChoosed: false,
+  isTimeChoosed: false,
+  isLocChoosed: false,
+  isCinemaChoosed: false,
+};
+// Collect error messages and show them sequentially
+let messages = [];
 
 // --- Constants
 const CINEMA_LIST = [
@@ -28,11 +40,13 @@ const CINEMA_LIST = [
   },
 ];
 
-const TIME_OPTIONS = ["13:00", "15:00", "19:30"];
+const TIME_OPTIONS = ["13:00", "15:00", "18:30", "21:00"];
 const LOCATION_OPTIONS = [
+  { value: "jakarta", label: "Jakarta" },
   { value: "bogor", label: "Bogor" },
   { value: "bandung", label: "Bandung" },
   { value: "surabaya", label: "Surabaya" },
+  { value: "jember", label: "Jember" },
 ];
 
 // --- MAIN COMPONENT
@@ -43,6 +57,12 @@ function Details() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  // const [orderInputted, setOrderInputted] = useState({
+  //   isDateChoosed: false,
+  //   isTimeChoosed: false,
+  //   isLocChoosed: false,
+  //   isCinemaChoosed: false,
+  // });
 
   // Get movie ID from search params and redirect if missing
   const id = searchParams.get("id");
@@ -60,23 +80,92 @@ function Details() {
   }, []);
 
   // Handle form submission for booking tickets
-  function handleSubmit(e) {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Add form data to redux store
-    dispatch(
-      addOrder({
-        movieId: id,
-        date: e.target.date.value,
-        time: e.target.time.value,
-        cityLocation: e.target.cityLocation.value,
-        cinema: e.target.cinema.value,
-      }),
-    );
+    // Get the value
+    const date = e.target.date.value;
+    const time = e.target.time.value;
+    const cityLocation = e.target.cityLocation.value;
+    const cinema = e.target.cinema.value;
 
-    // Navigate to order page
-    navigate("/order");
-  }
+    // Validation
+    // date
+    if (date !== "") {
+      // setOrderInputted((prev) => ({ ...prev, isDateChoosed: true }));
+      orderInputted.isDateChoosed = true;
+    } else {
+      // setOrderInputted((prev) => ({ ...prev, isDateChoosed: false }));
+      orderInputted.isDateChoosed = false;
+      messages.push("Please input 🗓️ date");
+    }
+
+    // time
+    if (time !== "") {
+      // setOrderInputted((prev) => ({ ...prev, isTimeChoosed: true }));
+      orderInputted.isTimeChoosed = true;
+    } else {
+      // setOrderInputted((prev) => ({ ...prev, isTimeChoosed: false }));
+      orderInputted.isTimeChoosed = false;
+      messages.push("Please input ⌚ time");
+    }
+
+    // location
+    if (cityLocation !== "") {
+      // setOrderInputted((prev) => ({ ...prev, isLocChoosed: true }));
+      orderInputted.isLocChoosed = true;
+    } else {
+      // setOrderInputted((prev) => ({ ...prev, isLocChoosed: false }));
+      orderInputted.isLocChoosed = false;
+      messages.push("Please input 📍 city location");
+    }
+
+    // cinema
+    if (cinema !== "") {
+      // setOrderInputted((prev) => ({ ...prev, isCinemaChoosed: true }));
+      orderInputted.isCinemaChoosed = true;
+    } else {
+      // setOrderInputted((prev) => ({ ...prev, isCinemaChoosed: false }));
+      orderInputted.isCinemaChoosed = false;
+      messages.push("Please choose 🎥 cinema");
+    }
+
+    if (messages.length) {
+      for (const msg of messages) {
+        toast.error(msg, { duration: 1500 });
+        // Wait slightly longer than duration to avoid overlap
+        await new Promise((res) => setTimeout(res, 1800));
+      }
+      // After showing the error message, empty it
+      messages = [];
+    }
+
+    // If there's no error
+    if (
+      orderInputted.isDateChoosed === true &&
+      orderInputted.isTimeChoosed === true &&
+      orderInputted.isLocChoosed === true &&
+      orderInputted.isCinemaChoosed === true
+    ) {
+      // Check orderInputed
+      console.log(orderInputted);
+
+      // Add form data to redux store
+      dispatch(
+        addOrder({
+          movieId: id,
+          date,
+          time,
+          cityLocation,
+          cinema,
+        }),
+      );
+
+      // Navigate to order page
+      navigate("/order");
+    }
+  };
 
   return (
     <main
@@ -134,7 +223,9 @@ function Details() {
                   </span>
                   <span>
                     <div className="font-light text-[#8692A6]">Duration</div>
-                    <div className="">2 hours 13 minutes</div>
+                    <div className="">
+                      {getDuration(movieState.movie.runtime)}
+                    </div>
                   </span>
                   <span>
                     <div className="font-light text-[#8692A6]">Casts</div>
@@ -175,18 +266,34 @@ function Details() {
                 {/* Choose Date */}
                 <span className="flex flex-col gap-2">
                   <div className="text-xl font-medium">Choose Date</div>
-                  <div className="rounded-md bg-[#EFF0F6] px-4 py-3">
+                  <div className="flex items-center gap-3 rounded-md bg-[#EFF0F6] px-4 py-3">
+                    <img src="/calender.png" alt="" />
                     <select className="w-full" name="date">
+                      {/* Disabled default */}
+                      <option disabled selected value="">
+                        Select date
+                      </option>
                       {(() => {
                         const today = new Date();
+
+                        // Option today
                         const option1 = new Date(today);
                         option1.setDate(today.getDate());
+
+                        // Option tommorow
                         const option2 = new Date(today);
                         option2.setDate(today.getDate() + 1);
+
+                        // Option day + 2
+                        const option3 = new Date(today);
+                        option3.setDate(today.getDate() + 2);
+
+                        // Function to format date
                         function formatDate(date) {
                           return date.toISOString().split("T")[0];
                         }
-                        return [option1, option2].map((date, idx) => (
+
+                        return [option1, option2, option3].map((date, idx) => (
                           <option key={idx} value={formatDate(date)}>
                             {date.toLocaleDateString()}
                           </option>
@@ -199,8 +306,12 @@ function Details() {
                 <span className="flex flex-col gap-2">
                   <div className="text-xl font-medium">Choose Time</div>
                   <div className="flex items-center gap-3 rounded-md bg-[#EFF0F6] px-4 py-3">
-                    <img src="/clock.png" alt="" />
+                    <img src="/clock.png" alt="clock logo" />
                     <select className="w-full" name="time" id="time">
+                      {/* Disabled default */}
+                      <option disabled selected value="">
+                        Select time
+                      </option>
                       {TIME_OPTIONS.map((time, idx) => {
                         return (
                           <option key={idx} value={time}>
@@ -216,9 +327,10 @@ function Details() {
                   <div className="flex items-center gap-3 rounded-md bg-[#EFF0F6] px-4 py-3">
                     <img src="/location.png" alt="" />
                     <select className="w-full" name="cityLocation" id="">
-                      {/* <option value="bogor">Bogor</option>
-                      <option value="bandung">Bandung</option>
-                      <option value="surabaya">Surabaya</option> */}
+                      {/* Disabled default */}
+                      <option disabled selected value="">
+                        Select location
+                      </option>
                       {LOCATION_OPTIONS.map((el, idx) => {
                         return (
                           <option key={idx} value={el.value}>

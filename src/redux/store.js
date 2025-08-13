@@ -3,6 +3,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 // Slice
 import movieReducer from "./slice/movieSlice";
 import orderReducer from "./slice/orderSlice";
+import historyReducer from "./slice/historySlice";
 
 import {
   persistStore,
@@ -28,6 +29,7 @@ const persistedReducer = persistReducer(
   combineReducers({
     movie: movieReducer,
     order: orderReducer,
+    history: historyReducer,
   }),
 );
 
