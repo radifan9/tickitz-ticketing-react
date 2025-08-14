@@ -30,11 +30,9 @@ const generateId = (existingUsers) => {
   return (maxId + 1).toString();
 };
 
-// Helper function to hash password
+// Helper function to hash password (In production change to real hash)
 const hashPassword = (password) => {
-  return `$2b$10$${btoa(password)
-    .replace(/[^a-zA-Z0-9]/g, "")
-    .substring(0, 22)}==`;
+  return password;
 };
 
 // --- Default User Data
@@ -42,7 +40,7 @@ const DEFAULT_USERS = [
   {
     id: "1",
     email: "alice@example.com",
-    password: "$2b$10$eImiTXuWVxfM37uY4JANjQ==", // This should be properly hashed
+    password: "alice@1AA", // This should be properly hashed
     role: "admin",
     full_name: "Admin",
     phone_number: "911",
@@ -52,7 +50,7 @@ const DEFAULT_USERS = [
   {
     id: "2",
     email: "bob@example.com",
-    password: "$2b$10$u0a7d.qfG1P3QYvFZUNQpO==", // This should be properly hashed
+    password: "b0b123Ad*aa", // This should be properly hashed
     role: "user",
     full_name: "Bob The Builder",
     phone_number: "911",

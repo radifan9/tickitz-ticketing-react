@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router";
 import { AuthOtherMethod } from "../AuthOtherMethod";
 import { toast } from "sonner";
+import useLocalStorage from "../../../hooks/useLocalStorage";
+import { useDispatch } from "react-redux";
+import { addLoggedIn } from "../../../redux/slice/loggedInSlice";
 
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
 const regexMin8 = /^.{8,}$/;
@@ -23,7 +26,10 @@ export default function SignIn() {
     isMinSpecial: false,
   });
   const [loginError, setLoginError] = useState("");
+  const dispatch = useDispatch();
 
+  // Get user from localStorage
+  const [users, _] = useLocalStorage("usersDB", () => DEFAULT_USERS);
   const navigate = useNavigate();
 
   // Handler functions
@@ -67,17 +73,24 @@ export default function SignIn() {
       return setLoginError("Password tidak memenuhi syarat.");
     }
 
-    // Get user from localStorage
-    const userLocalStorage = JSON.parse(localStorage.getItem("user1"));
-    if (
-      userLocalStorage &&
-      email === userLocalStorage.email &&
-      password === userLocalStorage.password
-    ) {
+    let userData = null;
+    let isEmailExist = false;
+    let isEmailPasswordMatch = false;
+
+    // Get data
+    userData = users.find((user) => user.email === email);
+
+    // Check if email exist, if its exist, it will return the whole data
+    isEmailExist = typeof userData === "object" ? true : false;
+
+    // Check if inputted password match with DB password
+    isEmailPasswordMatch = userData?.password == password ? true : false;
+
+    if (isEmailExist && isEmailPasswordMatch) {
       // Success
-      localStorage.setItem("activeUser", JSON.stringify({ email }));
+      const { email, role, full_name } = userData;
+      dispatch(addLoggedIn({ email, role, full_name }));
       toast.success("Login successful");
-      // window.location.replace("./home.html");
       navigate("/");
     } else {
       setLoginError("Email atau password salah.");
@@ -85,8 +98,6 @@ export default function SignIn() {
   };
 
   const handleEye = () => {
-    console.log("Eye clicked!");
-    console.log(passwordEye);
     setPasswordEye((now) => {
       if (now === "closed") {
         return "opened";
@@ -94,6 +105,30 @@ export default function SignIn() {
       return "closed";
     });
   };
+
+  // --- Default User Data
+  const DEFAULT_USERS = [
+    {
+      id: "1",
+      email: "alice@example.com",
+      password: "$2b$10$eImiTXuWVxfM37uY4JANjQ==", // This should be properly hashed
+      role: "admin",
+      full_name: "Admin",
+      phone_number: "911",
+      created_at: "2025-08-13T14:32:00Z",
+      updated_at: "2025-08-13T14:32:00Z",
+    },
+    {
+      id: "2",
+      email: "bob@example.com",
+      password: "$2b$10$u0a7d.qfG1P3QYvFZUNQpO==", // This should be properly hashed
+      role: "user",
+      full_name: "Bob The Builder",
+      phone_number: "911",
+      created_at: "2025-08-13T15:00:00Z",
+      updated_at: "2025-08-13T15:00:00Z",
+    },
+  ];
 
   return (
     <div className="relative min-h-screen bg-black bg-[url('/avengers.png')] bg-cover bg-top bg-no-repeat pb-16 font-['Mulish',Arial]">
