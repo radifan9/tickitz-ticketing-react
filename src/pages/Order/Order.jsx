@@ -231,7 +231,7 @@ function Order() {
           <div className="grid items-center gap-5 rounded-lg border-[1px] border-[#DEDEDE] px-3.5 py-8 md:grid-cols-[2fr_3fr_1fr]">
             {/*  Movie Poster  */}
             <img
-              className="aspect-[1.6/1] w-full rounded-lg object-cover object-top"
+              className="aspect-[2/1.5] md:aspect-[1/1.25] w-full rounded-lg object-cover object-center"
               src={`https://image.tmdb.org/t/p/w500/${movieState.movie.posterPath}`}
               alt=""
             />

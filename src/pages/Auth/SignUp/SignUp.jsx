@@ -1,24 +1,85 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
-// Component
+// --- Component
 import { StepOne } from "./StepOne";
 import { AuthOtherMethod } from "../AuthOtherMethod";
+
+// --- External libraries
 import { toast } from "sonner";
 
-// Regex for validation
+// --- Custom hooks
+import useLocalStorage from "../../../hooks/useLocalStorage";
+
+// --- Validation patterns
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
 const regexMin8 = /^.{8,}$/;
 const regexMinSmall = /[a-z]/;
 const regexMinLarge = /[A-Z]/;
 const regexMinSpecialChar = /[!@#$%^&*/()]/;
 
+// --- Utility Functions
+
+/**
+ * Generates a unique ID for new users based on existing users
+ * @param {Array} existingUsers - Array of existing users
+ * @returns {string} - New unique ID as string
+ */
+const generateId = (existingUsers) => {
+  const maxId = Math.max(...existingUsers.map((user) => parseInt(user.id)), 0);
+  return (maxId + 1).toString();
+};
+
+// Helper function to hash password
+const hashPassword = (password) => {
+  return `$2b$10$${btoa(password)
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .substring(0, 22)}==`;
+};
+
+// --- Default User Data
+const DEFAULT_USERS = [
+  {
+    id: "1",
+    email: "alice@example.com",
+    password: "$2b$10$eImiTXuWVxfM37uY4JANjQ==", // This should be properly hashed
+    role: "admin",
+    full_name: "Admin",
+    phone_number: "911",
+    created_at: "2025-08-13T14:32:00Z",
+    updated_at: "2025-08-13T14:32:00Z",
+  },
+  {
+    id: "2",
+    email: "bob@example.com",
+    password: "$2b$10$u0a7d.qfG1P3QYvFZUNQpO==", // This should be properly hashed
+    role: "user",
+    full_name: "Bob The Builder",
+    phone_number: "911",
+    created_at: "2025-08-13T15:00:00Z",
+    updated_at: "2025-08-13T15:00:00Z",
+  },
+];
+
+// --- MAIN COMPONENT
 export default function SignUp() {
-  const [isInputedEmail, setIsInputedEmail] = useState(false);
-  const [isInputedPassword, setIsInputedPassword] = useState(false);
+  // --- --- State management
+
+  // User data stored in localStorage
+  const [users, setUsers] = useLocalStorage("usersDB", () => DEFAULT_USERS);
+
+  // --- --- Form input states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+
+  // --- --- UI states
+  const [isInputedEmail, setIsInputedEmail] = useState(false);
+  const [isInputedPassword, setIsInputedPassword] = useState(false);
   const [passwordEye, setPasswordEye] = useState("closed");
+  const [isLoading, setIsLoading] = useState(false);
+
+  // --- --- Validation states
   const [emailError, setEmailError] = useState("");
   const [passwordErrors, setPasswordErrors] = useState({
     isMin8: false,
@@ -27,14 +88,21 @@ export default function SignUp() {
     isMinSpecial: false,
   });
 
-  // Hooks
+  // --- --- Hooks
   const navigate = useNavigate();
 
-  // Handler functions
+  // --- --- Event handlers
+
+  /**
+   * Handles email input changes and validates email format
+   * @param {Event} e - Input change event
+   */
   const handleEmailChange = (e) => {
     setIsInputedEmail(true);
     const value = e.target.value;
     setEmail(value);
+
+    // Email validation
     if (!value.trim()) {
       setEmailError("Email tidak boleh kosong");
     } else if (!emailRegex.test(value)) {
@@ -44,10 +112,16 @@ export default function SignUp() {
     }
   };
 
+  /**
+   * Handles password input changes and validates password criteria
+   * @param {Event} e - Input change event
+   */
   const handlePasswordChange = (e) => {
     setIsInputedPassword(true);
     const value = e.target.value;
     setPassword(value);
+
+    // Password validation against all criteria
     setPasswordErrors({
       isMin8: regexMin8.test(value),
       isMinSmall: regexMinSmall.test(value),
@@ -56,23 +130,85 @@ export default function SignUp() {
     });
   };
 
-  // If there's no error
-  const handleSubmit = (e) => {
+  /**
+   * Checks if email exists and registers new user if not
+   * @returns {Promise<boolean>} - Success status of registration
+   */
+  const checkEmailAndRegister = async () => {
+    try {
+      setIsLoading(true);
+
+      // Check if email already exists
+      const existingUser = users.find(
+        (user) => user.email.toLowerCase() === email.toLowerCase(),
+      );
+
+      if (existingUser) {
+        toast.error("Email sudah terdaftar. Silakan gunakan email lain.");
+        setEmailError("Email sudah terdaftar");
+        return false;
+      }
+
+      // Create new user object
+      const newUser = {
+        id: generateId(users),
+        email: email.toLowerCase(),
+        password: hashPassword(password), // Hash the password
+        role: "user",
+        full_name: "", // You can add a name field to the form if needed
+        phone_number: "",
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      };
+
+      // Add new user using the useLocalStorage setter
+      setUsers([...users, newUser]);
+
+      console.log("New user successfully added:", newUser);
+      toast.success("Registrasi berhasil! Silakan login.");
+      return true;
+    } catch (error) {
+      console.error("Error during registration:", error);
+      toast.error("Terjadi kesalahan saat registrasi. Silakan coba lagi.");
+      return false;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Check if terms are agreed to
+    if (!agreeToTerms) {
+      toast.error("Mohon setujui syarat dan ketentuan terlebih dahulu.");
+      return;
+    }
+
+    // Check if all validations pass
     if (
       !emailError &&
       passwordErrors.isMin8 &&
       passwordErrors.isMinSmall &&
       passwordErrors.isMinLarge &&
-      passwordErrors.isMinSpecial
+      passwordErrors.isMinSpecial &&
+      email &&
+      password
     ) {
-      localStorage.setItem("user1", JSON.stringify({ email, password }));
-      // window.location.replace("./login.html");
-      toast.success("Register successful")
-      navigate("/signin");
+      const registrationSuccess = await checkEmailAndRegister();
+
+      if (registrationSuccess) {
+        navigate("/signin");
+      }
+    } else {
+      toast.error("Mohon lengkapi semua field dengan benar.");
     }
   };
 
+  /**
+   * Toggles password visibility
+   */
   const handleEye = () => {
     setPasswordEye((now) => {
       if (now === "closed") {
@@ -82,13 +218,20 @@ export default function SignUp() {
     });
   };
 
+  /**
+   * Handles terms and conditions checkbox change
+   * @param {Event} e - Checkbox change event
+   */
+  const handleTermsChange = (e) => {
+    setAgreeToTerms(e.target.checked);
+  };
+
   return (
     <div className="relative min-h-screen bg-black bg-[url('/avengers.png')] bg-cover bg-top bg-no-repeat pb-16 font-['Mulish',Arial]">
       {/* Masking */}
       <div className="absolute inset-0 z-1 bg-black/40"></div>
       <div className="flex flex-col items-center gap-6">
         {/* Logo */}
-
         <img
           className="z-2 mt-20"
           src="/tickitz-white.png"
@@ -97,7 +240,6 @@ export default function SignUp() {
         />
 
         <main className="z-2 mx-auto flex w-[546px] flex-col gap-6 rounded-lg bg-white px-8 pt-12 md:p-12 md:pt-4">
-
           {/* Step */}
           <StepOne />
 
@@ -115,14 +257,13 @@ export default function SignUp() {
                 type="text"
                 id="email"
                 placeholder="Enter your email"
+                value={email}
+                disabled={isLoading}
               />
               <div
                 className={`text-sm ${emailError ? "text-red-500" : "text-green-600"}`}
               >
-                {isInputedEmail &&
-                  (emailError
-                    ? "Tolong masukkan input email yang valid"
-                    : "Email valid")}
+                {isInputedEmail && (emailError ? emailError : "Email valid")}
               </div>
             </div>
 
@@ -139,9 +280,9 @@ export default function SignUp() {
                   type={passwordEye === "closed" ? "password" : "text"}
                   id="password"
                   placeholder="Enter your password"
+                  value={password}
+                  disabled={isLoading}
                 />
-                {/* <!-- Eye opened --> */}
-                {/* <!-- Here we have both opened and closed eye --> */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -163,7 +304,6 @@ export default function SignUp() {
                   />
                 </svg>
 
-                {/* <!-- Eye closed --> */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -238,6 +378,9 @@ export default function SignUp() {
                 id="tAndC"
                 type="checkbox"
                 className="h-6 w-6 accent-[#1D4ED8]"
+                checked={agreeToTerms}
+                onChange={handleTermsChange}
+                disabled={isLoading}
               />
               <label
                 htmlFor="tAndC"
@@ -249,21 +392,21 @@ export default function SignUp() {
 
             <button
               type="submit"
-              className="block h-16 w-full rounded border-none bg-blue-700 text-base font-semibold text-white"
+              className="block h-16 w-full rounded border-none bg-blue-700 text-base font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-400"
+              disabled={isLoading}
             >
-              Join For Free Now
+              {isLoading ? "Creating Account..." : "Join For Free Now"}
             </button>
           </form>
 
           <div className="flex justify-center gap-2 text-base">
             <span className="text-[#6E7191]">Already have an account?</span>
-            {/* <a
-              href="./login.html"
+            <Link
+              to="/signin"
               className="font-semibold text-blue-700 hover:underline"
             >
               Log in
-            </a> */}
-            <Link to="/signin">Log in</Link>
+            </Link>
           </div>
 
           <div className="flex items-center justify-center gap-6">
@@ -274,7 +417,6 @@ export default function SignUp() {
 
           {/* Login using other method */}
           <AuthOtherMethod />
-          
         </main>
       </div>
     </div>

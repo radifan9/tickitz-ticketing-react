@@ -4,6 +4,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import movieReducer from "./slice/movieSlice";
 import orderReducer from "./slice/orderSlice";
 import historyReducer from "./slice/historySlice";
+import loggedInReducer from "./slice/loggedInSlice";
 
 import {
   persistStore,
@@ -27,6 +28,7 @@ const persistConfig = {
 const persistedReducer = persistReducer(
   persistConfig,
   combineReducers({
+    loggedIn: loggedInReducer,
     movie: movieReducer,
     order: orderReducer,
     history: historyReducer,

@@ -6,6 +6,8 @@ const initialState = {
       // Create orderId randomly
       orderId: null,
 
+      // User ID correspond who buys the ticket
+
       // From movie slice
       movieId: null,
       movieTitle: null,
@@ -17,6 +19,8 @@ const initialState = {
       cityLocation: null,
       cinema: null,
       seats: null,
+      virtualAccount: null,
+      paymentDue: null, // June 23 2024
       totalPayment: null,
       ticketStatus: {
         isActive: null,

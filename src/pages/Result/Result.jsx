@@ -1,4 +1,5 @@
 import React from "react";
+import QRCode from "react-qr-code";
 
 function Result() {
   return (
@@ -33,11 +34,12 @@ function Result() {
         {/* Ticket Shaped Element */}
         <div className="flex w-[295px] flex-col items-center rounded-lg bg-white">
           {/* QR */}
-          <img
+          {/* <img
             className="mt-8"
             src="/qr-code-1.png"
             alt="QR Code for payment"
-          />
+          /> */}
+          <QRCode className="p-10" value="SEATS" />
 
           {/* Horizontal line and circles */}
           <div className="relative mb-6 w-full border-b border-[#dedede]">

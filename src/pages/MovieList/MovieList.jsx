@@ -298,7 +298,7 @@ export default function MovieList() {
 
         {/* Grid Movie List */}
         <div
-          className={`${isLoading ? "" : "grid grid-cols-2 gap-4 md:grid-cols-4"}`}
+          className={`${isLoading ? "" : "grid grid-cols-2 gap-4 md:gap-y-8 md:grid-cols-4"}`}
         >
           {isLoading ? (
             <Loader />
