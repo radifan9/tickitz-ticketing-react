@@ -1,49 +1,42 @@
 import { Link, useNavigate } from "react-router";
-import ListItem from "./ListItem";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
+import ListItem from "./ListItem";
+import { removeLoggedIn } from "../redux/slice/loggedInSlice";
+
+// --- MAIN COMPONENT
 function Navbar() {
+  // --- --- Constants
   const navBtn = [
     { text: "Home", route: "/" },
     { text: "Movies", route: "/movies" },
     { text: "Buy Ticket", route: "/" },
   ];
 
-  // Hooks
-  const [activeUser, setActiveUser] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  // --- --- Hooks and state
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  // Local state for UI controls
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+
+  // --- --- Redux state
+  const loggedInState = useSelector((state) => state.loggedIn);
+  const activeUser = loggedInState.email !== null;
+
+  // --- --- Effects
+
+  // Check localStorage for active user (for debugging/sync purposes)
   useEffect(() => {
     const userFromStorage = window.localStorage.getItem("activeUser");
     const isUserActive = userFromStorage !== null && userFromStorage !== "";
-    setActiveUser(isUserActive);
+
     console.log("From localStorage:", userFromStorage);
     console.log("Is user active?", isUserActive);
-  }, []);
-
-  const toggleMobileMenu = () => {
-    setIsMobileMenuOpen(!isMobileMenuOpen);
-  };
-
-  const closeMobileMenu = () => {
-    setIsMobileMenuOpen(false);
-  };
-
-  const toggleProfileDropdown = () => {
-    setIsProfileDropdownOpen(!isProfileDropdownOpen);
-  };
-
-  const closeProfileDropdown = () => {
-    setIsProfileDropdownOpen(false);
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("activeUser");
-    setActiveUser(false);
-    setIsProfileDropdownOpen(false);
-  };
+    console.log("Redux loggedIn state:", loggedInState);
+  }, [loggedInState]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -61,6 +54,30 @@ function Navbar() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isProfileDropdownOpen]);
+
+  // --- --- Event Handlers
+
+  // Mobile menu handlers
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setIsMobileMenuOpen(false);
+  };
+
+  const toggleProfileDropdown = () => {
+    setIsProfileDropdownOpen(!isProfileDropdownOpen);
+  };
+
+  const closeProfileDropdown = () => {
+    setIsProfileDropdownOpen(false);
+  };
+
+  const handleLogout = () => {
+    dispatch(removeLoggedIn());
+    setIsProfileDropdownOpen(false);
+  };
 
   return (
     <>

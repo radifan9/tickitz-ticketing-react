@@ -13,13 +13,11 @@ const loggedInSlice = createSlice({
   reducers: {
     // When user successfully login
     addLoggedIn: (state, { payload }) => {
-      // state.loggedIn = payload;
       return payload;
     },
 
     // When user logged out
     removeLoggedIn: (state, { payload }) => {
-      // state.loggedIn = null;
       return initialState;
     },
   },
