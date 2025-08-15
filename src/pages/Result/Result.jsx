@@ -1,7 +1,14 @@
 import React from "react";
 import QRCode from "react-qr-code";
+import { useSelector } from "react-redux";
 
+// --- MAIN COMPONENTS
 function Result() {
+  // --- --- Hooks
+  const historyState = useSelector((state) => state.history);
+  console.log("History State");
+  console.log(historyState);
+
   return (
     <div className="flex flex-col justify-between bg-[#f5f5f5] md:flex-row">
       {/* Left Side */}
@@ -34,12 +41,11 @@ function Result() {
         {/* Ticket Shaped Element */}
         <div className="flex w-[295px] flex-col items-center rounded-lg bg-white">
           {/* QR */}
-          {/* <img
-            className="mt-8"
-            src="/qr-code-1.png"
-            alt="QR Code for payment"
-          /> */}
-          <QRCode className="p-10" value="SEATS" />
+
+          <QRCode
+            className="p-10"
+            value={`orderId:${historyState[historyState.length - 1].orderId}`}
+          />
 
           {/* Horizontal line and circles */}
           <div className="relative mb-6 w-full border-b border-[#dedede]">
@@ -57,7 +63,8 @@ function Result() {
                 Movie
               </span>
               <span className="text-sm font-semibold text-[#14142b]">
-                Spider-Man: ..
+                {/* Spider-Man: .. */}
+                {historyState[historyState.length - 1].originalTitle}
               </span>
             </div>
 
@@ -67,7 +74,7 @@ function Result() {
                 Category
               </span>
               <span className="text-sm font-semibold text-[#14142b]">
-                PG-13
+                {historyState[historyState.length - 1].cat}
               </span>
             </div>
 
@@ -75,7 +82,8 @@ function Result() {
             <div className="flex flex-col gap-1">
               <span className="text-xs font-semibold text-[#aaaaaa]">Date</span>
               <span className="text-sm font-semibold text-[#14142b]">
-                07 Jul
+                {/* 07 Jul */}
+                {historyState[historyState.length - 1].date}
               </span>
             </div>
 
@@ -83,7 +91,8 @@ function Result() {
             <div className="flex flex-col gap-1">
               <span className="text-xs font-semibold text-[#aaaaaa]">Time</span>
               <span className="text-sm font-semibold text-[#14142b]">
-                2:00pm
+                {/* 2:00pm */}
+                {historyState[historyState.length - 1].time}
               </span>
             </div>
 
@@ -93,7 +102,8 @@ function Result() {
                 Count
               </span>
               <span className="text-sm font-semibold text-[#14142b]">
-                3 pcs
+                {/* 3 pcs */}
+                {historyState[historyState.length - 1].seats.length} pcs
               </span>
             </div>
 
@@ -103,7 +113,17 @@ function Result() {
                 Seats
               </span>
               <span className="text-sm font-semibold text-[#14142b]">
-                C4, C5, C6
+                {/* Get the latest history, then map the seats */}
+                {historyState[historyState.length - 1].seats.map((el, idx) => {
+                  if (
+                    idx !==
+                    historyState[historyState.length - 1].seats.length - 1
+                  ) {
+                    return `${el}, `;
+                  } else {
+                    return `${el}`;
+                  }
+                })}
               </span>
             </div>
           </div>
@@ -111,7 +131,7 @@ function Result() {
           {/* Total Payment */}
           <div className="mb-8 flex w-4/5 justify-between rounded border border-[#dedede] px-[18px] py-3">
             <div>Total</div>
-            <div>$30.00</div>
+            <div>${historyState[historyState.length - 1].totalPayment}.00</div>
           </div>
         </div>
 

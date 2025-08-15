@@ -5,7 +5,7 @@ import { createSlice } from "@reduxjs/toolkit";
 // Usefull in order & payment
 const initialState = {
   order: {
-    movieId: null, // tidak perlu
+    movieId: null,
     date: null,
     time: null,
     cityLocation: null,
@@ -14,16 +14,6 @@ const initialState = {
     totalPayment: null,
   },
 };
-
-// navigate("/order", {
-//   state: {
-//     movieId: id,
-//     date: e.target.date.value,
-//     time: e.target.time.value,
-//     cityLocation: e.target.cityLocation.value,
-//     cinema: e.target.cinema.value,
-//   },
-// });
 
 const orderSlice = createSlice({
   initialState,

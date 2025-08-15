@@ -1,41 +1,39 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
-  history: [
-    {
-      // Create orderId randomly
-      orderId: null,
+const initialState = [
+  {
+    // Create orderId randomly
+    orderId: 0,
 
-      // User ID correspond who buys the ticket
+    // User ID correspond who buys the ticket
 
-      // From movie slice
-      movieId: null,
-      movieTitle: null,
-      cat: null, // PG-13
+    // From movie slice
+    movieId: null,
+    movieTitle: null,
+    cat: null, // PG-13
 
-      // From order slice
-      date: null,
-      time: null,
-      cityLocation: null,
-      cinema: null,
-      seats: null,
-      virtualAccount: null,
-      paymentDue: null, // June 23 2024
-      totalPayment: null,
-      ticketStatus: {
-        isActive: null,
-        isPaid: null,
-      },
+    // From order slice
+    date: null,
+    time: null,
+    cityLocation: null,
+    cinema: null,
+    seats: null,
+    virtualAccount: null,
+    paymentDue: null, // June 23 2024
+    totalPayment: null,
+    ticketStatus: {
+      isActive: null,
+      isPaid: null,
     },
-  ],
-};
+  },
+];
 
 const historySlice = createSlice({
   initialState,
   name: "history",
   reducers: {
     addHistory: (state, { payload }) => {
-      state.history.push(payload);
+      state.push(payload);
     },
   },
 });

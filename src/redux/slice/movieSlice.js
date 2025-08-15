@@ -8,8 +8,7 @@ import getCredits from "../../utils/getCredits";
 // Movie information
 const initialState = {
   movie: {
-    movieId: null,
-    movieTitle: null,
+    originalTitle: null,
     image: null, // url
     genres: null,
     releaseDate: null,

@@ -1,6 +1,9 @@
 function getDetails(rawData) {
   const movieDetails = {};
 
+  // movieId
+  Object.assign(movieDetails, { movieId: rawData.id });
+
   // backdropPath
   Object.assign(movieDetails, { backdropPath: rawData.backdrop_path });
 

@@ -1,4 +1,4 @@
-import { useState, Fragment, useEffect } from "react";
+import { useState, Fragment } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
 import { convertDate } from "../../utils/convertDate";
@@ -6,7 +6,6 @@ import { convertDate } from "../../utils/convertDate";
 // External Lib
 import { toast } from "sonner";
 import { addHistory } from "../../redux/slice/historySlice";
-import { v4 as uuidv4 } from "uuid";
 
 // Collect error messages and show them sequentially
 let messages = [];
@@ -115,29 +114,47 @@ function Payment() {
   };
 
   function handleCheckPayment() {
-    const { movieId, movieTitle, cat = "PG-13" } = movieState.movie;
+    const { movieId, originalTitle, cat = "PG-13" } = movieState.movie;
     const { date, time, cityLocation, cinema, seats, totalPayment } =
       orderState.order;
 
-    dispatch(
-      addHistory({
-        // orderId: Math.floor(Math.random() * 1000) + 1,
-        orderId: uuidv4(),
-        movieId,
-        movieTitle,
-        cat,
-        date,
-        time,
-        cityLocation,
-        cinema,
-        seats,
-        totalPayment,
-        ticketStatus: {
-          isActive: true,
-          isPaid: true,
-        },
-      }),
-    );
+    console.log("Movie State Data");
+    console.log(movieId, originalTitle, cat);
+
+    let largestId = 0;
+    historyState.forEach((el) => {
+      if (el.orderId > largestId) {
+        largestId = el.orderId;
+      }
+    });
+
+    console.log(`largest ID : ${largestId}`);
+
+    const obj = {};
+    Object.assign(obj, {
+      // orderId: Math.floor(Math.random() * 1000) + 1,
+      orderId: largestId + 1,
+      movieId,
+      originalTitle,
+      cat,
+      date,
+      time,
+      cityLocation,
+      cinema,
+      seats,
+      totalPayment,
+      ticketStatus: {
+        isActive: true,
+        isPaid: true,
+      },
+    });
+
+    console.log("New data :");
+    console.log(obj);
+
+    dispatch(addHistory(obj));
+
+    console.log(historyState);
 
     navigate("/result");
   }
