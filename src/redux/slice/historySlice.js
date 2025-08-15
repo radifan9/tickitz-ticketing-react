@@ -5,7 +5,8 @@ const initialState = [
     // Create orderId randomly
     orderId: 0,
 
-    // User ID correspond who buys the ticket
+    // email, user who buys the ticket
+    email: null,
 
     // From movie slice
     movieId: null,

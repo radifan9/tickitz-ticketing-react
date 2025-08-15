@@ -1,15 +1,13 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
 import { convertDate } from "../../utils/convertDate";
 
-// External Lib
+// --- External Libraries
 import { toast } from "sonner";
 import { addHistory } from "../../redux/slice/historySlice";
 
-// Collect error messages and show them sequentially
-let messages = [];
-
+// --- Constants
 const PAYMENT_METHODS = [
   { id: "gpay", name: "GPay", image: "/gpay.png" },
   { id: "visa", name: "Visa", image: "/logos_visa.png" },
@@ -21,14 +19,30 @@ const PAYMENT_METHODS = [
   { id: "ovo", name: "OVO", image: "/ovo.png" },
 ];
 
+// --- Validation regex patterns
+// source of regex : https://medium.com/@lelianto.eko/indonesian-usefull-regex-formatter-function-41e3c541fcb3
+const VALIDATION_PATTERNS = {
+  name: /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/,
+  email: /^[^@]+@[^@]+\.[^@]+$/,
+  phone: /^(?:\+62|62|0)[2-9]\d{7,11}$/,
+};
+
+// Collect error messages and show them sequentially
+let messages = [];
+
+// --- MAIN COMPONENT
 function Payment() {
-  // --- Redux
+  // --- --- Redux state
   const movieState = useSelector((state) => state.movie);
   const orderState = useSelector((state) => state.order);
   const historyState = useSelector((state) => state.history);
+  const loggedInState = useSelector((state) => state.loggedIn);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  // --- State
+  // --- --- Component State
+
+  // Payment information display data
   const [paymentInfo, setPaymentInfo] = useState([
     {
       title: "DATE & TIME",
@@ -42,36 +56,57 @@ function Payment() {
     },
     { title: "TOTAL PAYMENT", text: `$${orderState.order.totalPayment}.00` },
   ]);
+
+  // Selected payment method
   const [selectedPayment, setSelectedPayment] = useState("");
+
+  // User personal information form data
   const [personalInfo, setPersonalInfo] = useState({
     fullName: "",
-    email: "",
+    email: loggedInState.email || "", // Fallback if there's no loggedIn
     phoneNumber: "",
   });
+
+  // --- --- Modal visibility states
   const [showModal, setShowModal] = useState(false);
   const [isMaskVisible, setIsMaskVisible] = useState(false);
-  const navigate = useNavigate();
 
-  // Regex for validation
-  const nameRegex = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/;
-  const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
-  const phoneRegex = /^(?:\+62|62|0)[2-9]\d{7,11}$/;
-  // source of regex : https://medium.com/@lelianto.eko/indonesian-usefull-regex-formatter-function-41e3c541fcb3
-
-  // Assume initialize with error first (true), then set to false if validation is passed
+  // --- --- Form validation error states
+  // Initialize with error assumption (true), validate to false
   const [errorInput, setErrorInput] = useState({
     incorrectFullName: true,
     incorrectEmail: true,
     incorrectPhoneNum: true,
   });
 
+  // --- --- Event Handlers
+  /**
+   * Handles payment method selection
+   * @param {string} paymentId - The ID of the selected payment method
+   */
   const handlePaymentChange = (paymentId) => {
     setSelectedPayment(paymentId);
   };
 
+  /**
+   * Validates and updates email field
+   * @param {string} value - Email input value
+   */
+  function handleCheckEmail(value) {
+    setPersonalInfo((now) => ({ ...now, email: value }));
+    setErrorInput((prev) => ({
+      ...prev,
+      incorrectEmail: !VALIDATION_PATTERNS.email.test(value),
+    }));
+  }
+
+  /**
+   * Handles form submission with validation
+   * @param {Event} e - Form submit event
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Clicked Submit");
+    console.log("Submit Button Clicked!");
 
     if (errorInput.incorrectFullName)
       messages.push("Incorrect  Full Name is Inputted");
@@ -102,9 +137,6 @@ function Payment() {
         setIsMaskVisible(true);
       }
     }
-
-    console.log(personalInfo);
-    console.log(errorInput);
   };
 
   const closeModal = () => {
@@ -113,14 +145,15 @@ function Payment() {
     document.body.style.overflow = "unset";
   };
 
+  /**
+   * Processes payment confirmation and adds to history
+   */
   function handleCheckPayment() {
     const { movieId, originalTitle, cat = "PG-13" } = movieState.movie;
     const { date, time, cityLocation, cinema, seats, totalPayment } =
       orderState.order;
 
-    console.log("Movie State Data");
-    console.log(movieId, originalTitle, cat);
-
+    // Find largest ID in the history, then +1 from that ID for the next ID
     let largestId = 0;
     historyState.forEach((el) => {
       if (el.orderId > largestId) {
@@ -128,11 +161,10 @@ function Payment() {
       }
     });
 
-    console.log(`largest ID : ${largestId}`);
-
     const obj = {};
     Object.assign(obj, {
       // orderId: Math.floor(Math.random() * 1000) + 1,
+      email: personalInfo.email,
       orderId: largestId + 1,
       movieId,
       originalTitle,
@@ -149,22 +181,59 @@ function Payment() {
       },
     });
 
-    console.log("New data :");
-    console.log(obj);
-
+    // Add to history and navigate to results
     dispatch(addHistory(obj));
-
-    console.log(historyState);
-
     navigate("/result");
   }
 
-  const handlePayLater = (e) => {
-    e.preventDefault();
-    closeModal();
-    // Add any additional pay later logic here
+  /**
+   * Handles pay later functionality
+   * Similar to handle check but, make the isPaid to false
+   */
+  const handlePayLater = () => {
+    const { movieId, originalTitle, cat = "PG-13" } = movieState.movie;
+    const { date, time, cityLocation, cinema, seats, totalPayment } =
+      orderState.order;
+
+    // Find largest ID in the history, then +1 from that ID for the next ID
+    let largestId = 0;
+    historyState.forEach((el) => {
+      if (el.orderId > largestId) {
+        largestId = el.orderId;
+      }
+    });
+
+    const obj = {};
+    Object.assign(obj, {
+      // orderId: Math.floor(Math.random() * 1000) + 1,
+      email: personalInfo.email,
+      orderId: largestId + 1,
+      movieId,
+      originalTitle,
+      cat,
+      date,
+      time,
+      cityLocation,
+      cinema,
+      seats,
+      totalPayment,
+      ticketStatus: {
+        isActive: true,
+        isPaid: false,
+      },
+    });
+
+    // Add to history and navigate to results
+    dispatch(addHistory(obj));
+    navigate("/");
   };
 
+  // --- --- Utility functions
+
+  /**
+   * Formats a future date (1 day from now) for payment deadline
+   * @returns (string) Formatted date string
+   */
   const formatFutureDate = () => {
     const futureDate = new Date();
     futureDate.setDate(futureDate.getDate() + 1); // 1 day from now
@@ -174,6 +243,17 @@ function Payment() {
       day: "numeric",
     });
   };
+
+  // --- --- Effects
+
+  // Initialize validation on component mount
+  useEffect(() => {
+    // Validate for email
+    setErrorInput((prev) => ({
+      ...prev,
+      incorrectEmail: !VALIDATION_PATTERNS.email.test(personalInfo.email),
+    }));
+  }, []);
 
   return (
     <div className="relative">
@@ -226,7 +306,7 @@ function Payment() {
 
                 setErrorInput((prev) => ({
                   ...prev,
-                  incorrectFullName: !nameRegex.test(value),
+                  incorrectFullName: !VALIDATION_PATTERNS.name.test(value),
                 }));
               }}
             />
@@ -242,13 +322,7 @@ function Payment() {
               name="email"
               value={personalInfo.email}
               onChange={(e) => {
-                const value = e.target.value;
-                setPersonalInfo((now) => ({ ...now, email: value }));
-
-                setErrorInput((prev) => ({
-                  ...prev,
-                  incorrectEmail: !emailRegex.test(value),
-                }));
+                handleCheckEmail(e.target.value);
               }}
             />
           </div>
@@ -268,7 +342,7 @@ function Payment() {
 
                 setErrorInput((prev) => ({
                   ...prev,
-                  incorrectPhoneNum: !phoneRegex.test(value),
+                  incorrectPhoneNum: !VALIDATION_PATTERNS.phone.test(value),
                 }));
               }}
             />
