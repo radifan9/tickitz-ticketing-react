@@ -28,16 +28,14 @@ export default function Profile() {
 
   return (
     <>
-      <div className="md:grid-cols-[1fr 3fr] container mx-auto grid gap-y-8 md:grid md:py-8">
+      <div className="md:grid-cols-[1fr_3fr] container mx-auto grid gap-y-8 md:grid md:py-8">
         <ProfileHeader loc={"acc"} />
 
         {/* User Profile */}
         <UserProfile />
 
         {/* <!-- Account Setting --> */}
-        <div
-          className={`mb-10 rounded-2xl bg-white p-10  md:mx-0`}
-        >
+        <div className={`mb-10 rounded-2xl bg-white p-10 md:mx-0`}>
           <h2 className="mb-8 text-2xl font-medium">Account Settings</h2>
 
           {/* <!-- Details Information --> */}
