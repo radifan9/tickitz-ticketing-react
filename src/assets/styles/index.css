@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+@theme {
+  --small-pad: 16px;
+  --medium-pad: 192px;
+}

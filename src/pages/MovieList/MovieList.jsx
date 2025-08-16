@@ -229,7 +229,7 @@ export default function MovieList() {
   return (
     <div className="flex w-full flex-col gap-8">
       {/* Hero Section */}
-      <section className="relative flex h-96 flex-col items-start justify-center bg-[url('/avengers.png')] bg-cover bg-center px-12 after:absolute after:inset-0 after:bg-black/70 md:px-72">
+      <section className="relative flex h-96 flex-col items-start justify-center bg-[url('/avengers.png')] bg-cover bg-center px-12 after:absolute after:inset-0 after:bg-black/70 md:px-[var(--medium-pad)]">
         <div className="relative z-20 text-lg font-semibold text-[#FFFFFF]">
           LIST MOVIE OF THE WEEK
         </div>
@@ -239,9 +239,9 @@ export default function MovieList() {
       </section>
 
       {/* Main */}
-      <div className="flex flex-col items-center gap-10">
+      <div className="flex flex-col items-center gap-10 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
         {/* Cari Event dan Filter */}
-        <div className="flex w-2/3 flex-col gap-8 md:flex-row">
+        <div className="flex w-full flex-col gap-8 md:flex-row">
           {/* Filter query */}
           <div className="flex items-center gap-8">
             <label htmlFor="query" className="font-medium text-[#4E4B66]">
@@ -298,7 +298,7 @@ export default function MovieList() {
 
         {/* Grid Movie List */}
         <div
-          className={`${isLoading ? "" : "grid grid-cols-2 gap-4 md:gap-y-8 md:grid-cols-4"}`}
+          className={`${isLoading ? "" : "grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-y-8"}`}
         >
           {isLoading ? (
             <Loader />

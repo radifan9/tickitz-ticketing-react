@@ -84,7 +84,7 @@ function RouteHomeLayout() {
     <main className="flex flex-col">
       <Navbar />
       <InsideHomeLayout />
-      <div className="flex flex-col gap-8 px-8 md:px-72">
+      <div className="flex flex-col gap-8 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
         <Subscribe />
         <Footer />
       </div>
@@ -101,7 +101,7 @@ function RouteDetailsLayout() {
     <main className="flex flex-col">
       <Navbar />
       <Outlet />
-      <div className="flex flex-col gap-8 px-8 md:px-72">
+      <div className="flex flex-col gap-8 px-8 md:px-[var(--medium-pad)]">
         <Subscribe />
         <Footer />
       </div>
@@ -113,7 +113,7 @@ function RouteOrderLayout() {
   return (
     <>
       <Navbar />
-      <div className="flex flex-col items-center bg-[#A0A3BD33] px-8 py-4 md:px-72">
+      <div className="flex flex-col items-center bg-[#A0A3BD33] px-8 py-4 md:px-[var(--medium-pad)]">
         <Outlet />
       </div>
       <Footer />
@@ -126,7 +126,7 @@ function RouteResultLayout() {
     <>
       <Navbar />
       <Outlet />
-      <div className="px-8 py-4 md:px-72">
+      <div className="px-8 py-4 md:px-[var(--medium-pad)]">
         <Footer />
       </div>
     </>
@@ -153,7 +153,7 @@ function AdminLayout() {
   return (
     <>
       <NavbarAdmin />
-      <div className="flex flex-col items-center bg-[#f5f6f8] px-8 md:px-72">
+      <div className="flex flex-col items-center bg-[#f5f6f8] px-8 md:px-[var(--medium-pad)]">
         <Outlet />
       </div>
     </>

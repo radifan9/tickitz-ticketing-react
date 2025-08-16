@@ -42,7 +42,7 @@ function Footer() {
 
   return (
     <footer className="flex flex-col gap-10 md:mt-12">
-      <div className="flex flex-col items-start gap-8 md:flex-row md:justify-evenly">
+      <div className="flex flex-col items-start gap-8 md:flex-row md:justify-between">
         {/* Slogan */}
         <span className="text-sm font-light text-[#6E7191]">
           <img src="/tickitz-blue.png" alt="" />
@@ -96,7 +96,7 @@ function Footer() {
         </span>
       </div>
 
-      <div className="md:ml-28 text-[#6E7191]">
+      <div className="mb-12 text-[#6E7191]">
         © 2020 Tickitz. All Rights Reserved.
       </div>
     </footer>

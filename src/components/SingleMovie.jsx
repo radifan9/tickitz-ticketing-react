@@ -20,14 +20,12 @@ const formatReleaseDate = (dateString) => {
  * @returns {}
  */
 function SingleMovie({ movie }) {
-
   return (
-    <div className="flex w-[300px] flex-col gap-1" key={movie.id}>
-      <div className="group relative w-[300px]">
+    <div className="flex max-h-full max-w-full flex-col gap-1" key={movie.id}>
+      <div className="group relative max-h-full max-w-full">
         {/* Movie Poster */}
         <img
           className="rounded-md"
-          width="300px"
           src={movie.src}
           alt={movie.title}
           onClick={(e) => {
@@ -36,7 +34,7 @@ function SingleMovie({ movie }) {
         />
 
         {/* Link Hover */}
-        <div className="absolute inset-0 hidden flex-col items-center justify-center gap-2 rounded-md bg-black/60 group-hover:flex">
+        <div className="absolute inset-0 hidden max-w-full flex-col items-center justify-center gap-2 rounded-md bg-black/60 group-hover:flex">
           <Link
             className="flex h-10 w-40 items-center justify-center rounded-md border-[1px] text-sm text-[#FFFFFF]"
             to={`/details/?id=${movie.id}`}

@@ -8,9 +8,10 @@ import Genres from "../../components/Genres";
 import SingleMovie from "../../components/SingleMovie.jsx";
 
 function Home() {
+  const [moviesHero, setMoviesHero] = useState([]);
   const [excitingMovies, setExcitingMovies] = useState([]);
   const [upcomingMovies, setUpcomingMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setLoading] = useState(true);
 
   const whyChooseUs = [
     {
@@ -36,6 +37,15 @@ function Home() {
   useEffect(() => {
     async function fetchExcitingMovies() {
       try {
+        setLoading(true);
+
+        // Get 4 movies images for hero section
+        const moviesHero = await fetchWithAuth(
+          `${import.meta.env.VITE_API_URL}/movie/top_rated`,
+        );
+        console.log(moviesHero);
+        setMoviesHero(moviesHero.results);
+
         const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
         const genresNamed = genresData.genres;
 
@@ -93,9 +103,9 @@ function Home() {
   }, []);
 
   return (
-    <main className="mt-12 flex flex-col items-center gap-8 ">
+    <main className="mt-12 flex flex-col items-center gap-14">
       {/* Hero Section */}
-      <section className="flex flex-col gap-8 md:w-9/10 md:flex-row md:justify-center md:px-72">
+      <section className="flex flex-col gap-8 md:w-full md:flex-row md:justify-center md:px-[var(--medium-pad)]">
         <div className="flex flex-col items-center justify-center gap-8 md:items-start">
           <div className="text-center text-2xl font-semibold text-[#1D4ED8] md:text-3xl">
             MOVIE TICKET PURCHASES #1 IN INDONESIA
@@ -103,37 +113,41 @@ function Home() {
           <div className="text-center text-4xl font-normal md:text-left md:text-5xl">
             Experience the Magic of Cinema: Book Your Tickets Today
           </div>
-          <div className="text-center text-lg md:text-xl font-light text-[#A0A3BD]">
+          <div className="text-center text-lg font-light text-[#A0A3BD] md:text-xl">
             Sign up and get the ticket with a lot of discount
           </div>
         </div>
 
-        <section className="grid h-96 grid-cols-2 grid-rows-3 gap-2 md:w-1/3">
-          <img
-            className="col-span-1 row-span-1 h-full w-full rounded-t-4xl object-cover object-top"
-            src="/john-wick.png"
-            alt="John Wick Poster"
-          />
-          <img
-            className="col-span-1 col-start-2 row-span-2 row-start-1 row-end-3 h-full w-full rounded-t-4xl object-cover object-top"
-            src="/lion-king.png"
-            alt="Lion King Poster"
-          />
-          <img
-            className="col-span-1 col-start-1 row-span-2 row-start-2 h-full w-full rounded-b-4xl object-cover object-top"
-            src="/spiderman-poster.png"
-            alt="Spiderman Poster"
-          />
-          <img
-            className="col-span-1 col-start-2 row-span-1 row-start-3 h-full w-full rounded-b-4xl object-cover object-bottom"
-            src="/roblox.png"
-            alt="Roblox Poster"
-          />
+        <section className="grid h-96 grid-cols-2 grid-rows-3 gap-2 px-[var(--small-pad)] md:w-2/4">
+          {!isLoading && moviesHero && (
+            <>
+              <img
+                className="col-span-1 row-span-1 h-full w-full rounded-t-4xl object-cover object-center"
+                src={`https://image.tmdb.org/t/p/w500/${moviesHero[12].poster_path}`}
+                alt="John Wick Poster"
+              />
+              <img
+                className="col-span-1 col-start-2 row-span-2 row-start-1 row-end-3 h-full w-full rounded-t-4xl object-cover object-top"
+                src={`https://image.tmdb.org/t/p/w500/${moviesHero[8].poster_path}`}
+                alt="Lion King Poster"
+              />
+              <img
+                className="col-span-1 col-start-1 row-span-2 row-start-2 h-full w-full rounded-b-4xl object-cover object-top"
+                src={`https://image.tmdb.org/t/p/w500/${moviesHero[6].poster_path}`}
+                alt="Spiderman Poster"
+              />
+              <img
+                className="col-span-1 col-start-2 row-span-1 row-start-3 h-full w-full rounded-b-4xl object-cover object-center"
+                src={`https://image.tmdb.org/t/p/w500/${moviesHero[5].poster_path}`}
+                alt="Roblox Poster"
+              />
+            </>
+          )}
         </section>
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="flex flex-col items-center gap-8 md:px-72">
+      <section className="flex flex-col items-center gap-8 md:px-[var(--medium-pad)]">
         <div className="text-xl font-semibold text-[#1D4ED8]">
           WHY CHOOSE US
         </div>
@@ -161,14 +175,14 @@ function Home() {
       </section>
 
       {/* <!-- Exciting Movies --> */}
-      <section className="flex flex-col items-center gap-4">
+      <section className="flex flex-col items-center gap-8 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
         <div className="text-xl font-semibold text-[#1D4ED8]">MOVIES</div>
         <div className="text-center text-4xl font-light">
           Exciting Movies That Should Be Watched Today
         </div>
 
         {/* List of Exciting Movies */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-12 md:grid-cols-4">
           {excitingMovies.slice(0, 4).map((movie) => (
             <SingleMovie key={movie.id} movie={movie} />
           ))}
@@ -183,7 +197,7 @@ function Home() {
       </section>
 
       {/* <!-- Upcoming Movies --> */}
-      <section className="mb-8 flex flex-col items-center gap-4">
+      <section className="mb-8 flex flex-col items-center gap-8 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
         <div className="self-start text-xl font-semibold text-[#1D4ED8]">
           UPCOMING MOVIES
         </div>
@@ -192,7 +206,7 @@ function Home() {
         </div>
 
         {/* List of Upcoming Movies */}
-        <div className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-4">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-12 md:grid-cols-4">
           {upcomingMovies.slice(0, 4).map((movie) => (
             <SingleMovie key={movie.id} movie={movie} />
           ))}
