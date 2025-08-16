@@ -83,7 +83,7 @@ function Navbar() {
     <>
       {activeUser ? (
         // When there's a user
-        <header className="relative z-50 flex items-center px-8 py-4 shadow-sm md:px-16">
+        <header className="relative z-20 flex items-center px-8 py-4 shadow-sm md:px-16">
           <img className="" src="/tickitz-blue.png" alt="" />
           <nav className="ml-auto">
             <ul className="hidden gap-16 text-sm md:flex">
@@ -145,7 +145,7 @@ function Navbar() {
         </header>
       ) : (
         // When there's no user
-        <header className="relative z-50 flex items-center px-8 py-4 shadow-sm md:px-16">
+        <header className="relative z-20 flex items-center px-8 py-4 shadow-sm md:px-16">
           <img className="" src="/tickitz-blue.png" alt="" />
           <nav className="ml-auto">
             <ul className="hidden gap-16 text-sm md:flex">
@@ -184,7 +184,15 @@ function Navbar() {
       {isMobileMenuOpen && (
         <div className="md:hidden">
           {/* Mobile Navigation */}
+
           <nav className="fixed top-0 right-0 z-40 h-full w-80 bg-white shadow-lg">
+            <button
+              className="absolute top-[30px] right-8 z-60 md:hidden"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle mobile menu"
+            >
+              <img src="/hamburger-menu.png" alt="Hamburger Menu" />
+            </button>
             <div className="p-6">
               {/* Navigation Links */}
               <ul className="mb-8 space-y-6 pt-16">
@@ -192,7 +200,7 @@ function Navbar() {
                   <li key={idx}>
                     <Link
                       to={nav.route}
-                      className="block text-lg text-gray-800 hover:text-[#1D4ED8]"
+                      className="block w-fit text-lg text-gray-800 hover:text-[#1D4ED8]"
                       onClick={closeMobileMenu}
                     >
                       {nav.text}
@@ -232,7 +240,7 @@ function Navbar() {
                       handleLogout();
                       closeMobileMenu();
                     }}
-                    className="block w-2/3 rounded-md border-[1px] border-solid border-red-500 px-5 py-3 text-center text-red-500 hover:bg-red-50"
+                    className="block w-full rounded-md border-[1px] border-solid border-red-500 px-5 py-3 text-center text-red-500 hover:bg-red-50"
                   >
                     Logout
                   </button>
@@ -241,14 +249,14 @@ function Navbar() {
                 <div className="space-y-4">
                   <Link
                     to="/signin"
-                    className="block w-2/3 rounded-md border-[1px] border-solid px-5 py-3 text-center text-[#1D4ED8] hover:bg-gray-50"
+                    className="block w-full rounded-md border-[1px] border-solid px-5 py-3 text-center text-[#1D4ED8] hover:bg-gray-50"
                     onClick={closeMobileMenu}
                   >
                     Sign In
                   </Link>
                   <Link
                     to="/signup"
-                    className="block w-2/3 rounded-md border-[1px] border-solid bg-[#1D4ED8] px-5 py-3 text-center text-white hover:bg-blue-700"
+                    className="block w-full rounded-md border-[1px] border-solid bg-[#1D4ED8] px-5 py-3 text-center text-white hover:bg-blue-700"
                     onClick={closeMobileMenu}
                   >
                     Sign Up

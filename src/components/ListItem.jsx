@@ -11,7 +11,7 @@ function ListItem({ to, listText, loc }) {
     <li>
       <Link
         to={to}
-        className={`${loc === to ? "relative text-blue-700 after:absolute after:right-0 after:-bottom-0.5 after:left-0 after:h-0.5 after:bg-blue-700 after:content-['']" : ""}`}
+        className={` ${loc === to ? "relative text-blue-700 after:absolute after:right-0 after:-bottom-0.5 after:left-0 after:h-0.5 after:bg-blue-700 after:content-['']" : ""}`}
       >
         {listText}
       </Link>
