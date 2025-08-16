@@ -266,35 +266,55 @@ function Order() {
             <div className="h-1.5 w-97/100 rounded-md bg-[#9570FE]"></div>
             <div className="flex w-full flex-col gap-10">
               <div className="flex justify-between">
-                <div className="grid grid-cols-7 grid-rows-3 gap-1">
+                {/* Left side seating grid with row labels */}
+                <div className="grid grid-cols-8 grid-rows-7 gap-1">
+                  {/* Generate seats with row labels */}
                   {(function () {
                     const result = [];
-                    for (let i = 0; i < 49; i++) {
+                    const SEAT_ROWS = ["A", "B", "C", "D", "E", "F", "G"];
+
+                    for (let row = 0; row < 7; row++) {
+                      // Add row label
                       result.push(
-                        <Seat
-                          key={`seat-${i}`}
-                          id={`seat-${i}`}
-                          name={`seat-${i}`}
-                          selectedSeats={selectedSeats}
-                          onChange={(e) => {
-                            setSelectedSeats((selectedSeats) => {
-                              // Cek apakah selectedSeat sudah terpilih
-                              if (selectedSeats.includes(e.target.name)) {
-                                return selectedSeats.filter(
-                                  (seat) => seat !== e.target.name,
-                                );
-                              }
-                              return [...selectedSeats, e.target.name];
-                            });
-                            updateSeatInfo();
-                          }}
-                        />,
+                        <div
+                          key={`label-left-${row}`}
+                          className="flex h-8 w-8 items-center justify-center font-medium text-[#4E4B66]"
+                        >
+                          {SEAT_ROWS[row]}
+                        </div>,
                       );
+
+                      // Add seats for this row
+                      for (let col = 0; col < 7; col++) {
+                        const seatIndex = row * 7 + col;
+                        result.push(
+                          <Seat
+                            key={`seat-${seatIndex}`}
+                            id={`seat-${seatIndex}`}
+                            name={`seat-${seatIndex}`}
+                            selectedSeats={selectedSeats}
+                            onChange={(e) => {
+                              setSelectedSeats((selectedSeats) => {
+                                // Check if selectedSeat is already selected
+                                if (selectedSeats.includes(e.target.name)) {
+                                  return selectedSeats.filter(
+                                    (seat) => seat !== e.target.name,
+                                  );
+                                }
+                                return [...selectedSeats, e.target.name];
+                              });
+                              updateSeatInfo();
+                            }}
+                          />,
+                        );
+                      }
                     }
                     return result;
                   })()}
                 </div>
-                <div className="grid grid-cols-7 grid-rows-3 gap-1">
+
+                {/* Right side seating grid without labels */}
+                <div className="grid grid-cols-7 grid-rows-7 gap-1">
                   {(function () {
                     const result = [];
                     for (let i = 49; i < 98; i++) {
@@ -306,7 +326,7 @@ function Order() {
                           selectedSeats={selectedSeats}
                           onChange={(e) => {
                             setSelectedSeats((selectedSeats) => {
-                              // Cek apakah selectedSeat sudah terpilih
+                              // Check if selectedSeat is already selected
                               if (selectedSeats.includes(e.target.name)) {
                                 return selectedSeats.filter(
                                   (seat) => seat !== e.target.name,
@@ -326,7 +346,7 @@ function Order() {
           </div>
 
           {/* Seating key */}
-          <div className="self-stretch flex flex-col gap-4">
+          <div className="flex flex-col gap-4 self-stretch">
             <h3 className="text-lg font-semibold">Seating key</h3>
             <div className="grid grid-cols-2 gap-x-14 gap-y-4">
               <div className="flex items-center gap-6 md:hidden">

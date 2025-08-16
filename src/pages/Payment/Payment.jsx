@@ -256,10 +256,10 @@ function Payment() {
   }, []);
 
   return (
-    <div className="relative">
+    <div className="relative md:mx-auto">
       <form
         onSubmit={handleSubmit}
-        className="mb-12 flex w-[732px] flex-col gap-[18px] rounded-[6px] bg-white px-8 py-[38px]"
+        className="mb-12 flex w-full flex-col gap-[18px] rounded-[6px] bg-white px-8 py-[38px] md:w-[900px]"
       >
         <div className="flex flex-col items-center rounded-xl">
           <h2 className="mb-6 self-start text-2xl font-semibold">

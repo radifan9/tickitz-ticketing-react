@@ -97,7 +97,7 @@ function Footer() {
       </div>
 
       <div className="mb-12 text-[#6E7191]">
-        © 2020 Tickitz. All Rights Reserved.
+        © 2025 Tickitz. All Rights Reserved.
       </div>
     </footer>
   );
