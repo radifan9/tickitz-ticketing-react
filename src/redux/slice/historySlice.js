@@ -36,6 +36,9 @@ const historySlice = createSlice({
     addHistory: (state, { payload }) => {
       state.push(payload);
     },
+
+    // Change from Not Paid to Paid
+    
   },
 });
 

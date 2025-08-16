@@ -1,6 +1,13 @@
 import React from "react";
+import { useSelector } from "react-redux";
 
 export const UserProfile = () => {
+  const loggedInState = useSelector((state) => state.loggedIn);
+  const historyState = useSelector((state) => state.history);
+  const ticketHistory = historyState.filter(
+    (el) => el.email == loggedInState.email,
+  );
+
   return (
     <div className="rounded-2xl bg-white p-10 md:col-start-1 md:row-span-3 md:row-start-1 md:mx-6 md:h-fit">
       {/* <!-- Info text and setting button --> */}
@@ -16,7 +23,12 @@ export const UserProfile = () => {
       {/* <!-- Profile Pic and Data --> */}
       <div className="flex flex-col items-center">
         <img src="/profile-pic.png" alt="" />
-        <div className="text-2xl">Jonas El Rodriguez</div>
+        <div className="text-2xl">
+          {/* Jonas El Rodriguez */}
+          {loggedInState.full_name
+            ? loggedInState.loggedInState.full_name
+            : loggedInState.email}
+        </div>
         <div className="text-gray-600">Moviegoers</div>
       </div>
 
