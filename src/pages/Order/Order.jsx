@@ -226,12 +226,12 @@ function Order() {
         className="mb-8 grid gap-8 md:grid-cols-[3fr_2fr]"
       >
         {/* <!-- Left Side --> */}
-        <span className="flex w-full flex-col gap-8 rounded-md bg-white px-20 py-8">
+        <span className="flex w-full flex-col items-center gap-8 rounded-md bg-white px-20 py-8">
           {/* <!-- Top Information --> */}
           <div className="grid items-center gap-5 rounded-lg border-[1px] border-[#DEDEDE] px-3.5 py-8 md:grid-cols-[2fr_3fr_1fr]">
             {/*  Movie Poster  */}
             <img
-              className="aspect-[2/1.5] md:aspect-[1/1.25] w-full rounded-lg object-cover object-center"
+              className="aspect-[2/1.5] w-full rounded-lg object-cover object-center md:aspect-[1/1.25]"
               src={`https://image.tmdb.org/t/p/w500/${movieState.movie.posterPath}`}
               alt=""
             />
@@ -260,7 +260,8 @@ function Order() {
           </div>
 
           {/*  Choose seat buttons  */}
-          <div className="flex w-full flex-col items-center gap-4">
+          {/* Seat left and right side */}
+          <div className="flex w-full flex-col items-center gap-4 md:w-8/10">
             <div>Screen</div>
             <div className="h-1.5 w-97/100 rounded-md bg-[#9570FE]"></div>
             <div className="flex w-full flex-col gap-10">
@@ -321,36 +322,34 @@ function Order() {
                   })()}
                 </div>
               </div>
+            </div>
+          </div>
 
-              {/* Seating key */}
-              <h3 className="self-start text-lg font-semibold">Seating key</h3>
-              <div className="grid grid-cols-2 gap-x-14 gap-y-4">
-                <div className="flex items-center gap-6">
-                  <img src="/down-arrow.png" alt="" />
-                  <div className="text-xl font-normal text-[#4E4B66]">
-                    A - G
-                  </div>
-                </div>
-                <div className="flex items-center gap-6">
-                  <img src="/right-arrow.png" alt="" />
-                  <div className="text-xl font-normal text-[#4E4B66]">
-                    1 - 14
-                  </div>
-                </div>
-                {SEATING_KEY.map((key, idx) => {
-                  return (
-                    <div key={idx} className="flex items-center gap-6">
-                      <div
-                        className="h-8 w-8 rounded-md"
-                        style={{ backgroundColor: key.color }}
-                      ></div>
-                      <div className="text-xl font-normal text-[#4E4B66]">
-                        {key.text}
-                      </div>
-                    </div>
-                  );
-                })}
+          {/* Seating key */}
+          <div className="self-stretch flex flex-col gap-4">
+            <h3 className="text-lg font-semibold">Seating key</h3>
+            <div className="grid grid-cols-2 gap-x-14 gap-y-4">
+              <div className="flex items-center gap-6 md:hidden">
+                <img src="/down-arrow.png" alt="" />
+                <div className="text-xl font-normal text-[#4E4B66]">A - G</div>
               </div>
+              <div className="flex items-center gap-6 md:hidden">
+                <img src="/right-arrow.png" alt="" />
+                <div className="text-xl font-normal text-[#4E4B66]">1 - 14</div>
+              </div>
+              {SEATING_KEY.map((key, idx) => {
+                return (
+                  <div key={idx} className="flex items-center gap-6">
+                    <div
+                      className="h-8 w-8 rounded-md"
+                      style={{ backgroundColor: key.color }}
+                    ></div>
+                    <div className="text-xl font-normal text-[#4E4B66]">
+                      {key.text}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </span>

@@ -185,7 +185,7 @@ function Navbar() {
         <div className="md:hidden">
           {/* Mobile Navigation */}
 
-          <nav className="fixed top-0 right-0 z-40 h-full w-80 bg-white shadow-lg">
+          <nav className="fixed top-0 right-0 z-40 h-full w-64 bg-white shadow-lg">
             <button
               className="absolute top-[30px] right-8 z-60 md:hidden"
               onClick={toggleMobileMenu}

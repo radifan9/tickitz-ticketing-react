@@ -186,7 +186,7 @@ function Details() {
             <div className="absolute inset-0 bg-black/50" />
           </div>
 
-          <section className="relative mb-8 flex flex-col gap-8 px-8 md:px-[var(--medium-pad)]">
+          <section className="relative mb-8 flex flex-col gap-8 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
             {/* Movie Poster + Info */}
             <div className="-mt-80 flex flex-col items-center gap-4 md:-mt-60 md:flex-row">
               {/* Movie Image */}
