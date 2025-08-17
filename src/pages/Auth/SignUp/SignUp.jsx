@@ -8,8 +8,8 @@ import { AuthOtherMethod } from "../AuthOtherMethod";
 // --- External libraries
 import { toast } from "sonner";
 
-// --- Custom hooks
-import useLocalStorage from "../../../hooks/useLocalStorage";
+// --- Context
+import { useUsers } from "../../../contexts/users/usersContext";
 
 // --- Validation patterns
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
@@ -18,53 +18,15 @@ const regexMinSmall = /[a-z]/;
 const regexMinLarge = /[A-Z]/;
 const regexMinSpecialChar = /[!@#$%^&*/()]/;
 
-// --- Utility Functions
-
-/**
- * Generates a unique ID for new users based on existing users
- * @param {Array} existingUsers - Array of existing users
- * @returns {string} - New unique ID as string
- */
-const generateId = (existingUsers) => {
-  const maxId = Math.max(...existingUsers.map((user) => parseInt(user.id)), 0);
-  return (maxId + 1).toString();
-};
-
 // Helper function to hash password (In production change to real hash)
 const hashPassword = (password) => {
   return password;
 };
 
-// --- Default User Data
-const DEFAULT_USERS = [
-  {
-    id: "1",
-    email: "alice@example.com",
-    password: "alice@1AA", // This should be properly hashed
-    role: "admin",
-    full_name: "Admin",
-    phone_number: "911",
-    created_at: "2025-08-13T14:32:00Z",
-    updated_at: "2025-08-13T14:32:00Z",
-  },
-  {
-    id: "2",
-    email: "bob@example.com",
-    password: "b0b123Ad*aa", // This should be properly hashed
-    role: "user",
-    full_name: "Bob The Builder",
-    phone_number: "911",
-    created_at: "2025-08-13T15:00:00Z",
-    updated_at: "2025-08-13T15:00:00Z",
-  },
-];
-
 // --- MAIN COMPONENT
 export default function SignUp() {
-  // --- --- State management
-
-  // User data stored in localStorage
-  const [users, setUsers] = useLocalStorage("usersDB", () => DEFAULT_USERS);
+  // --- --- Context
+  const { addUser, findUserByEmail } = useUsers();
 
   // --- --- Form input states
   const [email, setEmail] = useState("");
@@ -136,10 +98,8 @@ export default function SignUp() {
     try {
       setIsLoading(true);
 
-      // Check if email already exists
-      const existingUser = users.find(
-        (user) => user.email.toLowerCase() === email.toLowerCase(),
-      );
+      // Check if email already exists using context helper
+      const existingUser = findUserByEmail(email);
 
       if (existingUser) {
         toast.error("Email sudah terdaftar. Silakan gunakan email lain.");
@@ -149,18 +109,15 @@ export default function SignUp() {
 
       // Create new user object
       const newUser = {
-        id: generateId(users),
         email: email.toLowerCase(),
         password: hashPassword(password), // Hash the password
         role: "user",
         full_name: "", // You can add a name field to the form if needed
         phone_number: "",
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
       };
 
-      // Add new user using the useLocalStorage setter
-      setUsers([...users, newUser]);
+      // Add new user using context
+      addUser(newUser);
 
       console.log("New user successfully added:", newUser);
       toast.success("Registrasi berhasil! Silakan login.");
