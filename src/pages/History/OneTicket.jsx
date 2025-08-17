@@ -26,7 +26,7 @@ export const OneTicket = ({ ticket }) => {
 
   return (
     <div
-      className={`flex flex-col gap-3 rounded-2xl bg-white pt-8 pb-4 md:col-start-2 md:mx-0`}
+      className={`flex flex-col gap-3 rounded-2xl bg-white py-8 md:col-start-2 md:mx-0`}
     >
       {/* Title */}
       <div className="flex flex-col items-start gap-3 pl-6">
@@ -51,7 +51,7 @@ export const OneTicket = ({ ticket }) => {
       <hr className="text-[#DEDEDE]" />
 
       {/* Ticket Status*/}
-      <div className="flex flex-col items-center gap-3 px-6">
+      <div className="flex flex-col items-center gap-4 px-6">
         <div
           className={`flex h-10 w-full items-center justify-center rounded-lg text-center font-semibold md:w-3/4 ${
             ticket.ticketStatus.isActive
@@ -72,7 +72,7 @@ export const OneTicket = ({ ticket }) => {
           {ticket.ticketStatus.isPaid ? "Paid" : "Not Paid"}
         </div>
         <button
-          className="flex items-center gap-3 text-lg font-normal text-[#AAAAAA]"
+          className="flex items-center gap-3 font-normal text-[#AAAAAA]"
           onClick={() => {
             setIsShowDetails((prev) => {
               return !prev;

@@ -37,7 +37,7 @@ export default function History() {
 
   return (
     <>
-      <div className="container mx-auto grid gap-y-4 pb-4 md:grid md:grid-cols-[1fr_3fr] md:items-start md:py-8">
+      <div className="mx-auto grid gap-y-4 pb-4 md:grid md:grid-cols-[1fr_3fr] md:items-start md:gap-x-8 md:py-8">
         {/* Profile Header */}
         <ProfileHeader loc={"history"} />
 

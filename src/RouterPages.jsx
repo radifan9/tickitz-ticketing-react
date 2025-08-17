@@ -138,7 +138,7 @@ function RouteProfile() {
     <>
       <Navbar />
 
-      <div className="bg-[#f5f6f8]">
+      <div className="bg-[#f5f6f8] px-[var(--small-pad)] md:px-[var(--medium-pad)]">
         <Outlet />
       </div>
     </>

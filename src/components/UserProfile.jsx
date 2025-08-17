@@ -9,7 +9,7 @@ export const UserProfile = () => {
   );
 
   return (
-    <div className="rounded-2xl bg-white p-10 md:col-start-1 md:row-span-3 md:row-start-1 md:mx-6 md:h-fit">
+    <div className="rounded-2xl bg-white p-10 md:col-start-1 md:row-span-3 md:row-start-1 md:h-fit">
       {/* <!-- Info text and setting button --> */}
       <div className="flex items-center justify-between">
         <span className="text-gray-600">INFO</span>

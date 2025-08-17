@@ -234,7 +234,7 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <div className="mt-6 flex flex-col gap-y-8 md:py-8">
+    <div className="mt-6 flex w-full flex-col gap-y-8 md:py-8">
       {/* Sales Chart */}
       <div className="rounded-2xl bg-white p-10">
         <h2 className="mb-8 text-2xl font-medium">Sales Chart</h2>
