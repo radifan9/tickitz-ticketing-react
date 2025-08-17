@@ -6,6 +6,9 @@ import useLocalStorage from "../../../hooks/useLocalStorage";
 import { useDispatch } from "react-redux";
 import { addLoggedIn } from "../../../redux/slice/loggedInSlice";
 
+// --- Context
+import { useUsers } from "../../../contexts/users/usersContext";
+
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
 const regexMin8 = /^.{8,}$/;
 const regexMinSmall = /[a-z]/;
@@ -29,7 +32,9 @@ export default function SignIn() {
   const dispatch = useDispatch();
 
   // Get user from localStorage
-  const [users, _] = useLocalStorage("usersDB", () => DEFAULT_USERS);
+  // const [users, _] = useLocalStorage("usersDB", () => DEFAULT_USERS);
+  const { users } = useUsers();
+  console.log(users);
   const navigate = useNavigate();
 
   // Handler functions
