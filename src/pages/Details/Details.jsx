@@ -5,9 +5,15 @@ import { useDispatch, useSelector } from "react-redux";
 // --- Redux actions
 import { movieActions } from "../../redux/slice/movieSlice";
 import { addOrder } from "../../redux/slice/orderSlice";
+
+// --- Components
 import Genres from "../../components/Genres";
 import Loader from "../../components/Loader";
+
+// --- Utils
 import { getDuration } from "../../utils/getDuration";
+
+// --- External lib
 import { toast } from "sonner";
 
 // --- Variables
@@ -64,6 +70,20 @@ function Details() {
   //   isCinemaChoosed: false,
   // });
 
+  // --- --- Helper functions
+  function checkIsLoggedIn() {
+    if (activeUser == false) {
+      // There's no active user, navigate to SignIn
+      console.log("⚠️ No logged in user");
+
+      toast.error("You must logged in first 🙏🏻");
+
+      setTimeout(() => {
+        navigate("/signin");
+      }, 700);
+    }
+  }
+
   // Get movie ID from search params and redirect if missing
   const id = searchParams.get("id");
   if (id === null) {
@@ -72,6 +92,8 @@ function Details() {
 
   // --- --- Redux state
   const movieState = useSelector((state) => state.movie);
+  const loggedInState = useSelector((state) => state.loggedIn);
+  const activeUser = loggedInState.email !== null;
 
   // --- --- Effects
   // Fetch movie data when component mounts
@@ -268,7 +290,11 @@ function Details() {
                   <div className="text-xl font-medium">Choose Date</div>
                   <div className="flex items-center gap-3 rounded-md bg-[#EFF0F6] px-4 py-3">
                     <img src="/calender.png" alt="" />
-                    <select className="w-full" name="date">
+                    <select
+                      className="w-full"
+                      name="date"
+                      onChange={checkIsLoggedIn}
+                    >
                       {/* Disabled default */}
                       <option disabled selected value="">
                         Select date
@@ -302,12 +328,18 @@ function Details() {
                     </select>
                   </div>
                 </span>
+
                 {/* Choose Time */}
                 <span className="flex flex-col gap-2">
                   <div className="text-xl font-medium">Choose Time</div>
                   <div className="flex items-center gap-3 rounded-md bg-[#EFF0F6] px-4 py-3">
                     <img src="/clock.png" alt="clock logo" />
-                    <select className="w-full" name="time" id="time">
+                    <select
+                      className="w-full"
+                      name="time"
+                      id="time"
+                      onChange={checkIsLoggedIn}
+                    >
                       {/* Disabled default */}
                       <option disabled selected value="">
                         Select time
@@ -322,11 +354,18 @@ function Details() {
                     </select>
                   </div>
                 </span>
+
+                {/* Choose Location */}
                 <span className="flex flex-col gap-2">
                   <div className="text-xl font-medium">Choose Location</div>
                   <div className="flex items-center gap-3 rounded-md bg-[#EFF0F6] px-4 py-3">
                     <img src="/location.png" alt="" />
-                    <select className="w-full" name="cityLocation" id="">
+                    <select
+                      className="w-full"
+                      name="cityLocation"
+                      id=""
+                      onChange={checkIsLoggedIn}
+                    >
                       {/* Disabled default */}
                       <option disabled selected value="">
                         Select location
@@ -372,7 +411,11 @@ function Details() {
                           name="cinema"
                           value={el.name}
                           checked={selectedCinema === el.name}
-                          onChange={() => setSelectedCinema(el.name)}
+                          onChange={() => {
+                            console.log("Cinema Selected!");
+                            checkIsLoggedIn();
+                            setSelectedCinema(el.name);
+                          }}
                         />
                         <label
                           htmlFor={el.name}
