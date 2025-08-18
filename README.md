@@ -57,15 +57,7 @@ tickitz/
 
 ---
 
-## 📝 Documentation
 
-This repository also includes **Basic DevOps documentation** in:  
-
-```
-Document/Weekly Task - 7.md
-```
-
----
 
 ## ⚡ Getting Started
 
@@ -92,3 +84,12 @@ npm run build
 
 ---
 
+## 📝 Documentation
+
+This repository also includes **Basic DevOps documentation** in:  
+
+```
+Document/Week-7/
+```
+
+---

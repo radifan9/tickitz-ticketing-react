@@ -145,6 +145,16 @@ Open Container Initiative (OCI) adalah standar industri untuk image & runtime co
 ![Docker Image Layer](img/Pasted%20image%2020250818083611.png)
 
 
+Docker image itu sebenarnya punya beberapa lapisan atau layer yang jadi satu kesatuan. Setiap layer ini, isinya perubahan atau sejumlah instruksi yang akan dipakai untuk membangun aplikasi. 
+
+### Layers
+
+Setiap image docker itu pasti punya beberapa layer atau lapisan. Nah, dalam setiap lapisannya itu ada instruksi yang tertulis pada Docker File. 
+
+Misalnya, ada perintah seperti `COPY`, `RUN`, atau `ADD` yang akan menambahkan lapisan baru ke image kamu. 
+
+Lapisan satu ini punya sifat read-only, jadi tak akan bisa kamu ubah setelah membuatnya. Kecuali untuk writable yang ada di kontainer. Dengan ini, maka kamu tak bisa mengubah setiap perintah yang ada. 
+
 ---
 ## i. Docker Volume dan Network
 

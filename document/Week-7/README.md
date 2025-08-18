@@ -14,7 +14,7 @@ To Run the builded image
 docker run -d --name tickitz -p 80:80 vite-server:latest 
 ```
 
-To Access Through Local Wifi :
+To Access Through My Local Wifi :
 ```
 http://localhost
 http://192.168.100.232/
@@ -24,6 +24,8 @@ http://192.168.100.232/
 ---
 
 ### 🗝️ Docker SSH Server
+
+(Running from this directory "/document/Week-7/")
 
 Generate Public-Private Key Pair
 ```bash
@@ -36,7 +38,13 @@ To Build Image Containing SSH Server
 docker build -t weekly-ssh:latest .
 ```
 
-To Run
+To Run the builded image
 ```bash
 docker run -d --name my-ssh weekly-ssh:latest
+```
+
+
+To Connect to SSH
+```bash
+ssh -i radif_ecdsa radif@172.17.0.3
 ```
