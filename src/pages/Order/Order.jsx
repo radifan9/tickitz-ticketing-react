@@ -226,7 +226,7 @@ function Order() {
         className="mb-8 grid gap-8 md:grid-cols-[3fr_2fr]"
       >
         {/* <!-- Left Side --> */}
-        <span className="flex w-full flex-col items-center gap-8 rounded-md bg-white px-20 py-8">
+        <span className="flex w-full flex-col items-center gap-8 rounded-md bg-white px-4 py-8 md:px-20">
           {/* <!-- Top Information --> */}
           <div className="grid items-center gap-5 rounded-lg border-[1px] border-[#DEDEDE] px-3.5 py-8 md:grid-cols-[2fr_3fr_1fr]">
             {/*  Movie Poster  */}
@@ -278,7 +278,7 @@ function Order() {
                       result.push(
                         <div
                           key={`label-left-${row}`}
-                          className="flex h-8 w-8 items-center justify-center font-medium text-[#4E4B66]"
+                          className="invisible flex h-8 w-8 items-center justify-center font-medium text-[#4E4B66] md:visible"
                         >
                           {SEAT_ROWS[row]}
                         </div>,
