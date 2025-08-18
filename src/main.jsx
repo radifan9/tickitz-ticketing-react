@@ -39,6 +39,5 @@ createRoot(document.getElementById("root")).render(
         </UsersProvider>
       </PersistGate>
     </ReduxProvider>
-    ,
   </StrictMode>,
 );

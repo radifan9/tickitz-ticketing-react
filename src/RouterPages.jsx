@@ -12,6 +12,7 @@ import PrivateRoute from "./utils/PrivateRoute.jsx";
 // Pages
 import SignUp from "./pages/Auth/SignUp/SignUp.jsx";
 import SignIn from "./pages/Auth//SignIn/SignIn.jsx";
+import Forget from "./pages/Auth/Forget/Forget.jsx";
 import MovieList from "./pages/MovieList/MovieList.jsx";
 import Subscribe from "./components/Subscribe.jsx";
 import Order from "./pages/Order/Order.jsx";
@@ -45,6 +46,7 @@ function RouterPages() {
           <Route element={<RouteAuthLayout />}>
             <Route path="signup" element={<SignUp />} />
             <Route path="signin" element={<SignIn />} />
+            <Route path="forget" element={<Forget />} />
           </Route>
 
           {/* Order, payment */}

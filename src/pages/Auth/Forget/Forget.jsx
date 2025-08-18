@@ -1,26 +1,30 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router";
-import { AuthOtherMethod } from "../AuthOtherMethod";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import useLocalStorage from "../../../hooks/useLocalStorage";
 import { useDispatch } from "react-redux";
-import { addLoggedIn } from "../../../redux/slice/loggedInSlice";
 
 // --- Context
 import { useUsers } from "../../../contexts/users/usersContext";
 
+// --- Constants & Validation Ruiles
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
 const regexMin8 = /^.{8,}$/;
 const regexMinSmall = /[a-z]/;
 const regexMinLarge = /[A-Z]/;
 const regexMinSpecialChar = /[!@#$%^&*/()]/;
 
-export default function SignIn() {
+// --- MAIN COMPONENT
+export default function Forget() {
+  // --- --- Form input states
+  const [email, setEmail] = useState("");
+  const [newPassword, setPassword] = useState("");
+
+  // --- --- UI states
   const [isInputedEmail, setIsInputedEmail] = useState(false);
   const [isInputedPassword, setIsInputedPassword] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
   const [passwordEye, setPasswordEye] = useState("closed");
+
+  // --- --- Error states
   const [emailError, setEmailError] = useState("");
   const [passwordErrors, setPasswordErrors] = useState({
     isMin8: false,
@@ -29,15 +33,12 @@ export default function SignIn() {
     isMinSpecial: false,
   });
   const [loginError, setLoginError] = useState("");
-  const dispatch = useDispatch();
 
-  // Get user from localStorage
-  // const [users, _] = useLocalStorage("usersDB", () => DEFAULT_USERS);
-  const { users } = useUsers();
-  console.log(users);
+  // --- --- Hooks
+  const { users, updateUser } = useUsers();
   const navigate = useNavigate();
 
-  // Handler functions
+  // --- --- Event Handlers
   const handleEmailChange = (e) => {
     setIsInputedEmail(true);
     const value = e.target.value;
@@ -80,25 +81,24 @@ export default function SignIn() {
 
     let userData = null;
     let isEmailExist = false;
-    let isEmailPasswordMatch = false;
 
     // Get data
     userData = users.find((user) => user.email === email);
 
     // Check if email exist, if its exist, it will return the whole data
     isEmailExist = typeof userData === "object" ? true : false;
+    console.log("Is email exist ? ", isEmailExist);
 
-    // Check if inputted password match with DB password
-    isEmailPasswordMatch = userData?.password == password ? true : false;
-
-    if (isEmailExist && isEmailPasswordMatch) {
-      // Success
-      const { email, role, full_name } = userData;
-      dispatch(addLoggedIn({ email, role, full_name }));
-      toast.success("Login successful");
-      navigate("/");
-    } else {
-      setLoginError("Email atau password salah.");
+    // If email exist, change the password
+    if (isEmailExist) {
+      // This will send the entire data
+      // Should refactor : only send id and new hashed password
+      updateUser({
+        ...userData,
+        password: newPassword,
+      });
+      toast.success("Password changed.");
+      navigate("/signin");
     }
   };
 
@@ -110,30 +110,6 @@ export default function SignIn() {
       return "closed";
     });
   };
-
-  // --- Default User Data
-  const DEFAULT_USERS = [
-    {
-      id: "1",
-      email: "alice@example.com",
-      password: "$2b$10$eImiTXuWVxfM37uY4JANjQ==", // This should be properly hashed
-      role: "admin",
-      full_name: "Admin",
-      phone_number: "911",
-      created_at: "2025-08-13T14:32:00Z",
-      updated_at: "2025-08-13T14:32:00Z",
-    },
-    {
-      id: "2",
-      email: "bob@example.com",
-      password: "$2b$10$u0a7d.qfG1P3QYvFZUNQpO==", // This should be properly hashed
-      role: "user",
-      full_name: "Bob The Builder",
-      phone_number: "911",
-      created_at: "2025-08-13T15:00:00Z",
-      updated_at: "2025-08-13T15:00:00Z",
-    },
-  ];
 
   return (
     <div className="relative min-h-screen bg-black bg-[url('/avengers.png')] bg-cover bg-top bg-no-repeat pb-16 font-['Mulish',Arial]">
@@ -148,14 +124,14 @@ export default function SignIn() {
           width="276px"
         />
 
-        <main className="z-2 mx-auto flex w-[546px] flex-col gap-6 rounded-lg bg-white px-8 pt-6 md:p-12">
+        <main className="z-2 mx-auto flex w-[546px] flex-col gap-6 rounded-lg bg-white px-8 pt-8 pb-8 md:p-12">
           {/* Welcome Back */}
-          <div className="mt-14 flex flex-col gap-4">
+          <div className="flex flex-col gap-4">
             <h1 className="text-3xl font-semibold text-[#14142B]">
-              Welcome Back👋
+              Forget Password ❔
             </h1>
             <p className="text-lg font-normal text-[#A0A3BD]">
-              Sign in with your data that you entered during your registration
+              Reset your password
             </p>
           </div>
 
@@ -187,7 +163,7 @@ export default function SignIn() {
             {/* Password */}
             <div className="flex flex-col gap-1 text-[#4E4B66]">
               <label className="font-medium" htmlFor="password">
-                Password
+                New Password
               </label>
               <div className="flex items-center rounded border border-[#dedede]">
                 <input
@@ -289,31 +265,16 @@ export default function SignIn() {
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 text-base text-[#1D4ED8]">
-              <Link to="/forget" className="hover:underline">
-                Forgot your password?
-              </Link>
-            </div>
-
             <button
               className="block h-16 w-full items-center justify-center rounded border-none bg-blue-700 text-base font-semibold text-white"
               type="submit"
             >
-              Login
+              Reset Password
             </button>
             {loginError && (
               <div className="mt-2 text-center text-red-500">{loginError}</div>
             )}
           </form>
-
-          <div className="flex items-center justify-center gap-6">
-            <span className="w-full border-b border-[#a0a3bd]"></span>
-            <span className="text-xs text-[#a0a3bd]">Or</span>
-            <span className="w-full border-b border-[#a0a3bd]"></span>
-          </div>
-
-          {/* Other method */}
-          <AuthOtherMethod />
         </main>
       </div>
     </div>

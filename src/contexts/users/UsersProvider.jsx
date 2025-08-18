@@ -99,6 +99,9 @@ const UsersProvider = ({ children }) => {
     updateUser: (userData) =>
       enhancedDispatch({ type: "UPDATE_USER", payload: userData }),
 
+    updatePassword: (userData) =>
+      enhancedDispatch({ type: "UPDATE_PASS", payload: userData}),
+
     findUserByEmail: (email) =>
       users.find((user) => user.email.toLowerCase() === email.toLowerCase()),
   };
