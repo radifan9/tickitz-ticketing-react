@@ -63,12 +63,6 @@ function Details() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  // const [orderInputted, setOrderInputted] = useState({
-  //   isDateChoosed: false,
-  //   isTimeChoosed: false,
-  //   isLocChoosed: false,
-  //   isCinemaChoosed: false,
-  // });
 
   // --- --- Helper functions
   function checkIsLoggedIn() {
@@ -199,7 +193,7 @@ function Details() {
       {movieState?.isSuccess && (
         <>
           {/* Header image */}
-          <div className="relative w-full md:h-80">
+          <div className="relative w-full md:h-90">
             <img
               className="h-full w-full object-cover"
               src={`https://image.tmdb.org/t/p/original/${movieState.movie.backdropPath}`}
@@ -210,16 +204,16 @@ function Details() {
 
           <section className="relative mb-8 flex flex-col gap-8 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
             {/* Movie Poster + Info */}
-            <div className="-mt-80 flex flex-col items-center gap-4 md:-mt-60 md:flex-row">
+            <div className="-mt-70 flex flex-col items-center gap-4 md:-mt-80 md:flex-row">
               {/* Movie Image */}
               <img
-                className="rounded-2xl object-cover md:aspect-6/7 md:w-[30%]"
+                className="rounded-lg object-cover md:w-[25%]"
                 src={`https://image.tmdb.org/t/p/w500/${movieState.movie.posterPath}`}
                 alt="${movieDetails.title}"
               />
 
               {/* Info */}
-              <span className="flex flex-col items-center gap-4 md:mt-60">
+              <span className="flex flex-col items-center gap-4 md:mt-75 md:ml-2">
                 <h1 className="text-3xl font-medium md:self-start">
                   {movieState.movie.originalTitle}
                 </h1>
