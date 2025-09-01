@@ -241,7 +241,7 @@ export default function MovieList() {
       {/* Main */}
       <div className="flex flex-col items-center gap-10 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
         {/* Cari Event dan Filter */}
-        <div className="flex w-full flex-col gap-8 md:flex-row">
+        <div className="flex w-full flex-col items-center gap-8 md:flex-row">
           {/* Filter query */}
           <div className="flex items-center gap-8">
             <label htmlFor="query" className="font-medium text-[#4E4B66]">
@@ -298,7 +298,7 @@ export default function MovieList() {
 
         {/* Grid Movie List */}
         <div
-          className={`${isLoading ? "" : "grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-y-8"}`}
+          className={`${isLoading ? "" : "grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-y-8"}`}
         >
           {isLoading ? (
             <Loader />
