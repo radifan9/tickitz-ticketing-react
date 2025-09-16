@@ -68,5 +68,8 @@ const HistoryProvider = ({ children }) => {
 
   // Enhanced dispatch
   // Add some common operation
-  const enhancedDispatch = (action) => {};
+  const enhancedDispatch = (action) => {
+    switch (action.type) {
+    }
+  };
 };

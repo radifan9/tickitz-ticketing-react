@@ -272,6 +272,15 @@ function Order() {
                   {(function () {
                     const result = [];
                     const SEAT_ROWS = ["A", "B", "C", "D", "E", "F", "G"];
+                    const SEAT_COLUMNS = [
+                      "1",
+                      "2",
+                      "3",
+                      "4",
+                      "5",
+                      "6",
+                      "7",
+                    ];
 
                     for (let row = 0; row < 7; row++) {
                       // Add row label

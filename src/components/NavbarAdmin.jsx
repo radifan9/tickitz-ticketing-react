@@ -1,6 +1,7 @@
 import { Link, useLocation } from "react-router";
 import ListItem from "./ListItem";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 function NavbarAdmin() {
   const navBtn = [
@@ -9,16 +10,21 @@ function NavbarAdmin() {
   ];
 
   // Hooks
-  const [activeUser, setActiveUser] = useState(false);
+  // const [activeUser, setActiveUser] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const dispatch = useDispatch();
+
+  // --- --- Redux state
+  const loggedInState = useSelector((state) => state.loggedIn);
+  const activeUser = loggedInState.email !== null;
 
   useEffect(() => {
-    const userFromStorage = window.localStorage.getItem("activeUser");
-    const isUserActive = userFromStorage !== null && userFromStorage !== "";
-    setActiveUser(isUserActive);
-    console.log("From localStorage:", userFromStorage);
-    console.log("Is user active?", isUserActive);
+    // const userFromStorage = window.localStorage.getItem("activeUser");
+    // const isUserActive = userFromStorage !== null && userFromStorage !== "";
+    // setActiveUser(isUserActive);
+    // console.log("From localStorage:", userFromStorage);
+    // console.log("Is user active?", isUserActive);
   }, []);
 
   const toggleMobileMenu = () => {

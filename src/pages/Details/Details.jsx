@@ -12,6 +12,7 @@ import Loader from "../../components/Loader";
 
 // --- Utils
 import { getDuration } from "../../utils/getDuration";
+import { formatMovieReleaseDate } from "../../utils/formatMovieReleaseDate";
 
 // --- External lib
 import { toast } from "sonner";
@@ -204,7 +205,7 @@ function Details() {
 
           <section className="relative mb-8 flex flex-col gap-8 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
             {/* Movie Poster + Info */}
-            <div className="-mt-70 flex flex-col items-center gap-4 md:-mt-80 md:flex-row">
+            <div className="-mt-80 flex flex-col items-center gap-4 md:-mt-80 md:flex-row">
               {/* Movie Image */}
               <img
                 className="rounded-lg object-cover md:w-[25%]"
@@ -226,13 +227,18 @@ function Details() {
                 </div>
 
                 {/* <!-- About Movie --> */}
-                <div className="grid grid-cols-2">
+                <div className="grid grid-cols-2 gap-y-4">
+                  {/* Release Date */}
                   <span>
                     <div className="font-light text-[#8692A6]">
                       Release Date
                     </div>
-                    <div className="">{movieState.movie.releaseDate}</div>
+                    <div className="">
+                      {formatMovieReleaseDate(movieState.movie.releaseDate)}
+                    </div>
                   </span>
+
+                  {/* Directed by */}
                   <span>
                     <div className="font-light text-[#8692A6]">Directed by</div>
                     <div className="">{movieState.movie.director}</div>
@@ -413,10 +419,10 @@ function Details() {
                         />
                         <label
                           htmlFor={el.name}
-                          className={`flex max-h-18 cursor-pointer items-center justify-center rounded-lg bg-white p-5 ${
+                          className={`flex max-h-18 cursor-pointer items-center justify-center rounded-lg p-5 hover:shadow-md ${
                             selectedCinema === el.name
-                              ? "border-2 border-[#1D4ED8]"
-                              : "border-[1px] border-[#DEDEDE]"
+                              ? "border-2 border-[#1D4ED8] bg-blue-50"
+                              : "border-[1px] border-[#DEDEDE] bg-white"
                           }`}
                         >
                           <img

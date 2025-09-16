@@ -29,7 +29,7 @@ export const OneTicket = ({ ticket }) => {
       className={`flex flex-col gap-3 rounded-2xl bg-white py-8 md:col-start-2 md:mx-0`}
     >
       {/* Title */}
-      <div className="flex flex-col items-start gap-3 pl-6">
+      <div className="flex flex-col items-start gap-3 pl-10 md:px-32">
         <img
           className="max-w-32"
           src={
@@ -51,9 +51,9 @@ export const OneTicket = ({ ticket }) => {
       <hr className="text-[#DEDEDE]" />
 
       {/* Ticket Status*/}
-      <div className="flex flex-col items-center gap-4 px-6">
+      <div className="flex flex-col items-center gap-4 px-10 md:px-32">
         <div
-          className={`flex h-10 w-full items-center justify-center rounded-lg text-center font-semibold md:w-3/4 ${
+          className={`flex h-10 w-full items-center justify-center rounded-lg text-center font-semibold md:w-full ${
             ticket.ticketStatus.isActive
               ? "bg-[#00BA8833] text-[#00BA88]"
               : "bg-[#6E719133] text-[#6E7191]"
@@ -63,7 +63,7 @@ export const OneTicket = ({ ticket }) => {
         </div>
 
         <div
-          className={`flex h-10 w-full items-center justify-center rounded-lg text-center font-semibold md:w-3/4 ${
+          className={`flex h-10 w-full items-center justify-center rounded-lg text-center font-semibold md:w-full ${
             ticket.ticketStatus.isPaid
               ? "bg-[#1D4ED833] text-[#1D4ED8]"
               : "bg-[#E82C2C33] text-[#E82C2C]"
@@ -92,7 +92,7 @@ export const OneTicket = ({ ticket }) => {
       {
         // Paid
         isShowDetails && ticket.ticketStatus.isPaid && (
-          <div className="flex flex-col gap-4 px-6 pr-12">
+          <div className="flex flex-col gap-4 px-10 pr-12 md:px-32">
             <div className="flex flex-col gap-2">
               <h2 className="text-lg font-medium">Ticket Information</h2>
               <QRCode
@@ -179,7 +179,7 @@ export const OneTicket = ({ ticket }) => {
       {
         // Not Paid
         isShowDetails && ticket.ticketStatus.isPaid == false && (
-          <div className="flex flex-col gap-4 px-6 pr-12">
+          <div className="flex flex-col gap-4 px-10 pr-12 md:px-32">
             <div className="flex flex-col gap-2">
               <h2 className="text-lg font-medium">
                 Ticket Information Not Paid
@@ -187,7 +187,7 @@ export const OneTicket = ({ ticket }) => {
             </div>
 
             {/* Info Grid */}
-            <div className="grid-cols-1">
+            <div className="grid grid-cols-1 gap-y-1">
               <div className="text-base font-normal text-[#8692A6]">
                 No. Rekening Virtual
               </div>
@@ -203,7 +203,7 @@ export const OneTicket = ({ ticket }) => {
                 Total Payment
               </div>
               <div className="text-lg font-semibold text-[#1D4ED8]">$30</div>
-              <div className="text-sm font-normal text-[#A0A3BD]">
+              <div className="mb-2 text-sm font-normal text-[#A0A3BD]">
                 Pay this payment bill before it is due, on June 23, 2023. If the
                 bill has not been paid by the specified time, it will be
                 forfeited

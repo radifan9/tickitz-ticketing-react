@@ -1,6 +1,29 @@
-import React from "react";
+import React, { useState } from "react";
+
+// --- Constants
+const CINEMA_LIST = [
+  {
+    name: "ebv",
+    src: "/ebv-id.png",
+  },
+  {
+    name: "hiflix",
+    src: "/hiflix-red.png",
+  },
+  {
+    name: "CineOne21",
+    src: "/CineOne21-fitted.png",
+  },
+  {
+    name: "Cinepolis",
+    src: "/cinepolis.png",
+  },
+];
 
 export const AdminAddMovie = () => {
+  // --- --- State & Hooks
+  const [selectedCinema, setSelectedCinema] = useState();
+
   // --- --- Handler
   function handleSubmit(e) {
     e.preventDefault();
@@ -50,6 +73,24 @@ export const AdminAddMovie = () => {
             className="h-12 rounded-lg border-[1px] border-[#DEDEDE] px-8 text-sm"
             placeholder="Action, Adventure, Sci-Fi"
           />
+        </div>
+
+        {/* Rating Umur */}
+        <div className="flex flex-col gap-2">
+          <label htmlFor="cat" className="text-[#696F79]">
+            Age Rating
+          </label>
+          <div className="flex h-12 rounded-lg border-[1px] border-[#DEDEDE] px-8 text-sm">
+            <select className="w-full text-[#696F79]" name="" id="">
+              <option value="SU">SU : Semua Umur</option>
+              <option value="R13+">
+                R13+ : Remaja, Cocok untuk usia 13 tahun ke atas.
+              </option>
+              <option value="D17+">
+                R17+ : Dewasa, Cocok untuk usia 17 tahun ke atas.
+              </option>
+            </select>
+          </div>
         </div>
 
         {/* Release Date */}
@@ -149,6 +190,42 @@ export const AdminAddMovie = () => {
             className="h-12 rounded-lg border-[1px] border-[#DEDEDE] px-8 py-6 text-sm"
             placeholder="Purwokerto, Bandung, .."
           />
+        </div>
+
+        {/* Cinema */}
+        <div className="flex flex-col gap-2">
+          <label htmlFor="cat" className="text-[#696F79]">
+            Cinema
+          </label>
+          <div className="mb-3 grid grid-cols-2 items-center gap-8 md:grid-cols-4">
+            {CINEMA_LIST.map((el, idx) => {
+              return (
+                <React.Fragment key={idx}>
+                  <input
+                    className="hidden"
+                    type="checkbox"
+                    id={el.name}
+                    name="cinema"
+                    value={el.name}
+                    checked={selectedCinema === el.name}
+                    onChange={() => {
+                      setSelectedCinema(el.name);
+                    }}
+                  />
+                  <label
+                    htmlFor={el.name}
+                    className={`flex h-18 cursor-pointer items-center justify-center rounded-lg p-1 hover:shadow-md ${
+                      selectedCinema === el.name
+                        ? "border-2 border-[#1D4ED8] bg-blue-50"
+                        : "border-[1px] border-[#DEDEDE] bg-white"
+                    }`}
+                  >
+                    <img className="" src={el.src} alt={`Logo ${el.name}`} />
+                  </label>
+                </React.Fragment>
+              );
+            })}
+          </div>
         </div>
 
         {/* Set date & time */}

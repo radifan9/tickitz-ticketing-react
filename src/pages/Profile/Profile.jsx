@@ -28,7 +28,7 @@ export default function Profile() {
 
   return (
     <>
-      <div className="mx-auto grid gap-y-8 md:grid md:grid-cols-[1fr_3fr] md:gap-x-8 md:py-8">
+      <div className="mx-auto grid gap-y-4 md:grid md:grid-cols-[1fr_3fr] md:gap-x-8 md:py-8">
         <ProfileHeader loc={"acc"} />
 
         {/* User Profile */}
