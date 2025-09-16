@@ -149,6 +149,7 @@ export default function SignUp() {
           },
         },
       );
+      
       const response = await fetch(request, {
         body: JSON.stringify(body),
       });

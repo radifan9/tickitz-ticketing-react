@@ -1,10 +1,14 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  full_name: null,
+  // full_name: null,
   email: null,
   role: null, // Either "admin" or "user"
   phoneNumber: null,
+  token: null,
+  img: null,
+  first_name: null,
+  last_name: null,
 };
 
 const loggedInSlice = createSlice({

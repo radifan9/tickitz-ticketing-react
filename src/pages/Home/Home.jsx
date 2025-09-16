@@ -6,6 +6,7 @@ import getGenreNameFromID from "../../utils/getGenreNameFromID.jsx";
 
 import Genres from "../../components/Genres";
 import SingleMovie from "../../components/SingleMovie.jsx";
+import fetchBEWithoutAuth from "../../utils/fetchBEWithoutAuth.jsx";
 
 function Home() {
   const [moviesHero, setMoviesHero] = useState([]);
@@ -76,19 +77,33 @@ function Home() {
     async function upcomingMovies() {
       try {
         const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
-        const genresNamed = genresData.genres;
+        // const genresNamed = genresData.genres;
 
-        const urlMovies = `${import.meta.env.VITE_API_URL}/movie/upcoming`;
-        const moviesData = await fetchWithAuth(urlMovies);
-        const results = moviesData.results;
+        // const urlMovies = `${import.meta.env.VITE_API_URL}/movie/upcoming`;
+        // const moviesData = await fetchWithAuth(urlMovies);
+        // const results = moviesData.results;
+
+        // const upcomingMovieList = results.map((movie) => {
+        //   return {
+        //     id: movie.id,
+        //     title: movie.original_title,
+        //     releaseDate: movie.release_date,
+        //     genres: getGenreNameFromID(movie.genre_ids, genresNamed),
+        //     src: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+        //   };
+        // });
+
+        const urlMovies = `${import.meta.env.VITE_BE_HOST}/api/v1/movies/upcoming`;
+        const moviesData = await fetchBEWithoutAuth("GET", urlMovies);
+        const results = moviesData.data;
 
         const upcomingMovieList = results.map((movie) => {
           return {
             id: movie.id,
-            title: movie.original_title,
+            title: movie.title,
             releaseDate: movie.release_date,
-            genres: getGenreNameFromID(movie.genre_ids, genresNamed),
-            src: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+            genres: movie.genres,
+            src: `${import.meta.env.VITE_POSTER_PATH}${movie.poster_img}`,
           };
         });
 

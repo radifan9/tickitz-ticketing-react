@@ -62,7 +62,40 @@ export default function SignIn() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const loginUser = async () => {
+    try {
+      const body = {
+        email: email,
+        password: password,
+      };
+
+      const request = new Request(
+        `${import.meta.env.VITE_BE_HOST}/api/v1/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const response = await fetch(request, {
+        body: JSON.stringify(body),
+      });
+
+      if (!response.ok) {
+        throw new Error(response.status);
+      }
+
+      const data = await response.json();
+
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError("");
 
@@ -81,19 +114,31 @@ export default function SignIn() {
     let isEmailExist = false;
     let isEmailPasswordMatch = false;
 
-    // Get data
-    userData = users.find((user) => user.email === email);
+    // // Get data
+    // userData = users.find((user) => user.email === email);
 
-    // Check if email exist, if its exist, it will return the whole data
-    isEmailExist = typeof userData === "object" ? true : false;
+    // // Check if email exist, if its exist, it will return the whole data
+    // isEmailExist = typeof userData === "object" ? true : false;
 
-    // Check if inputted password match with DB password
-    isEmailPasswordMatch = userData?.password == password ? true : false;
+    // // Check if inputted password match with DB password
+    // isEmailPasswordMatch = userData?.password == password ? true : false;
+    const loginData = await loginUser();
 
-    if (isEmailExist && isEmailPasswordMatch) {
+    // if (isEmailExist && isEmailPasswordMatch)
+    if (loginData.success) {
       // Success
-      const { email, role, full_name } = userData;
-      dispatch(addLoggedIn({ email, role, full_name }));
+
+      console.log("Login Data : ", loginData);
+
+      // Get Profile Data
+
+      // const { email, role, full_name } = userData;
+      // dispatch(addLoggedIn({ email, role, full_name, }));
+      const token = loginData.token
+      dispatch(addLoggedIn({ token }));
+
+      // Set token to global state
+
       toast.success("Login successful");
       navigate("/");
     } else {
