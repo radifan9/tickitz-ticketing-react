@@ -48,6 +48,7 @@ function Home() {
 
         const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
         const genresNamed = genresData.genres;
+        console.log(genresNamed);
 
         const urlMovies = `${import.meta.env.VITE_API_URL}/movie/popular`;
         const moviesData = await fetchWithAuth(urlMovies);

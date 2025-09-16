@@ -32,6 +32,8 @@ const getMovieThunk = createAsyncThunk(
       const urlMovie = `${import.meta.env.VITE_API_URL}/movie/${movieId}`;
       const urlCredits = `${import.meta.env.VITE_API_URL}/movie/${movieId}/credits`;
 
+      console.log(`urlCredits : ${urlCredits}`);
+
       const obj = {};
 
       // Get Movie Details
@@ -41,6 +43,7 @@ const getMovieThunk = createAsyncThunk(
 
       // Get Credits Information
       const movieCredits = await fetchWithAuth(urlCredits);
+      console.log(movieCredits);
 
       const creditsInfo = getCredits(movieCredits);
       Object.assign(obj, creditsInfo);

@@ -1,17 +1,17 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
-// --- Component
+// Component
 import { StepOne } from "./StepOne";
 import { AuthOtherMethod } from "../AuthOtherMethod";
 
-// --- External libraries
+// External libraries
 import { toast } from "sonner";
 
-// --- Context
-import { useUsers } from "../../../contexts/users/usersContext";
+// Context
+// import { useUsers } from "../../../contexts/users/usersContext";
 
-// --- Validation patterns
+// Validation patterns
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
 const regexMin8 = /^.{8,}$/;
 const regexMinSmall = /[a-z]/;
@@ -19,27 +19,27 @@ const regexMinLarge = /[A-Z]/;
 const regexMinSpecialChar = /[!@#$%^&*/()]/;
 
 // Helper function to hash password (In production change to real hash)
-const hashPassword = (password) => {
-  return password;
-};
+// const hashPassword = (password) => {
+//   return password;
+// };
 
-// --- MAIN COMPONENT
+// MAIN COMPONENT
 export default function SignUp() {
-  // --- --- Context
-  const { addUser, findUserByEmail } = useUsers();
+  // Context
+  // const { addUser, findUserByEmail } = useUsers();
 
-  // --- --- Form input states
+  // Form input states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [agreeToTerms, setAgreeToTerms] = useState(false);
 
-  // --- --- UI states
+  // UI states
   const [isInputedEmail, setIsInputedEmail] = useState(false);
   const [isInputedPassword, setIsInputedPassword] = useState(false);
   const [passwordEye, setPasswordEye] = useState("closed");
   const [isLoading, setIsLoading] = useState(false);
 
-  // --- --- Validation states
+  // Validation states
   const [emailError, setEmailError] = useState("");
   const [passwordErrors, setPasswordErrors] = useState({
     isMin8: false,
@@ -48,10 +48,10 @@ export default function SignUp() {
     isMinSpecial: false,
   });
 
-  // --- --- Hooks
+  // Hooks
   const navigate = useNavigate();
 
-  // --- --- Event handlers
+  // Event handlers
 
   /**
    * Handles email input changes and validates email format
@@ -94,38 +94,78 @@ export default function SignUp() {
    * Checks if email exists and registers new user if not
    * @returns {Promise<boolean>} - Success status of registration
    */
-  const checkEmailAndRegister = async () => {
+  // const checkEmailAndRegister = async () => {
+  //   try {
+  //     setIsLoading(true);
+
+  //     // Check if email already exists using context helper
+  //     const existingUser = findUserByEmail(email);
+
+  //     if (existingUser) {
+  //       toast.error("Email sudah terdaftar. Silakan gunakan email lain.");
+  //       setEmailError("Email sudah terdaftar");
+  //       return false;
+  //     }
+
+  //     // Create new user object
+  //     const newUser = {
+  //       email: email.toLowerCase(),
+  //       password: hashPassword(password), // Hash the password
+  //       role: "user",
+  //       full_name: "", // You can add a name field to the form if needed
+  //       phone_number: "",
+  //     };
+
+  //     // Add new user using context
+  //     addUser(newUser);
+
+  //     console.log("New user successfully added:", newUser);
+  //     toast.success("Registrasi berhasil! Silakan login.");
+  //     return true;
+  //   } catch (error) {
+  //     console.error("Error during registration:", error);
+  //     toast.error("Terjadi kesalahan saat registrasi. Silakan coba lagi.");
+  //     return false;
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
+  const registerUser = async () => {
     try {
       setIsLoading(true);
 
-      // Check if email already exists using context helper
-      const existingUser = findUserByEmail(email);
-
-      if (existingUser) {
-        toast.error("Email sudah terdaftar. Silakan gunakan email lain.");
-        setEmailError("Email sudah terdaftar");
-        return false;
-      }
-
-      // Create new user object
-      const newUser = {
-        email: email.toLowerCase(),
-        password: hashPassword(password), // Hash the password
-        role: "user",
-        full_name: "", // You can add a name field to the form if needed
-        phone_number: "",
+      const body = {
+        email: email,
+        password: password,
       };
 
-      // Add new user using context
-      addUser(newUser);
+      const request = new Request(
+        `${import.meta.env.VITE_BE_HOST}/api/v1/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+      const response = await fetch(request, {
+        body: JSON.stringify(body),
+      });
 
-      console.log("New user successfully added:", newUser);
-      toast.success("Registrasi berhasil! Silakan login.");
-      return true;
+      if (!response.ok) {
+        throw new Error(response.status);
+      }
+
+      const data = await response.json();
+
+      return data;
     } catch (error) {
-      console.error("Error during registration:", error);
-      toast.error("Terjadi kesalahan saat registrasi. Silakan coba lagi.");
-      return false;
+      if (error == "Error: 409") {
+        // Email sudah terdaftar
+        toast.error("Email sudah terdaftar.");
+        setEmailError("Email sudah terdaftar")
+      }
     } finally {
       setIsLoading(false);
     }
@@ -151,7 +191,8 @@ export default function SignUp() {
       email &&
       password
     ) {
-      const registrationSuccess = await checkEmailAndRegister();
+      // const registrationSuccess = await checkEmailAndRegister();
+      const registrationSuccess = await registerUser();
 
       if (registrationSuccess) {
         navigate("/signin");

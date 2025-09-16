@@ -412,7 +412,6 @@ function Details() {
                           value={el.name}
                           checked={selectedCinema === el.name}
                           onChange={() => {
-                            console.log("Cinema Selected!");
                             checkIsLoggedIn();
                             setSelectedCinema(el.name);
                           }}
