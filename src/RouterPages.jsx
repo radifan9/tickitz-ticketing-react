@@ -41,36 +41,43 @@ function RouterPages() {
           <Route path="details" element={<RouteDetailsLayout />}>
             <Route index element={<Details />} />
           </Route>
-
           {/* Auth: SignUp and SignIn */}
           <Route element={<RouteAuthLayout />}>
             <Route path="signup" element={<SignUp />} />
             <Route path="signin" element={<SignIn />} />
             <Route path="forget" element={<Forget />} />
           </Route>
-
           {/* Order, payment */}
           <Route element={<RouteOrderLayout />}>
             <Route path="order" element={<Order />} />
             <Route path="payment" element={<Payment />} />
           </Route>
-
           {/* Ticket Result */}
           <Route element={<RouteResultLayout />}>
             <Route path="result" element={<Result />} />
           </Route>
 
           {/* User Profile, Settings */}
-          <Route element={<RouteProfile />}>
-            {/* <PrivateRoute redirectTo={<SignIn />}> */}
+          <Route
+            element={
+              <PrivateRoute redirectTo="/signin" authorizeRole={["user"]}>
+                <RouteProfile />
+              </PrivateRoute>
+            }
+          >
             <Route path="profile" element={<Profile />} />
             <Route path="history" element={<History />} />
-            {/* </PrivateRoute> */}
           </Route>
 
           {/* Admin page */}
-          {/* admin prefix */}
-          <Route path="admin" element={<AdminLayout />}>
+          <Route
+            path="admin"
+            element={
+              <PrivateRoute redirectTo="/" authorizeRole={["admin"]}>
+                <AdminLayout />
+              </PrivateRoute>
+            }
+          >
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="movie" element={<AdminMovie />} />
             <Route path="add" element={<AdminAddMovie />} />

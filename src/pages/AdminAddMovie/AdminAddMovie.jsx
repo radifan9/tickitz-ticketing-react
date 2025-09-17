@@ -34,7 +34,7 @@ export const AdminAddMovie = () => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBjZTI0MTI5LWZkYzMtNDg0Yy1iOWU3LWZhYzc1M2FlZGRlOSIsInJvbGUiOiJhZG1pbiIsImlzcyI6InRpY2tpdHoiLCJleHAiOjE3NTgwNzYyNjYsImlhdCI6MTc1ODA3MjY2Nn0.f0NfPltM2FqbWAG0PBYBmlyKbWwnoXwD4sy43_ZVyus`,
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBjZTI0MTI5LWZkYzMtNDg0Yy1iOWU3LWZhYzc1M2FlZGRlOSIsInJvbGUiOiJhZG1pbiIsImlzcyI6InRpY2tpdHoiLCJleHAiOjE3NTgxMTk2NzEsImlhdCI6MTc1ODExNjA3MX0.2oVNONg4vYs0GQ8RwpGvrGsAWFFiCUb91UoqKwy-81M`,
           },
         },
       );

@@ -16,8 +16,11 @@ function NavbarAdmin() {
   const dispatch = useDispatch();
 
   // --- --- Redux state
-  const loggedInState = useSelector((state) => state.loggedIn);
-  const activeUser = loggedInState.email !== null;
+  // const loggedInState = useSelector((state) => state.loggedIn);
+  const authState = useSelector((state) => state.loggedIn);
+  const { token, role } = authState;
+
+  const activeUser = token !== null;
 
   useEffect(() => {
     // const userFromStorage = window.localStorage.getItem("activeUser");

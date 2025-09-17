@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import ListItem from "./ListItem";
-// import { removeLoggedIn } from "../redux/slice/loggedInSlice";
+import { loggedInActions } from "../redux/slice/loggedInSlice";
 
 //  MAIN COMPONENT
 function Navbar() {
@@ -22,8 +22,6 @@ function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  // Redux state
-  // const loggedInState = useSelector((state) => state.loggedIn);
   // Redux selectors
   const authState = useSelector((state) => state.loggedIn);
   const {
@@ -40,11 +38,11 @@ function Navbar() {
   // Effects
   // Check localStorage for active user (for debugging/sync purposes)
   useEffect(() => {
-    const userFromStorage = window.localStorage.getItem("activeUser");
-    const isUserActive = userFromStorage !== null && userFromStorage !== "";
+    // const userFromStorage = window.localStorage.getItem("activeUser");
+    // const isUserActive = userFromStorage !== null && userFromStorage !== "";
 
-    console.log("From localStorage:", userFromStorage);
-    console.log("Is user active?", isUserActive);
+    // console.log("From localStorage:", userFromStorage);
+    // console.log("Is user active?", isUserActive);
     console.log("Redux loggedIn state:", activeUser);
   }, [activeUser]);
 
@@ -65,7 +63,7 @@ function Navbar() {
     };
   }, [isProfileDropdownOpen]);
 
-  // --- --- Event Handlers
+  // Event Handlers
 
   // Mobile menu handlers
   const toggleMobileMenu = () => {
@@ -85,7 +83,7 @@ function Navbar() {
   };
 
   const handleLogout = () => {
-    // dispatch(removeLoggedIn());
+    dispatch(loggedInActions.logoutThunk({ token }));
     setIsProfileDropdownOpen(false);
   };
 

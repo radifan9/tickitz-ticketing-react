@@ -114,6 +114,34 @@ const getProfileThunk = createAsyncThunk(
   },
 );
 
+const logoutThunk = createAsyncThunk(
+  "auth/logout",
+  async ({ token }, { rejectWithValue }) => {
+    try {
+      const request = new Request(
+        `${import.meta.env.VITE_BE_HOST}/api/v1/auth/logout`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      const response = await fetch(request);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+  },
+);
+
 // Slice definition
 const loggedInSlice = createSlice({
   initialState,
@@ -144,6 +172,7 @@ const loggedInSlice = createSlice({
 
       .addCase(loginThunk.fulfilled, (state, { payload }) => {
         // Store authentication token
+        state.role = payload.data.role;
         state.token = payload.data.token;
 
         // Update UI states
@@ -206,25 +235,39 @@ const loggedInSlice = createSlice({
           payload,
           error,
         };
+      })
+
+      .addCase(logoutThunk.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isFailed = false;
+        state.error = null;
+      })
+
+      .addCase(logoutThunk.fulfilled, (state, { _ }) => {
+        // If logout successful, clear the token and other information
+        state.token = null;
+        state.email = null;
+        state.role = null;
+        state.phoneNumber = null;
+        state.img = null;
+        state.first_name = null;
+        state.last_name = null;
+
+        // Update UI states
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+
+      .addCase(logoutThunk.rejected, (state, { payload, error }) => {
+        state.isLoading = false;
+        state.isFailed = true;
+        state.error = {
+          payload,
+          error,
+        };
       }),
 });
-
-// Commented out old slice implementation for reference
-// const loggedInSlice = createSlice({
-//   initialState,
-//   name: "loggedIn",
-//   reducers: {
-//     // When user successfully login
-//     addLoggedIn: (state, { payload }) => {
-//       return payload;
-//     },
-
-//     // When user logged out
-//     removeLoggedIn: (state, { payload }) => {
-//       return initialState;
-//     },
-//   },
-// });
 
 export default loggedInSlice.reducer;
 
@@ -236,4 +279,5 @@ export const loggedInActions = {
   ...loggedInSlice.actions,
   loginThunk,
   getProfileThunk,
+  logoutThunk,
 };
