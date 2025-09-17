@@ -1,26 +1,52 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router";
-import { AuthOtherMethod } from "../AuthOtherMethod";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
 import { toast } from "sonner";
-// import useLocalStorage from "../../../hooks/useLocalStorage";
-import { useDispatch } from "react-redux";
-import { addLoggedIn } from "../../../redux/slice/loggedInSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { loggedInActions } from "../../../redux/slice/loggedInSlice";
+import { AuthOtherMethod } from "../AuthOtherMethod";
 
-// --- Context
-import { useUsers } from "../../../contexts/users/usersContext";
-
+// Validation regex patterns
 const emailRegex = /^[^@]+@[^@]+\.[^@]+$/;
 const regexMin8 = /^.{8,}$/;
 const regexMinSmall = /[a-z]/;
 const regexMinLarge = /[A-Z]/;
 const regexMinSpecialChar = /[!@#$%^&*/()]/;
 
+// Default user data (for reference/testing)
+const DEFAULT_USERS = [
+  {
+    id: "1",
+    email: "alice@example.com",
+    password: "$2b$10$eImiTXuWVxfM37uY4JANjQ==", // This should be properly hashed
+    role: "admin",
+    full_name: "Admin",
+    phone_number: "911",
+    created_at: "2025-08-13T14:32:00Z",
+    updated_at: "2025-08-13T14:32:00Z",
+  },
+  {
+    id: "2",
+    email: "bob@example.com",
+    password: "$2b$10$u0a7d.qfG1P3QYvFZUNQpO==", // This should be properly hashed
+    role: "user",
+    full_name: "Bob The Builder",
+    phone_number: "911",
+    created_at: "2025-08-13T15:00:00Z",
+    updated_at: "2025-08-13T15:00:00Z",
+  },
+];
+
 export default function SignIn() {
-  const [isInputedEmail, setIsInputedEmail] = useState(false);
-  const [isInputedPassword, setIsInputedPassword] = useState(false);
+  // State management
+
+  // Form input states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [passwordEye, setPasswordEye] = useState("closed");
+
+  // Validation states
+  const [isInputedEmail, setIsInputedEmail] = useState(false);
+  const [isInputedPassword, setIsInputedPassword] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordErrors, setPasswordErrors] = useState({
     isMin8: false,
@@ -29,18 +55,39 @@ export default function SignIn() {
     isMinSpecial: false,
   });
   const [loginError, setLoginError] = useState("");
+
+  // Hooks
   const dispatch = useDispatch();
-
-  // Get user from localStorage
-  // const [users, _] = useLocalStorage("usersDB", () => DEFAULT_USERS);
-  const { users } = useUsers();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Handler functions
+  // Redux selectors
+  const authState = useSelector((state) => state.loggedIn);
+  const {
+    isLoading,
+    isSuccess,
+    isFailed,
+    error,
+    token,
+    isAuthenticated,
+    role,
+  } = authState;
+
+  // Routing logic
+  // Get redirect path from location state (if user was redirected here from a protected route)
+  const from = location.state?.from?.pathname || "/";
+
+  // Event handlers
+
+  /**
+   * Handle email input changes and validation
+   */
   const handleEmailChange = (e) => {
     setIsInputedEmail(true);
     const value = e.target.value;
     setEmail(value);
+
+    // Email validation
     if (!value.trim()) {
       setEmailError("Email tidak boleh kosong");
     } else if (!emailRegex.test(value)) {
@@ -50,10 +97,15 @@ export default function SignIn() {
     }
   };
 
+  /**
+   * Handle password input changes and validation
+   */
   const handlePasswordChange = (e) => {
     setIsInputedPassword(true);
     const value = e.target.value;
     setPassword(value);
+
+    // Password validation against all criteria
     setPasswordErrors({
       isMin8: regexMin8.test(value),
       isMinSmall: regexMinSmall.test(value),
@@ -62,44 +114,26 @@ export default function SignIn() {
     });
   };
 
-  const loginUser = async () => {
-    try {
-      const body = {
-        email: email,
-        password: password,
-      };
-
-      const request = new Request(
-        `${import.meta.env.VITE_BE_HOST}/api/v1/auth/login`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      const response = await fetch(request, {
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        throw new Error(response.status);
+  /**
+   * Toggle password visibility
+   */
+  const handleEye = () => {
+    setPasswordEye((now) => {
+      if (now === "closed") {
+        return "opened";
       }
-
-      const data = await response.json();
-
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
+      return "closed";
+    });
   };
 
+  /**
+   * Handle form submission and login process
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoginError("");
 
-    // Validation
+    // Form validation before submission
     if (emailError) return setLoginError(emailError);
     if (
       !passwordErrors.isMin8 ||
@@ -110,90 +144,51 @@ export default function SignIn() {
       return setLoginError("Password tidak memenuhi syarat.");
     }
 
-    let userData = null;
-    let isEmailExist = false;
-    let isEmailPasswordMatch = false;
-
-    // // Get data
-    // userData = users.find((user) => user.email === email);
-
-    // // Check if email exist, if its exist, it will return the whole data
-    // isEmailExist = typeof userData === "object" ? true : false;
-
-    // // Check if inputted password match with DB password
-    // isEmailPasswordMatch = userData?.password == password ? true : false;
-    const loginData = await loginUser();
-
-    // if (isEmailExist && isEmailPasswordMatch)
-    if (loginData.success) {
-      // Success
-
-      console.log("Login Data : ", loginData);
-
-      // Get Profile Data
-
-      // const { email, role, full_name } = userData;
-      // dispatch(addLoggedIn({ email, role, full_name, }));
-      const token = loginData.token
-      dispatch(addLoggedIn({ token }));
-
-      // Set token to global state
-
-      toast.success("Login successful");
-      navigate("/");
-    } else {
-      setLoginError("Email atau password salah.");
-    }
+    // Dispatch login action
+    dispatch(loggedInActions.loginThunk({ email, password }));
   };
 
-  const handleEye = () => {
-    setPasswordEye((now) => {
-      if (now === "closed") {
-        return "opened";
+  // Effects
+
+  /**
+   * Handle login success and navigation
+   */
+  useEffect(() => {
+    if (isSuccess && token) {
+      toast.success("Login berhasil!");
+
+      // Navigate based on user role
+      if (authState.role === "admin") {
+        console.log("--- Logged In as admin");
+        navigate("/admin/dashboard", { replace: true });
+      } else {
+        // For regular users, get profile data first
+        console.log("--- Logged In as user");
+        console.log(token);
+        dispatch(loggedInActions.getProfileThunk({ token }));
+        navigate(from, { replace: true });
       }
-      return "closed";
-    });
-  };
+    }
+  });
 
-  // --- Default User Data
-  const DEFAULT_USERS = [
-    {
-      id: "1",
-      email: "alice@example.com",
-      password: "$2b$10$eImiTXuWVxfM37uY4JANjQ==", // This should be properly hashed
-      role: "admin",
-      full_name: "Admin",
-      phone_number: "911",
-      created_at: "2025-08-13T14:32:00Z",
-      updated_at: "2025-08-13T14:32:00Z",
-    },
-    {
-      id: "2",
-      email: "bob@example.com",
-      password: "$2b$10$u0a7d.qfG1P3QYvFZUNQpO==", // This should be properly hashed
-      role: "user",
-      full_name: "Bob The Builder",
-      phone_number: "911",
-      created_at: "2025-08-13T15:00:00Z",
-      updated_at: "2025-08-13T15:00:00Z",
-    },
-  ];
-
+  // Render
   return (
     <div className="relative min-h-screen bg-black bg-[url('/avengers.png')] bg-cover bg-top bg-no-repeat pb-16 font-['Mulish',Arial]">
-      {/* Masking */}
+      {/* Background Overlay */}
       <div className="absolute inset-0 z-1 bg-black/40"></div>
+
       <div className="flex flex-col items-center gap-6">
         {/* Logo */}
         <img
           className="z-2 mt-20"
           src="/tickitz-white.png"
-          alt=""
+          alt="Tickitz Logo"
           width="276px"
         />
 
+        {/* Main Login Form Container */}
         <main className="z-2 mx-auto flex w-[546px] flex-col gap-6 rounded-lg bg-white px-8 pt-6 md:p-12">
-          {/* Welcome Back */}
+          {/* Header Section */}
           <div className="mt-14 flex flex-col gap-4">
             <h1 className="text-3xl font-semibold text-[#14142B]">
               Welcome Back👋
@@ -203,8 +198,9 @@ export default function SignIn() {
             </p>
           </div>
 
+          {/* Login Form */}
           <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-            {/* Email */}
+            {/* Email Input Field */}
             <div className="flex flex-col gap-1 text-[#4E4B66]">
               <label className="font-medium" htmlFor="email">
                 Email
@@ -217,7 +213,9 @@ export default function SignIn() {
                 id="email"
                 placeholder="Enter your email"
                 value={email}
+                disabled={isLoading}
               />
+              {/* Email Validation Feedback */}
               <div
                 className={`text-sm ${emailError ? "text-red-500" : "text-green-600"}`}
               >
@@ -228,11 +226,13 @@ export default function SignIn() {
               </div>
             </div>
 
-            {/* Password */}
+            {/* Password Input Field */}
             <div className="flex flex-col gap-1 text-[#4E4B66]">
               <label className="font-medium" htmlFor="password">
                 Password
               </label>
+
+              {/* Password Input with Eye Toggle */}
               <div className="flex items-center rounded border border-[#dedede]">
                 <input
                   onChange={handlePasswordChange}
@@ -241,9 +241,10 @@ export default function SignIn() {
                   type={passwordEye === "closed" ? "password" : "text"}
                   id="password"
                   placeholder="Enter your password"
+                  disabled={isLoading}
                 />
-                {/* <!-- Eye opened --> */}
-                {/* <!-- Here we have both opened and closed eye --> */}
+
+                {/* Eye Icon - Opened State */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -265,7 +266,7 @@ export default function SignIn() {
                   />
                 </svg>
 
-                {/* <!-- Eye closed --> */}
+                {/* Eye Icon - Closed State */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -283,7 +284,9 @@ export default function SignIn() {
                 </svg>
               </div>
 
+              {/* Password Validation Feedback */}
               <div className="text-sm">
+                {/* Minimum 8 characters check */}
                 <div
                   className={
                     passwordErrors.isMin8 ? "text-green-600" : "text-red-500"
@@ -294,6 +297,8 @@ export default function SignIn() {
                       ? "✅ Minimum 8 characters"
                       : "❌ Minimum 8 characters")}
                 </div>
+
+                {/* Lowercase character check */}
                 <div
                   className={
                     passwordErrors.isMinSmall
@@ -306,6 +311,8 @@ export default function SignIn() {
                       ? "✅ Minimum 1 small character"
                       : "❌ Minimum 1 small character")}
                 </div>
+
+                {/* Uppercase character check */}
                 <div
                   className={
                     passwordErrors.isMinLarge
@@ -318,6 +325,8 @@ export default function SignIn() {
                       ? "✅ Minimum 1 large character"
                       : "❌ Minimum 1 large character")}
                 </div>
+
+                {/* Special character check */}
                 <div
                   className={
                     passwordErrors.isMinSpecial
@@ -333,30 +342,36 @@ export default function SignIn() {
               </div>
             </div>
 
+            {/* Forgot Password Link */}
             <div className="flex justify-end gap-2 text-base text-[#1D4ED8]">
               <Link to="/forget" className="hover:underline">
                 Forgot your password?
               </Link>
             </div>
 
+            {/* Submit Button */}
             <button
               className="block h-16 w-full items-center justify-center rounded border-none bg-blue-700 text-base font-semibold text-white"
               type="submit"
+              disabled={isLoading}
             >
               Login
             </button>
+
+            {/* Login Error Display */}
             {loginError && (
               <div className="mt-2 text-center text-red-500">{loginError}</div>
             )}
           </form>
 
+          {/* Divider */}
           <div className="flex items-center justify-center gap-6">
             <span className="w-full border-b border-[#a0a3bd]"></span>
             <span className="text-xs text-[#a0a3bd]">Or</span>
             <span className="w-full border-b border-[#a0a3bd]"></span>
           </div>
 
-          {/* Other method */}
+          {/* Alternative Authentication Methods */}
           <AuthOtherMethod />
         </main>
       </div>

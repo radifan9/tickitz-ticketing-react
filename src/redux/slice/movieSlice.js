@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
-//
 import fetchWithAuth from "../../utils/fetchWithAuth";
 import getDetails from "../../utils/getDetails";
 import getCredits from "../../utils/getCredits";

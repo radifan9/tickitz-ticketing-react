@@ -3,18 +3,18 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 import ListItem from "./ListItem";
-import { removeLoggedIn } from "../redux/slice/loggedInSlice";
+// import { removeLoggedIn } from "../redux/slice/loggedInSlice";
 
-// --- MAIN COMPONENT
+//  MAIN COMPONENT
 function Navbar() {
-  // --- --- Constants
+  // Constants
   const navBtn = [
     { text: "Home", route: "/" },
     { text: "Movies", route: "/movies" },
     { text: "Buy Ticket", route: "/" },
   ];
 
-  // --- --- Hooks and state
+  // Hooks and state
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -22,12 +22,22 @@ function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
 
-  // --- --- Redux state
-  const loggedInState = useSelector((state) => state.loggedIn);
-  const activeUser = loggedInState.email !== null;
+  // Redux state
+  // const loggedInState = useSelector((state) => state.loggedIn);
+  // Redux selectors
+  const authState = useSelector((state) => state.loggedIn);
+  const {
+    isLoading,
+    isSuccess,
+    isFailed,
+    error,
+    token,
+    isAuthenticated,
+    role,
+  } = authState;
+  const activeUser = token !== null;
 
-  // --- --- Effects
-
+  // Effects
   // Check localStorage for active user (for debugging/sync purposes)
   useEffect(() => {
     const userFromStorage = window.localStorage.getItem("activeUser");
@@ -35,8 +45,8 @@ function Navbar() {
 
     console.log("From localStorage:", userFromStorage);
     console.log("Is user active?", isUserActive);
-    console.log("Redux loggedIn state:", loggedInState);
-  }, [loggedInState]);
+    console.log("Redux loggedIn state:", activeUser);
+  }, [activeUser]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -75,7 +85,7 @@ function Navbar() {
   };
 
   const handleLogout = () => {
-    dispatch(removeLoggedIn());
+    // dispatch(removeLoggedIn());
     setIsProfileDropdownOpen(false);
   };
 
