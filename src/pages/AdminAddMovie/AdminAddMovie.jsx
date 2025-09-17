@@ -25,9 +25,48 @@ export const AdminAddMovie = () => {
   const [selectedCinema, setSelectedCinema] = useState();
 
   // --- --- Handler
-  function handleSubmit(e) {
-    e.preventDefault();
-  }
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+
+      const request = new Request(
+        `${import.meta.env.VITE_BE_HOST}/api/v1/admin/movies`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBjZTI0MTI5LWZkYzMtNDg0Yy1iOWU3LWZhYzc1M2FlZGRlOSIsInJvbGUiOiJhZG1pbiIsImlzcyI6InRpY2tpdHoiLCJleHAiOjE3NTgwNzYyNjYsImlhdCI6MTc1ODA3MjY2Nn0.f0NfPltM2FqbWAG0PBYBmlyKbWwnoXwD4sy43_ZVyus`,
+          },
+        },
+      );
+
+      const formdata = new FormData();
+      const posterFile = e.target.poster_img.files[0];
+      const backdropFile = e.target.backdrop_img.files[0];
+      formdata.append("poster_img", posterFile);
+      formdata.append("backdrop_img", backdropFile);
+      formdata.append("title", e.target.movieTitle.value);
+      formdata.append("genres", e.target.cat.value);
+      formdata.append("age_rating_id", e.target.age_rating_id.value);
+      formdata.append("director", e.target.director.value);
+      formdata.append("cast", e.target.cast.value);
+      formdata.append("release_date", e.target.releaseDate.value);
+      formdata.append(
+        "duration_minutes",
+        e.target.hour.value * 60 + e.target.minute.value,
+      );
+
+      console.log(formdata);
+
+      const response = await fetch(request, {
+        body: formdata,
+      });
+
+      const result = await response.json();
+      console.log(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="mt-8 mb-20 flex w-full flex-col rounded-2xl bg-white p-9">
@@ -37,14 +76,31 @@ export const AdminAddMovie = () => {
         {/* Image */}
         <div className="flex flex-col gap-2">
           <label htmlFor="image" className="text-[#696F79]">
-            Upload Image
+            Poster Image
           </label>
-          <button
+          <input
+            type="file"
+            name="poster_img"
+            id="file"
+            className="h-10 w-fit rounded-lg bg-[#1D4ED8] px-8 text-sm text-white"
+          />
+
+          <label htmlFor="image" className="text-[#696F79]">
+            Backdrop Image
+          </label>
+          <input
+            type="file"
+            name="backdrop_img"
+            id="file"
+            className="h-10 w-fit rounded-lg bg-[#1D4ED8] px-8 text-sm text-white"
+          />
+
+          {/* <button
             id="image"
             className="h-10 w-fit rounded-lg bg-[#1D4ED8] px-8 text-sm text-white"
           >
             Upload
-          </button>
+          </button> */}
         </div>
 
         {/* Movie Name */}
@@ -81,13 +137,20 @@ export const AdminAddMovie = () => {
             Age Rating
           </label>
           <div className="flex h-12 rounded-lg border-[1px] border-[#DEDEDE] px-8 text-sm">
-            <select className="w-full text-[#696F79]" name="" id="">
-              <option value="SU">SU : Semua Umur</option>
-              <option value="R13+">
+            <select
+              className="w-full text-[#696F79]"
+              name="age_rating_id"
+              id="age_rating_id"
+            >
+              <option value="1">SU : Semua Umur</option>
+              <option value="2">
                 R13+ : Remaja, Cocok untuk usia 13 tahun ke atas.
               </option>
-              <option value="D17+">
+              <option value="3">
                 R17+ : Dewasa, Cocok untuk usia 17 tahun ke atas.
+              </option>
+              <option value="4">
+                R21+ : Dewasa, Cocok untuk usia 21 tahun ke atas.
               </option>
             </select>
           </div>
@@ -103,7 +166,7 @@ export const AdminAddMovie = () => {
             name="releaseDate"
             id="releaseDate"
             className="h-12 rounded-lg border-[1px] border-[#DEDEDE] px-8 text-sm"
-            placeholder="07/05/2020"
+            placeholder="2025-12-30"
           />
         </div>
 
