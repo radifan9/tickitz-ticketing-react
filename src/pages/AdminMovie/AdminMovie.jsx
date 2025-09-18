@@ -19,7 +19,10 @@ export const AdminMovie = () => {
       const data = await apiFetch("/api/v1/admin/movies", "GET", token);
       setMovies(data);
     } catch (error) {
-      console.log(error);
+      console.log(`error : ${error}`);
+      if (error == "Error: 401") {
+        navigate("/signin");
+      }
     }
   };
 

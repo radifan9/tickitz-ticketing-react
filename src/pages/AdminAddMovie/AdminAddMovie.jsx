@@ -6,20 +6,28 @@ import { toast } from "sonner";
 // Constants
 const CINEMA_LIST = [
   {
+    id: 1,
     name: "ebv",
     src: "/ebv-id.png",
+    ticket_price: 10,
   },
   {
+    id: 2,
     name: "hiflix",
     src: "/hiflix-red.png",
+    ticket_price: 15,
   },
   {
+    id: 3,
     name: "CineOne21",
     src: "/CineOne21-fitted.png",
+    ticket_price: 10,
   },
   {
+    id: 4,
     name: "Cinepolis",
     src: "/cinepolis.png",
+    ticket_price: 20,
   },
 ];
 
@@ -82,13 +90,18 @@ export const AdminAddMovie = () => {
       formdata.append("title", e.target.movieTitle.value);
       formdata.append("genres", e.target.cat.value);
       formdata.append("age_rating_id", e.target.age_rating_id.value);
-      formdata.append("director", e.target.director.value);
-      formdata.append("cast", e.target.cast.value);
       formdata.append("release_date", e.target.releaseDate.value);
       formdata.append(
         "duration_minutes",
         parseInt(e.target.hour.value) * 60 + parseInt(e.target.minute.value),
       );
+      formdata.append("director", e.target.director.value);
+      formdata.append("cast", e.target.cast.value);
+      formdata.append("synopsis", e.target.synopsis.value);
+      formdata.append("city_id", e.target.loc.value);
+      formdata.append("cinema_id", selectedCinemas);
+      formdata.append("show_date", e.target.date.value);
+      formdata.append("show_time_id", selectedShowTimes);
 
       console.log("Form Data : ");
       console.log(formdata);
@@ -345,13 +358,13 @@ export const AdminAddMovie = () => {
                     id={el.name}
                     name="cinema"
                     value={el.name}
-                    checked={selectedCinemas.includes(el.name)}
-                    onChange={() => toggleCinema(el.name)}
+                    checked={selectedCinemas.includes(el.id)}
+                    onChange={() => toggleCinema(el.id)}
                   />
                   <label
                     htmlFor={el.name}
                     className={`flex h-18 cursor-pointer items-center justify-center rounded-lg p-1 hover:shadow-md ${
-                      selectedCinemas.includes(el.name)
+                      selectedCinemas.includes(el.id)
                         ? "border-2 border-[#1D4ED8] bg-blue-50"
                         : "border-[1px] border-[#DEDEDE] bg-white"
                     }`}
@@ -371,11 +384,11 @@ export const AdminAddMovie = () => {
           </label>
           <div className="flex items-center gap-8 rounded-md bg-[#EFF0F6] px-4 py-3">
             <img src="/calender.png" alt="" />
-            <input className="flex w-full" type="date" name="" id="" />
+            <input className="flex w-full" type="date" name="date" id="date" />
           </div>
 
           {/* SHOW TIME */}
-          <div className="mb-3 grid grid-cols-2 items-center gap-8 md:grid-cols-4">
+          <div className="mb-3 grid grid-cols-2 items-center gap-x-8 gap-y-2 md:grid-cols-4">
             {SHOWTIME_LIST.map((el, idx) => {
               return (
                 <React.Fragment key={idx}>

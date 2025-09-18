@@ -3,6 +3,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import fetchWithAuth from "../../utils/fetchWithAuth";
 import getDetails from "../../utils/getDetails";
 import getCredits from "../../utils/getCredits";
+import apiFetch from "../../utils/apiFetch";
+import apiFetchNoAuth from "../../utils/apiFetchNoAuth";
 
 // Movie information
 const initialState = {
@@ -28,26 +30,26 @@ const getMovieThunk = createAsyncThunk(
   "movie/get_data",
   async ({ movieId }, { rejectWithValue }) => {
     try {
-      const urlMovie = `${import.meta.env.VITE_API_URL}/movie/${movieId}`;
-      const urlCredits = `${import.meta.env.VITE_API_URL}/movie/${movieId}/credits`;
+      // const urlMovie = `${import.meta.env.VITE_API_URL}/movie/${movieId}`;
+      // const urlCredits = `${import.meta.env.VITE_API_URL}/movie/${movieId}/credits`;
 
-      console.log(`urlCredits : ${urlCredits}`);
+      // console.log(`urlCredits : ${urlCredits}`);
+      console.log("movie id : ");
+      console.log(movieId);
 
-      const obj = {};
+
 
       // Get Movie Details
-      const movieData = await fetchWithAuth(urlMovie);
-      const movieDetails = getDetails(movieData);
-      Object.assign(obj, movieDetails);
+      // const movieData = await fetchWithAuth(urlMovie);
+      // const movieDetails = getDetails(movieData);
+      const urlMovie = `${import.meta.env.VITE_BE_HOST}/api/v1/movies/${movieId}`;
+      console.log("url movie : ");
+      console.log(urlMovie);
 
-      // Get Credits Information
-      const movieCredits = await fetchWithAuth(urlCredits);
-      console.log(movieCredits);
+      const movieData = await apiFetchNoAuth("GET", urlMovie);
+ 
 
-      const creditsInfo = getCredits(movieCredits);
-      Object.assign(obj, creditsInfo);
-
-      return obj;
+      return movieData.data;
     } catch (err) {
       // const error = new Error(
       //   `Error fetching movie details\n${err.status}: ${err.statusText}`,

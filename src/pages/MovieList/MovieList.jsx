@@ -4,13 +4,14 @@ import { useSearchParams } from "react-router";
 import { useDebounce } from "use-debounce";
 
 // --- Utils
-import fetchWithAuth from "../../utils/fetchWithAuth.jsx";
-import getGenreNameFromID from "../../utils/getGenreNameFromID.jsx";
+// import fetchWithAuth from "../../utils/fetchWithAuth.jsx";
+// import getGenreNameFromID from "../../utils/getGenreNameFromID.jsx";
 
 // --- Components
 import SingleMovie from "../../components/SingleMovie.jsx";
 import { Pagination } from "./Pagination.jsx";
 import Loader from "../../components/Loader.jsx";
+import fetchBEWithoutAuth from "../../utils/fetchBEWithoutAuth.jsx";
 
 // --- Constants
 const FILTER_BUTTONS = [
@@ -37,9 +38,9 @@ const FILTER_BUTTONS = [
 
 const PAGINATION_ITEMS = [1, 2, 3, "/white-right-arrow.png"];
 
-// --- MAIN COMPONENT
+// MAIN COMPONENT
 export default function MovieList() {
-  // --- --- State Management
+  // State Management
   const [checkedFilter, setCheckedFilter] = useState([]);
   const [movies, setMovies] = useState([]);
   const [isLoading, setLoading] = useState(true);
@@ -50,24 +51,24 @@ export default function MovieList() {
   const [debouncedValue] = useDebounce(searchQuery, 1000);
   const [selectedGenreIds, setSelectedGenreIds] = useState("");
 
-  // --- --- Helper Functions
+  // Helper Functions
   /**
    * Updates URL search params for genres
    * @param {string} genreIds - Comma-separated genre IDs
    */
-  function updateGenresInSearchParams(genreIds) {
-    setSearchParams((searchParams) => {
-      if (searchParams.has("genres")) {
-        // If genres exists, replace existing value for genres
-        searchParams.set("genres", genreIds);
-      } else {
-        // If genres doesn't exists, add new genres param
-        searchParams.append("genres", genreIds);
-      }
-      // Returns updated params
-      return searchParams;
-    });
-  }
+  // function updateGenresInSearchParams(genreIds) {
+  //   setSearchParams((searchParams) => {
+  //     if (searchParams.has("genres")) {
+  //       // If genres exists, replace existing value for genres
+  //       searchParams.set("genres", genreIds);
+  //     } else {
+  //       // If genres doesn't exists, add new genres param
+  //       searchParams.append("genres", genreIds);
+  //     }
+  //     // Returns updated params
+  //     return searchParams;
+  //   });
+  // }
 
   /**
    * Updates URL search params for search query
@@ -77,17 +78,17 @@ export default function MovieList() {
     // If empty, remove query param instead of setting it to empty string
     if (!encodedQuery) {
       setSearchParams((sp) => {
-        sp.delete("query");
+        sp.delete("keywords");
         return sp;
       });
       return;
     }
 
     setSearchParams((searchParams) => {
-      if (searchParams.has("query")) {
-        searchParams.set("query", encodedQuery);
+      if (searchParams.has("keywords")) {
+        searchParams.set("keywords", encodedQuery);
       } else {
-        searchParams.append("query", encodedQuery);
+        searchParams.append("keywords", encodedQuery);
       }
       return searchParams;
     });
@@ -98,51 +99,78 @@ export default function MovieList() {
    * @param {string} paramName - Parameter name to remove
    */
   function removeFromSearchParams(paramName) {
-    // console.log(`Removed param ${paramName}`);
     setSearchParams((sp) => {
       sp.delete(paramName);
       return sp;
     });
-    // console.log(`Param now ${searchParams.get(paramName)}`);
   }
 
-  /**
-   * Constructs API URL based on current filters and search state
-   * @returns {string} API URL for fetching movies
-   */
+  // /**
+  //  * Constructs API URL based on current filters and search state
+  //  * @returns {string} API URL for fetching movies
+  //  */
+  // const buildApiUrl = () => {
+  //   const baseUrl = import.meta.env.VITE_API_URL;
+  //   const searchParamsString = searchParams.toString();
+
+  //   // If there's a selected genres
+  //   if (selectedGenreIds) {
+  //     removeFromSearchParams("keywords");
+  //     updateGenresInSearchParams(selectedGenreIds);
+
+  //     // Discover
+  //     return `${baseUrl}/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${selectedGenreIds}&${searchParamsString}`;
+  //   }
+
+  //   // Default, if no search query or genre inputted
+  //   if (searchQuery === "") {
+  //     removeFromSearchParams("keywords");
+  //     removeFromSearchParams("genres");
+
+  //     // Now Playing
+  //     return `${baseUrl}/movie/now_playing?${searchParamsString}&language=en-US`;
+  //   }
+
+  //   // Search movies based on search query
+  //   if (searchQuery !== "") {
+  //     const encodedQuery = encodeURIComponent(debouncedValue);
+  //     updateQueryInSearchParams(encodedQuery);
+
+  //     // Search Query
+  //     return `${baseUrl}/search/movie?query=${encodedQuery}&include_adult=false&language=en-US&${searchParamsString}`;
+  //   }
+  // };
   const buildApiUrl = () => {
-    const baseUrl = import.meta.env.VITE_API_URL;
-    const searchParamsString = searchParams.toString();
+    const baseUrl = `${import.meta.env.VITE_BE_HOST}/api/v1/movies/`;
 
-    // If there's a selected genres
-    if (selectedGenreIds) {
-      removeFromSearchParams("query");
-      updateGenresInSearchParams(selectedGenreIds);
+    // Create URLSearchParams from current searchParams
+    const params = new URLSearchParams();
 
-      // Discover
-      return `${baseUrl}/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${selectedGenreIds}&${searchParamsString}`;
+    // Add page parameter (always present, defaults to 1)
+    const page = searchParams.get("page") || "1";
+    params.append("page", page);
+
+    // Add keywords if present
+    const keywords = searchParams.get("keywords");
+    if (keywords && keywords.trim()) {
+      params.append("keywords", keywords);
     }
 
-    // Default, if no search query or genre inputted
-    if (searchQuery === "") {
-      removeFromSearchParams("query");
-      removeFromSearchParams("genres");
-
-      // Now Playing
-      return `${baseUrl}/movie/now_playing?${searchParamsString}&language=en-US`;
+    // Add genres - prioritize searchParams over state for consistency
+    const genresFromParams = searchParams.get("genres");
+    if (genresFromParams && genresFromParams.trim()) {
+      params.append("genres", genresFromParams);
+    } else if (selectedGenreIds && selectedGenreIds.trim()) {
+      // Only use selectedGenreIds if no genres in searchParams
+      params.append("genres", selectedGenreIds);
     }
 
-    // Search movies based on search query
-    if (searchQuery !== "") {
-      const encodedQuery = encodeURIComponent(debouncedValue);
-      updateQueryInSearchParams(encodedQuery);
-
-      // Search Query
-      return `${baseUrl}/search/movie?query=${encodedQuery}&include_adult=false&language=en-US&${searchParamsString}`;
-    }
+    // Build final URL
+    const queryString = params.toString();
+    return queryString ? `${baseUrl}?${queryString}` : baseUrl;
   };
 
-  // --- --- API Functions
+  // API Functions
   /**
    * Fetches movie list from API based on current filters and search parameters
    */
@@ -152,22 +180,38 @@ export default function MovieList() {
       setLoading(true);
 
       // Fetch genres data
-      const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
-      const genresNamed = genresData.genres;
+      // const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
+      // const genresNamed = genresData.genres;
 
       // Build API URL and fetch movies
+      // const urlMovies = buildApiUrl();
+      // const urlMovies = `${import.meta.env.VITE_BE_HOST}/api/v1/movies/`;
+      // const moviesData = await fetchWithAuth(urlMovies);
       const urlMovies = buildApiUrl();
-      const moviesData = await fetchWithAuth(urlMovies);
-      const results = moviesData.results;
+      console.log("Fetching movies from:", urlMovies); // For debugging
+
+      // Fetch movies all (without any params)
+      const moviesData = await fetchBEWithoutAuth("GET", urlMovies);
+
+      const results = moviesData.data;
+
+      // Handle null or empty results
+      if (!results || !Array.isArray(results) || results.length == 0) {
+        console.log("No movies found or results is null/empty");
+        setMovies([]);
+        return;
+      }
+
       const movieList = results
         // Sometimes there's a movie with no picture, skip if poster_path is null
         .filter((movie) => movie.poster_path !== null)
         .map((movie) => {
           return {
             id: movie.id,
-            title: movie.original_title,
-            genres: getGenreNameFromID(movie.genre_ids, genresNamed),
-            src: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+            title: movie.title,
+            // genres: getGenreNameFromID(movie.genres, genresNamed),
+            genres: movie.genres,
+            src: `${import.meta.env.VITE_POSTER_PATH}${movie.poster_img}`,
           };
         });
 
@@ -179,7 +223,7 @@ export default function MovieList() {
     }
   }
 
-  // --- --- Event Handlers
+  // Event Handlers
 
   /**
    * Handles filter button clicks for genre selection
@@ -197,7 +241,7 @@ export default function MovieList() {
     });
   };
 
-  // --- --- Effects
+  // Effects
 
   // Update selected genre IDs when filter changes
   useEffect(() => {
@@ -213,7 +257,7 @@ export default function MovieList() {
     const encodedQuery = encodeURIComponent((debouncedValue || "").trim());
 
     if (!encodedQuery) {
-      removeFromSearchParams("query");
+      removeFromSearchParams("keywords");
       return; // prevent re-adding `query` with an empty value below
     }
 
@@ -244,16 +288,16 @@ export default function MovieList() {
         <div className="flex w-full flex-col items-center gap-8 md:flex-row">
           {/* Filter query */}
           <div className="flex items-center gap-8">
-            <label htmlFor="query" className="font-medium text-[#4E4B66]">
+            <label htmlFor="keywords" className="font-medium text-[#4E4B66]">
               Cari Event
             </label>
             <div className="flex h-16 items-center gap-5 rounded-md border-[1px] border-[#DEDEDE] px-3">
               <img src="/search.png" alt="" />
               <input
-                name="query"
+                name="keywords"
                 className="outline-0"
                 type="text"
-                id="query"
+                id="keywords"
                 placeholder="New Born Expert"
                 value={searchQuery}
                 onChange={(e) => {

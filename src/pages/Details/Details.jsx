@@ -2,22 +2,22 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 
-// --- Redux actions
+// Redux actions
 import { movieActions } from "../../redux/slice/movieSlice";
 import { addOrder } from "../../redux/slice/orderSlice";
 
-// --- Components
+// Components
 import Genres from "../../components/Genres";
 import Loader from "../../components/Loader";
 
-// --- Utils
+// Utils
 import { getDuration } from "../../utils/getDuration";
 import { formatMovieReleaseDate } from "../../utils/formatMovieReleaseDate";
 
-// --- External lib
+// External lib
 import { toast } from "sonner";
 
-// --- Variables
+// Variables
 const orderInputted = {
   isDateChoosed: false,
   isTimeChoosed: false,
@@ -27,7 +27,7 @@ const orderInputted = {
 // Collect error messages and show them sequentially
 let messages = [];
 
-// --- Constants
+// Constants
 const CINEMA_LIST = [
   {
     name: "ebv",
@@ -51,21 +51,21 @@ const TIME_OPTIONS = ["13:00", "15:00", "18:30", "21:00"];
 const LOCATION_OPTIONS = [
   { value: "jakarta", label: "Jakarta" },
   { value: "bogor", label: "Bogor" },
-  { value: "bandung", label: "Bandung" },
-  { value: "surabaya", label: "Surabaya" },
-  { value: "jember", label: "Jember" },
+  { value: "depok", label: "Depok" },
+  { value: "tangerang", label: "Tangerang" },
+  { value: "bekasi", label: "Bekasi" },
 ];
 
-// --- MAIN COMPONENT
+// MAIN COMPONENT
 function Details() {
-  // --- --- State & Hooks
+  // State & Hooks
   const [selectedCinema, setSelectedCinema] = useState();
   const [cinemaPagination, _] = useState(1);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // --- --- Helper functions
+  // Helper functions
   function checkIsLoggedIn() {
     if (activeUser == false) {
       // There's no active user, navigate to SignIn
@@ -85,14 +85,17 @@ function Details() {
     navigate("/movies");
   }
 
-  // --- --- Redux state
+  // Redux state
   const movieState = useSelector((state) => state.movie);
   const loggedInState = useSelector((state) => state.loggedIn);
   const activeUser = loggedInState.email !== null;
 
-  // --- --- Effects
+  // Effects
   // Fetch movie data when component mounts
   useEffect(() => {
+    console.log("getMovieThunk want to run");
+    console.log("movie ID : ");
+    console.log(id);
     dispatch(movieActions.getMovieThunk({ movieId: id }));
   }, []);
 
@@ -197,8 +200,8 @@ function Details() {
           <div className="relative w-full md:h-90">
             <img
               className="h-full w-full object-cover"
-              src={`https://image.tmdb.org/t/p/original/${movieState.movie.backdropPath}`}
-              alt={movieState.movie?.originalTitle || "Movie backdrop"}
+              src={`${import.meta.env.VITE_BACKDROP_PATH}${movieState.movie.backdrop_img}`}
+              alt={movieState.movie?.title || "Movie backdrop"}
             />
             <div className="absolute inset-0 bg-black/50" />
           </div>
@@ -209,14 +212,14 @@ function Details() {
               {/* Movie Image */}
               <img
                 className="rounded-lg object-cover md:w-[25%]"
-                src={`https://image.tmdb.org/t/p/w500/${movieState.movie.posterPath}`}
-                alt="${movieDetails.title}"
+                src={`${import.meta.env.VITE_POSTER_PATH}${movieState.movie.poster_img}`}
+                alt={`${movieState.title}`}
               />
 
               {/* Info */}
               <span className="flex flex-col items-center gap-4 md:mt-75 md:ml-2">
                 <h1 className="text-3xl font-medium md:self-start">
-                  {movieState.movie.originalTitle}
+                  {movieState.movie.title}
                 </h1>
 
                 {/* <!-- Genres --> */}
@@ -234,7 +237,7 @@ function Details() {
                       Release Date
                     </div>
                     <div className="">
-                      {formatMovieReleaseDate(movieState.movie.releaseDate)}
+                      {formatMovieReleaseDate(movieState.movie.release_date)}
                     </div>
                   </span>
 
@@ -246,14 +249,14 @@ function Details() {
                   <span>
                     <div className="font-light text-[#8692A6]">Duration</div>
                     <div className="">
-                      {getDuration(movieState.movie.runtime)}
+                      {getDuration(movieState.movie.duration_minutes)}
                     </div>
                   </span>
                   <span>
                     <div className="font-light text-[#8692A6]">Casts</div>
                     <div className="">
-                      {movieState.movie.castList.map((el, idx) => {
-                        if (idx == movieState.movie.castList.length - 1) {
+                      {movieState.movie.cast?.map((el, idx) => {
+                        if (idx == movieState.movie.cast.length - 1) {
                           return (
                             <React.Fragment key={idx}>{el}</React.Fragment>
                           );
@@ -272,7 +275,7 @@ function Details() {
             <div className="">
               <h3 className="text-xl font-medium">Synopsis</h3>
               <p className="text-base font-light text-[#A0A3BD]">
-                {movieState.movie.overview}
+                {movieState.movie.synopsis}
               </p>
             </div>
 
@@ -314,16 +317,22 @@ function Details() {
                         const option3 = new Date(today);
                         option3.setDate(today.getDate() + 2);
 
+                        // Option day + 3
+                        const option4 = new Date(today);
+                        option3.setDate(today.getDate() + 3);
+
                         // Function to format date
                         function formatDate(date) {
                           return date.toISOString().split("T")[0];
                         }
 
-                        return [option1, option2, option3].map((date, idx) => (
-                          <option key={idx} value={formatDate(date)}>
-                            {date.toLocaleDateString()}
-                          </option>
-                        ));
+                        return [option1, option2, option3, option4].map(
+                          (date, idx) => (
+                            <option key={idx} value={formatDate(date)}>
+                              {date.toLocaleDateString()}
+                            </option>
+                          ),
+                        );
                       })()}
                     </select>
                   </div>

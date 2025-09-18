@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router";
 import ListItem from "./ListItem";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { loggedInActions } from "../redux/slice/loggedInSlice";
 
 function NavbarAdmin() {
   const navBtn = [
@@ -47,8 +48,9 @@ function NavbarAdmin() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("activeUser");
-    setActiveUser(false);
+    // localStorage.removeItem("activeUser");
+    // setActiveUser(false);
+    dispatch(loggedInActions.logoutThunk({ token }));
     setIsProfileDropdownOpen(false);
   };
 

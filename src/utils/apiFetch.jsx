@@ -7,9 +7,9 @@ async function apiFetch(url, method, token) {
   });
 
   const response = await fetch(request);
+
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.message);
+    throw new Error(response.status);
   }
 
   const data = await response.json();
