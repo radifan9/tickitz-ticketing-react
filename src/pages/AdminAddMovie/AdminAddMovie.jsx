@@ -1,7 +1,6 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { loggedInActions } from "../../redux/slice/loggedInSlice";
-import { useLocation, useNavigate } from "react-router";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router";
 import { toast } from "sonner";
 
 // Constants
@@ -24,26 +23,41 @@ const CINEMA_LIST = [
   },
 ];
 
+const SHOWTIME_LIST = [
+  {
+    id: 1,
+    start_at: "12:00",
+  },
+
+  {
+    id: 2,
+    start_at: "15:00",
+  },
+
+  {
+    id: 3,
+    start_at: "18:00",
+  },
+
+  {
+    id: 4,
+    start_at: "21:00",
+  },
+];
+
 export const AdminAddMovie = () => {
-  // State & Hooks
-  const [selectedCinema, setSelectedCinema] = useState();
+  // State
+  const [selectedCinemas, setSelectedCinemas] = useState([]);
+  const [selectedShowTimes, setSelectedShowTimes] = useState([]);
+  const [posterName, setPosterName] = useState("Upload Poster");
+  const [backdropName, setBackdropName] = useState("Upload Backdrop");
 
   // Hooks
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const location = useLocation();
 
   // Redux
   const authState = useSelector((state) => state.loggedIn);
-  const {
-    isLoading,
-    isSuccess,
-    isFailed,
-    error,
-    token,
-    isAuthenticated,
-    role,
-  } = authState;
+  const { token } = authState;
 
   // Handler
   const handleSubmit = async (e) => {
@@ -73,8 +87,11 @@ export const AdminAddMovie = () => {
       formdata.append("release_date", e.target.releaseDate.value);
       formdata.append(
         "duration_minutes",
-        e.target.hour.value * 60 + e.target.minute.value,
+        parseInt(e.target.hour.value) * 60 + parseInt(e.target.minute.value),
       );
+
+      console.log("Form Data : ");
+      console.log(formdata);
 
       const response = await fetch(request, {
         body: formdata,
@@ -88,11 +105,29 @@ export const AdminAddMovie = () => {
       const result = await response.json();
       console.log(result);
 
-      toast.success("Successfully added new movie!");
+      toast.success(`Successfully added ${e.target.movieTitle.value}!`);
       navigate("/admin/movie", { replace: true });
     } catch (error) {
       console.log(error);
     }
+  };
+
+  // Toggle cinema
+  const toggleCinema = (cinemaName) => {
+    setSelectedCinemas((prev) =>
+      prev.includes(cinemaName)
+        ? prev.filter((c) => c !== cinemaName)
+        : [...prev, cinemaName],
+    );
+  };
+
+  // Toggle showtime
+  const toggleShowTime = (showTime) => {
+    setSelectedShowTimes((prev) =>
+      prev.includes(showTime)
+        ? prev.filter((t) => t !== showTime)
+        : [...prev, showTime],
+    );
   };
 
   return (
@@ -108,26 +143,39 @@ export const AdminAddMovie = () => {
           <input
             type="file"
             name="poster_img"
-            id="file"
-            className="h-10 w-fit rounded-lg bg-[#1D4ED8] px-8 text-sm text-white"
+            id="poster_img"
+            className="hidden"
+            onChange={
+              (e) => setPosterName(e.target.files[0]?.name || "Upload Poster")
+              // e.target.backdrop_img.files[0]
+            }
           />
+          <label
+            htmlFor="poster_img"
+            className="flex h-10 w-fit cursor-pointer items-center justify-center rounded-lg bg-[#1D4ED8] px-8 text-sm text-white"
+          >
+            {posterName}
+          </label>
 
           <label htmlFor="image" className="text-[#696F79]">
             Backdrop Image
           </label>
+
           <input
             type="file"
             name="backdrop_img"
-            id="file"
-            className="h-10 w-fit rounded-lg bg-[#1D4ED8] px-8 text-sm text-white"
+            id="backdrop_img"
+            className="hidden"
+            onChange={(e) =>
+              setBackdropName(e.target.files[0]?.name || "Upload Backdrop")
+            }
           />
-
-          {/* <button
-            id="image"
-            className="h-10 w-fit rounded-lg bg-[#1D4ED8] px-8 text-sm text-white"
+          <label
+            htmlFor="backdrop_img"
+            className="flex h-10 w-fit cursor-pointer items-center justify-center rounded-lg bg-[#1D4ED8] px-8 text-sm text-white"
           >
-            Upload
-          </button> */}
+            {backdropName}
+          </label>
         </div>
 
         {/* Movie Name */}
@@ -278,7 +326,7 @@ export const AdminAddMovie = () => {
             name="loc"
             id="loc"
             className="h-12 rounded-lg border-[1px] border-[#DEDEDE] px-8 py-6 text-sm"
-            placeholder="Purwokerto, Bandung, .."
+            placeholder="Jakarta, Bogor, .."
           />
         </div>
 
@@ -297,20 +345,18 @@ export const AdminAddMovie = () => {
                     id={el.name}
                     name="cinema"
                     value={el.name}
-                    checked={selectedCinema === el.name}
-                    onChange={() => {
-                      setSelectedCinema(el.name);
-                    }}
+                    checked={selectedCinemas.includes(el.name)}
+                    onChange={() => toggleCinema(el.name)}
                   />
                   <label
                     htmlFor={el.name}
                     className={`flex h-18 cursor-pointer items-center justify-center rounded-lg p-1 hover:shadow-md ${
-                      selectedCinema === el.name
+                      selectedCinemas.includes(el.name)
                         ? "border-2 border-[#1D4ED8] bg-blue-50"
                         : "border-[1px] border-[#DEDEDE] bg-white"
                     }`}
                   >
-                    <img className="" src={el.src} alt={`Logo ${el.name}`} />
+                    <img src={el.src} alt={`Logo ${el.name}`} />
                   </label>
                 </React.Fragment>
               );
@@ -325,25 +371,40 @@ export const AdminAddMovie = () => {
           </label>
           <div className="flex items-center gap-8 rounded-md bg-[#EFF0F6] px-4 py-3">
             <img src="/calender.png" alt="" />
-            <select className="w-full" name="date">
-              {(() => {
-                const today = new Date();
-                const option1 = new Date(today);
-                option1.setDate(today.getDate());
-                const option2 = new Date(today);
-                option2.setDate(today.getDate() + 1);
-                function formatDate(date) {
-                  return date.toISOString().split("T")[0];
-                }
-                return [option1, option2].map((date, idx) => (
-                  <option key={idx} value={formatDate(date)}>
-                    {date.toLocaleDateString()}
-                  </option>
-                ));
-              })()}
-            </select>
+            <input className="flex w-full" type="date" name="" id="" />
           </div>
 
+          {/* SHOW TIME */}
+          <div className="mb-3 grid grid-cols-2 items-center gap-8 md:grid-cols-4">
+            {SHOWTIME_LIST.map((el, idx) => {
+              return (
+                <React.Fragment key={idx}>
+                  <input
+                    className="hidden"
+                    type="checkbox"
+                    id={el.id}
+                    name="cinema"
+                    value={el.id}
+                    checked={selectedShowTimes.includes(el.id)}
+                    onChange={() => toggleShowTime(el.id)}
+                  />
+                  <label
+                    htmlFor={el.id}
+                    className={`flex h-10 cursor-pointer items-center justify-center rounded-lg p-1 hover:shadow-md ${
+                      selectedShowTimes.includes(el.id)
+                        ? "border-2 border-[#1D4ED8] bg-blue-50"
+                        : "border-[1px] border-[#DEDEDE] bg-white"
+                    }`}
+                  >
+                    {/* <img src={el.src} alt={`Logo ${el.name}`} /> */}
+                    <span>{el.start_at}</span>
+                  </label>
+                </React.Fragment>
+              );
+            })}
+          </div>
+
+          {/* ADD SHOW TIME */}
           <div className="flex items-center gap-5">
             <button className="flex h-7 items-center rounded border-[1px] border-[#1D4ED8] px-4 text-3xl font-light text-[#1D4ED8]">
               +
@@ -353,21 +414,7 @@ export const AdminAddMovie = () => {
               type="text"
               name=""
               id=""
-              placeholder="08:30am"
-            />
-            <input
-              className="h-7 font-medium"
-              type="text"
-              name=""
-              id=""
-              placeholder="12:30am"
-            />
-            <input
-              className="h-7 font-medium"
-              type="text"
-              name=""
-              id=""
-              placeholder="12:30am"
+              placeholder="add custom time"
             />
           </div>
         </div>
