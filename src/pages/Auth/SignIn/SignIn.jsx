@@ -12,33 +12,7 @@ const regexMinSmall = /[a-z]/;
 const regexMinLarge = /[A-Z]/;
 const regexMinSpecialChar = /[!@#$%^&*/()]/;
 
-// Default user data (for reference/testing)
-const DEFAULT_USERS = [
-  {
-    id: "1",
-    email: "alice@example.com",
-    password: "$2b$10$eImiTXuWVxfM37uY4JANjQ==", // This should be properly hashed
-    role: "admin",
-    full_name: "Admin",
-    phone_number: "911",
-    created_at: "2025-08-13T14:32:00Z",
-    updated_at: "2025-08-13T14:32:00Z",
-  },
-  {
-    id: "2",
-    email: "bob@example.com",
-    password: "$2b$10$u0a7d.qfG1P3QYvFZUNQpO==", // This should be properly hashed
-    role: "user",
-    full_name: "Bob The Builder",
-    phone_number: "911",
-    created_at: "2025-08-13T15:00:00Z",
-    updated_at: "2025-08-13T15:00:00Z",
-  },
-];
-
 export default function SignIn() {
-  // State management
-
   // Form input states
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

@@ -1,6 +1,10 @@
 import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loggedInActions } from "../../redux/slice/loggedInSlice";
+import { useLocation, useNavigate } from "react-router";
+import { toast } from "sonner";
 
-// --- Constants
+// Constants
 const CINEMA_LIST = [
   {
     name: "ebv",
@@ -21,10 +25,27 @@ const CINEMA_LIST = [
 ];
 
 export const AdminAddMovie = () => {
-  // --- --- State & Hooks
+  // State & Hooks
   const [selectedCinema, setSelectedCinema] = useState();
 
-  // --- --- Handler
+  // Hooks
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Redux
+  const authState = useSelector((state) => state.loggedIn);
+  const {
+    isLoading,
+    isSuccess,
+    isFailed,
+    error,
+    token,
+    isAuthenticated,
+    role,
+  } = authState;
+
+  // Handler
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
@@ -34,7 +55,7 @@ export const AdminAddMovie = () => {
         {
           method: "POST",
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBjZTI0MTI5LWZkYzMtNDg0Yy1iOWU3LWZhYzc1M2FlZGRlOSIsInJvbGUiOiJhZG1pbiIsImlzcyI6InRpY2tpdHoiLCJleHAiOjE3NTgxMTk2NzEsImlhdCI6MTc1ODExNjA3MX0.2oVNONg4vYs0GQ8RwpGvrGsAWFFiCUb91UoqKwy-81M`,
+            Authorization: `Bearer ${token}`,
           },
         },
       );
@@ -55,14 +76,20 @@ export const AdminAddMovie = () => {
         e.target.hour.value * 60 + e.target.minute.value,
       );
 
-      console.log(formdata);
-
       const response = await fetch(request, {
         body: formdata,
       });
 
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+
       const result = await response.json();
       console.log(result);
+
+      toast.success("Successfully added new movie!");
+      navigate("/admin/movie", { replace: true });
     } catch (error) {
       console.log(error);
     }
