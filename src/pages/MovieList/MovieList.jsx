@@ -1,19 +1,15 @@
-// --- Library
+// Library
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router";
 import { useDebounce } from "use-debounce";
 
-// --- Utils
-// import fetchWithAuth from "../../utils/fetchWithAuth.jsx";
-// import getGenreNameFromID from "../../utils/getGenreNameFromID.jsx";
-
-// --- Components
+// Components
 import SingleMovie from "../../components/SingleMovie.jsx";
 import { Pagination } from "./Pagination.jsx";
 import Loader from "../../components/Loader.jsx";
 import fetchBEWithoutAuth from "../../utils/fetchBEWithoutAuth.jsx";
 
-// --- Constants
+// Constants
 const FILTER_BUTTONS = [
   { id: 28, name: "Action" },
   { id: 12, name: "Adventure" },
@@ -36,8 +32,6 @@ const FILTER_BUTTONS = [
   { id: 37, name: "Western" },
 ];
 
-const PAGINATION_ITEMS = [1, 2, 3, "/white-right-arrow.png"];
-
 // MAIN COMPONENT
 export default function MovieList() {
   // State Management
@@ -50,25 +44,6 @@ export default function MovieList() {
   });
   const [debouncedValue] = useDebounce(searchQuery, 1000);
   const [selectedGenreIds, setSelectedGenreIds] = useState("");
-
-  // Helper Functions
-  /**
-   * Updates URL search params for genres
-   * @param {string} genreIds - Comma-separated genre IDs
-   */
-  // function updateGenresInSearchParams(genreIds) {
-  //   setSearchParams((searchParams) => {
-  //     if (searchParams.has("genres")) {
-  //       // If genres exists, replace existing value for genres
-  //       searchParams.set("genres", genreIds);
-  //     } else {
-  //       // If genres doesn't exists, add new genres param
-  //       searchParams.append("genres", genreIds);
-  //     }
-  //     // Returns updated params
-  //     return searchParams;
-  //   });
-  // }
 
   /**
    * Updates URL search params for search query
@@ -105,41 +80,6 @@ export default function MovieList() {
     });
   }
 
-  // /**
-  //  * Constructs API URL based on current filters and search state
-  //  * @returns {string} API URL for fetching movies
-  //  */
-  // const buildApiUrl = () => {
-  //   const baseUrl = import.meta.env.VITE_API_URL;
-  //   const searchParamsString = searchParams.toString();
-
-  //   // If there's a selected genres
-  //   if (selectedGenreIds) {
-  //     removeFromSearchParams("keywords");
-  //     updateGenresInSearchParams(selectedGenreIds);
-
-  //     // Discover
-  //     return `${baseUrl}/discover/movie?include_adult=false&include_video=false&language=en-US&sort_by=popularity.desc&with_genres=${selectedGenreIds}&${searchParamsString}`;
-  //   }
-
-  //   // Default, if no search query or genre inputted
-  //   if (searchQuery === "") {
-  //     removeFromSearchParams("keywords");
-  //     removeFromSearchParams("genres");
-
-  //     // Now Playing
-  //     return `${baseUrl}/movie/now_playing?${searchParamsString}&language=en-US`;
-  //   }
-
-  //   // Search movies based on search query
-  //   if (searchQuery !== "") {
-  //     const encodedQuery = encodeURIComponent(debouncedValue);
-  //     updateQueryInSearchParams(encodedQuery);
-
-  //     // Search Query
-  //     return `${baseUrl}/search/movie?query=${encodedQuery}&include_adult=false&language=en-US&${searchParamsString}`;
-  //   }
-  // };
   const buildApiUrl = () => {
     const baseUrl = `${import.meta.env.VITE_BE_HOST}/api/v1/movies/`;
 
@@ -179,14 +119,6 @@ export default function MovieList() {
       // Every time try to fetch, set the isLoading to true
       setLoading(true);
 
-      // Fetch genres data
-      // const genresData = await fetchWithAuth(import.meta.env.VITE_GENRES_API);
-      // const genresNamed = genresData.genres;
-
-      // Build API URL and fetch movies
-      // const urlMovies = buildApiUrl();
-      // const urlMovies = `${import.meta.env.VITE_BE_HOST}/api/v1/movies/`;
-      // const moviesData = await fetchWithAuth(urlMovies);
       const urlMovies = buildApiUrl();
       console.log("Fetching movies from:", urlMovies); // For debugging
 
@@ -353,7 +285,6 @@ export default function MovieList() {
 
         {/*  Page Navigation  */}
         <Pagination
-          PAGINATION_ITEMS={PAGINATION_ITEMS}
           searchParams={searchParams}
           setSearchParams={setSearchParams}
         />

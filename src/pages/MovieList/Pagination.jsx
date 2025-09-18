@@ -1,66 +1,83 @@
 import React from "react";
 
 export const Pagination = ({
-  PAGINATION_ITEMS,
   searchParams,
   setSearchParams,
 }) => {
+  const currentPage = parseInt(searchParams.get("page")) || 1;
+  
+  // Function to generate page numbers to display
+  const generatePageNumbers = () => {
+    const pages = [];
+    const maxVisiblePages = 3; // Show 3 page numbers
+    
+    // Calculate start page based on current page
+    let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+    
+    for (let i = startPage; i < startPage + maxVisiblePages; i++) {
+      pages.push(i);
+    }
+    
+    return pages;
+  };
+
+  const updatePage = (newPage) => {
+    if (newPage >= 1) {
+      setSearchParams((searchParams) => {
+        if (searchParams.has("page")) {
+          searchParams.set("page", newPage);
+        } else {
+          searchParams.append("page", newPage);
+        }
+        return searchParams;
+      });
+    }
+  };
+
+  const pageNumbers = generatePageNumbers();
+
   return (
-    <div className="mb-8 flex gap-2">
-      {PAGINATION_ITEMS.map((pageNumber, idx) =>
-        searchParams.get("page") == pageNumber ? (
-          <span
-            key={idx}
-            className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#2563EB] p-5 text-[#FFFFFF]"
-            onClick={() => {
-              setSearchParams((searchParams) => {
-                if (searchParams.has("page")) {
-                  searchParams.set("page", pageNumber);
-                } else {
-                  searchParams.append("page", pageNumber);
-                }
-                return searchParams;
-              });
-            }}
-          >
-            {pageNumber}
-          </span>
-        ) : typeof pageNumber === "string" ? (
-          // If it's a string then show an image
-          <span
-            key={idx}
-            className="relative flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#1D4ED8] p-5"
-            onClick={() => {
-              setSearchParams(() => {
-                if (searchParams.has("page")) {
-                  const pageNow = searchParams.get("page");
-                  searchParams.set("page", parseInt(pageNow) + 1);
-                }
-                return searchParams;
-              });
-            }}
-          >
-            <img src={pageNumber} alt="Next" className="absolute h-4 w-4" />
-          </span>
-        ) : (
-          <span
-            key={idx}
-            className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#F9FAFB] p-5 text-[#A0A3BD]"
-            onClick={() => {
-              setSearchParams((searchParams) => {
-                if (searchParams.has("page")) {
-                  searchParams.set("page", pageNumber);
-                } else {
-                  searchParams.append("page", pageNumber);
-                }
-                return searchParams;
-              });
-            }}
-          >
-            {pageNumber}
-          </span>
-        ),
+    <div className="mb-8 flex gap-2 items-center">
+      {/* Left Arrow - Show if current page >= 2 */}
+      {currentPage >= 2 && (
+        <span
+          className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#1D4ED8] p-5"
+          onClick={() => updatePage(currentPage - 1)}
+        >
+          <img 
+            src="/white-right-arrow.png" 
+            alt="Previous" 
+            className="absolute h-4 w-4 rotate-180" 
+          />
+        </span>
       )}
+
+      {/* Page Numbers */}
+      {pageNumbers.map((pageNumber, idx) => (
+        <span
+          key={idx}
+          className={`flex h-5 w-5 cursor-pointer items-center justify-center rounded-full p-5 ${
+            currentPage === pageNumber
+              ? "bg-[#2563EB] text-[#FFFFFF]"
+              : "bg-[#F9FAFB] text-[#A0A3BD]"
+          }`}
+          onClick={() => updatePage(pageNumber)}
+        >
+          {pageNumber}
+        </span>
+      ))}
+
+      {/* Right Arrow - Always show for infinite pagination */}
+      <span
+        className="flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-[#1D4ED8] p-5"
+        onClick={() => updatePage(currentPage + 1)}
+      >
+        <img 
+          src="/white-right-arrow.png" 
+          alt="Next" 
+          className="absolute h-4 w-4" 
+        />
+      </span>
     </div>
   );
 };
