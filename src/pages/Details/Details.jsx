@@ -16,6 +16,7 @@ import { formatMovieReleaseDate } from "../../utils/formatMovieReleaseDate";
 
 // External lib
 import { toast } from "sonner";
+import apiFetchNoAuth from "../../utils/apiFetchNoAuth";
 
 // Variables
 const orderInputted = {
@@ -28,39 +29,43 @@ const orderInputted = {
 let messages = [];
 
 // Constants
-const CINEMA_LIST = [
-  {
-    name: "ebv",
-    src: "/ebv-id.png",
-  },
-  {
-    name: "hiflix",
-    src: "/hiflix-red.png",
-  },
-  {
-    name: "CineOne21",
-    src: "/CineOne21-fitted.png",
-  },
-  {
-    name: "Cinepolis",
-    src: "/cinepolis.png",
-  },
-];
-
-const TIME_OPTIONS = ["13:00", "15:00", "18:30", "21:00"];
-const LOCATION_OPTIONS = [
-  { value: "jakarta", label: "Jakarta" },
-  { value: "bogor", label: "Bogor" },
-  { value: "depok", label: "Depok" },
-  { value: "tangerang", label: "Tangerang" },
-  { value: "bekasi", label: "Bekasi" },
-];
+// const CINEMA_LIST = [
+//   {
+//     name: "ebv",
+//     src: "/ebv-id.png",
+//   },
+//   {
+//     name: "hiflix",
+//     src: "/hiflix-red.png",
+//   },
+//   {
+//     name: "CineOne21",
+//     src: "/CineOne21-fitted.png",
+//   },
+//   {
+//     name: "Cinepolis",
+//     src: "/cinepolis.png",
+//   },
+// ];
+// const TIME_OPTIONS = ["13:00", "15:00", "18:30", "21:00"];
+// const LOCATION_OPTIONS = [
+//   { value: "jakarta", label: "Jakarta" },
+//   { value: "bogor", label: "Bogor" },
+//   { value: "depok", label: "Depok" },
+//   { value: "tangerang", label: "Tangerang" },
+//   { value: "bekasi", label: "Bekasi" },
+// ];
 
 // MAIN COMPONENT
 function Details() {
   // State & Hooks
   const [selectedCinema, setSelectedCinema] = useState();
-  const [cinemaPagination, _] = useState(1);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [cinemas, setCinemas] = useState([]);
+  const [showCinemas, setShowCinemas] = useState(false);
+  // const [cinemaPagination, _] = useState(1);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -87,20 +92,136 @@ function Details() {
 
   // Redux state
   const movieState = useSelector((state) => state.movie);
+  const schedules = useSelector((state) => state.movie.schedules);
   const loggedInState = useSelector((state) => state.loggedIn);
-  const activeUser = loggedInState.email !== null;
+  const activeUser = loggedInState.token !== null;
+
+  // Helper functions to get filtered options
+  const getAvailableDates = () => {
+    if (!schedules || schedules.length === 0) return [];
+    return [...new Set(schedules.map((schedule) => schedule.show_date))].sort();
+  };
+
+  const getAvailableTimes = () => {
+    if (!schedules || schedules.length === 0) return [];
+
+    let filteredSchedules = schedules;
+    if (selectedDate) {
+      filteredSchedules = filteredSchedules.filter(
+        (schedule) => schedule.show_date === selectedDate,
+      );
+    }
+    if (selectedLocation) {
+      filteredSchedules = filteredSchedules.filter(
+        (schedule) => schedule.city_name.toLowerCase() === selectedLocation,
+      );
+    }
+
+    return [
+      ...new Set(filteredSchedules.map((schedule) => schedule.start_at)),
+    ].sort();
+  };
+
+  const getAvailableLocations = () => {
+    if (!schedules || schedules.length === 0) return [];
+
+    let locationFilteredSchedules = schedules;
+    if (selectedDate) {
+      locationFilteredSchedules = locationFilteredSchedules.filter(
+        (schedule) => schedule.show_date === selectedDate,
+      );
+    }
+    if (selectedTime) {
+      locationFilteredSchedules = locationFilteredSchedules.filter(
+        (schedule) => schedule.start_at === selectedTime,
+      );
+    }
+
+    // Deduplicate by city_name
+    const uniqueCities = Array.from(
+      new Set(
+        locationFilteredSchedules.map((schedule) =>
+          schedule.city_name.toLowerCase(),
+        ),
+      ),
+    );
+
+    return uniqueCities.map((city) => ({
+      value: city,
+      label: locationFilteredSchedules.find(
+        (schedule) => schedule.city_name.toLowerCase() === city,
+      ).city_name, // original label-case
+    }));
+  };
+
+  const getAvailableCinemas = () => {
+    if (!schedules || schedules.length === 0) return [];
+
+    let filteredCinemas = schedules;
+    if (selectedDate) {
+      filteredCinemas = filteredCinemas.filter(
+        (schedule) => schedule.show_date === selectedDate,
+      );
+    }
+    if (selectedTime) {
+      filteredCinemas = filteredCinemas.filter(
+        (schedule) => schedule.start_at === selectedTime,
+      );
+    }
+    if (selectedLocation) {
+      filteredCinemas = filteredCinemas.filter(
+        (schedules) => schedules.city_name.toLowerCase() === selectedLocation,
+      );
+    }
+    console.log(`Date : ${selectedDate}`);
+    console.log(`Time : ${selectedTime}`);
+    console.log(`Location : ${selectedLocation}`);
+    console.log(filteredCinemas);
+
+    return [
+      ...new Set(filteredCinemas.map((schedule) => schedule.cinema_name)),
+    ];
+  };
 
   // Effects
   // Fetch movie data when component mounts
   useEffect(() => {
-    console.log("getMovieThunk want to run");
-    console.log("movie ID : ");
-    console.log(id);
     dispatch(movieActions.getMovieThunk({ movieId: id }));
+    dispatch(movieActions.getSchedulesBasedOnMovieID({ movieID: id }));
+
+    // Fetch cinema list
+    (async () => {
+      try {
+        const json = await apiFetchNoAuth(
+          "GET",
+          "http://localhost:3000/api/v1/schedules/cinemas",
+        );
+        if (json.success) {
+          setCinemas(json.data);
+        }
+      } catch (err) {
+        console.error("Error fetching cinemas", err);
+      }
+    })();
   }, []);
 
-  // Handle form submission for booking tickets
+  // Reset dependent selections when parent selection changes
+  useEffect(() => {
+    if (selectedDate) {
+      // Check if current time is still available
+      const availableTimes = getAvailableTimes();
+      if (selectedTime && !availableTimes.includes(selectedTime)) {
+        setSelectedTime("");
+      }
+    }
+  }, [selectedDate]);
 
+  // Reset showCinemas
+  useEffect(() => {
+    setShowCinemas(false);
+  }, [selectedDate, selectedTime, selectedLocation]);
+
+  // Handle form submission for booking tickets
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -187,6 +308,17 @@ function Details() {
     }
   };
 
+  // Format date for display
+  const formatDateForDisplay = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
+  };
+
+  // Format time for display
+  const formatTimeForDisplay = (timeString) => {
+    return timeString.slice(0, 5); // Remove seconds, show HH:MM
+  };
+
   return (
     <main
       className={`${movieState.isLoading ? "my-12 flex justify-center" : "flex flex-col items-center"}`}
@@ -206,7 +338,7 @@ function Details() {
             <div className="absolute inset-0 bg-black/50" />
           </div>
 
-          <section className="relative mb-8 flex flex-col gap-8 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
+          <section className="relative w-full mb-8 flex flex-col gap-8 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
             {/* Movie Poster + Info */}
             <div className="-mt-80 flex flex-col items-center gap-4 md:-mt-80 md:flex-row">
               {/* Movie Image */}
@@ -230,7 +362,7 @@ function Details() {
                 </div>
 
                 {/* <!-- About Movie --> */}
-                <div className="grid grid-cols-2 gap-y-4">
+                <div className="grid grid-cols-2 gap-x-4 gap-y-4">
                   {/* Release Date */}
                   <span>
                     <div className="font-light text-[#8692A6]">
@@ -296,44 +428,21 @@ function Details() {
                     <select
                       className="w-full"
                       name="date"
-                      onChange={checkIsLoggedIn}
+                      value={selectedDate}
+                      onChange={(e) => {
+                        checkIsLoggedIn();
+                        setSelectedDate(e.target.value);
+                      }}
                     >
                       {/* Disabled default */}
                       <option disabled selected value="">
                         Select date
                       </option>
-                      {(() => {
-                        const today = new Date();
-
-                        // Option today
-                        const option1 = new Date(today);
-                        option1.setDate(today.getDate());
-
-                        // Option tommorow
-                        const option2 = new Date(today);
-                        option2.setDate(today.getDate() + 1);
-
-                        // Option day + 2
-                        const option3 = new Date(today);
-                        option3.setDate(today.getDate() + 2);
-
-                        // Option day + 3
-                        const option4 = new Date(today);
-                        option3.setDate(today.getDate() + 3);
-
-                        // Function to format date
-                        function formatDate(date) {
-                          return date.toISOString().split("T")[0];
-                        }
-
-                        return [option1, option2, option3, option4].map(
-                          (date, idx) => (
-                            <option key={idx} value={formatDate(date)}>
-                              {date.toLocaleDateString()}
-                            </option>
-                          ),
-                        );
-                      })()}
+                      {getAvailableDates().map((date, idx) => (
+                        <option key={idx} value={date}>
+                          {formatDateForDisplay(date)}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </span>
@@ -347,19 +456,21 @@ function Details() {
                       className="w-full"
                       name="time"
                       id="time"
-                      onChange={checkIsLoggedIn}
+                      value={selectedTime}
+                      onChange={(e) => {
+                        checkIsLoggedIn();
+                        setSelectedTime(e.target.value);
+                      }}
                     >
                       {/* Disabled default */}
                       <option disabled selected value="">
                         Select time
                       </option>
-                      {TIME_OPTIONS.map((time, idx) => {
-                        return (
-                          <option key={idx} value={time}>
-                            {time}
-                          </option>
-                        );
-                      })}
+                      {getAvailableTimes().map((time, idx) => (
+                        <option key={idx} value={time}>
+                          {formatTimeForDisplay(time)}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </span>
@@ -373,19 +484,28 @@ function Details() {
                       className="w-full"
                       name="cityLocation"
                       id=""
-                      onChange={checkIsLoggedIn}
+                      value={selectedLocation}
+                      onChange={(e) => {
+                        checkIsLoggedIn();
+                        setSelectedLocation(e.target.value);
+                      }}
                     >
                       {/* Disabled default */}
                       <option disabled selected value="">
                         Select location
                       </option>
-                      {LOCATION_OPTIONS.map((el, idx) => {
+                      {/* {LOCATION_OPTIONS.map((el, idx) => {
                         return (
                           <option key={idx} value={el.value}>
                             {el.label}
                           </option>
                         );
-                      })}
+                      })} */}
+                      {getAvailableLocations().map((location, idx) => (
+                        <option key={idx} value={location.value}>
+                          {location.label}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </span>
@@ -393,26 +513,32 @@ function Details() {
                   <div className="invisible text-xl font-medium">
                     Filter Button
                   </div>
-                  <button className="w-full gap-3 rounded-md bg-[#1D4ED8] px-4 py-3 text-[#F8FAFC]">
+                  <button
+                    className="w-full gap-3 rounded-md bg-[#1D4ED8] px-4 py-3 text-[#F8FAFC]"
+                    type="button"
+                    onClick={() => {
+                      // getAvailableCinemas();
+                      checkIsLoggedIn();
+                      setShowCinemas(true);
+                    }}
+                  >
                     Filter
                   </button>
                 </span>
               </div>
 
               {/* <!-- Choose Cinema --> */}
-              <div className="flex flex-col items-center gap-3">
-                <div className="self-start">
-                  <h3 className="text-xl font-medium">Choose Cinema</h3>
-                  <span className="font-semibold text-[#8692A6]">
-                    39 Result
-                  </span>
-                </div>
-
-                {/*  Button Choose Cinema   */}
-                <div className="mb-3 grid grid-cols-2 items-center gap-8 md:grid-cols-4">
-                  {CINEMA_LIST.map((el, idx) => {
-                    return (
-                      <React.Fragment key={idx}>
+              <div className="mb-3 grid grid-cols-2 items-center gap-8 md:grid-cols-4">
+                {showCinemas &&
+                  cinemas
+                    .filter((cinema) =>
+                      getAvailableCinemas().some(
+                        (name) =>
+                          name.toLowerCase() === cinema.name.toLowerCase(),
+                      ),
+                    )
+                    .map((el) => (
+                      <React.Fragment key={el.id}>
                         <input
                           className="hidden"
                           type="radio"
@@ -434,36 +560,13 @@ function Details() {
                           }`}
                         >
                           <img
-                            className=""
-                            src={el.src}
+                            src={`${import.meta.env.VITE_CINEMAS_PATH}${el.img}`}
                             alt={`Logo ${el.name}`}
                           />
+                          {/* optional price */}
                         </label>
                       </React.Fragment>
-                    );
-                  })}
-                </div>
-
-                {/* Cinema Pagination */}
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4].map((page) =>
-                    page === cinemaPagination ? (
-                      <button
-                        key={page}
-                        className="h-10 w-10 cursor-pointer rounded-lg bg-[#1D4ED8] text-lg text-white shadow"
-                      >
-                        {page}
-                      </button>
-                    ) : (
-                      <button
-                        key={page}
-                        className="h-10 w-10 cursor-pointer rounded-lg border-[1px] border-[#DEDEDE] bg-white text-lg text-[#4E4B66]"
-                      >
-                        {page}
-                      </button>
-                    ),
-                  )}
-                </div>
+                    ))}
               </div>
 
               <button

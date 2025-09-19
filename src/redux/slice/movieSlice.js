@@ -1,10 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-
-import fetchWithAuth from "../../utils/fetchWithAuth";
-import getDetails from "../../utils/getDetails";
-import getCredits from "../../utils/getCredits";
-import apiFetch from "../../utils/apiFetch";
 import apiFetchNoAuth from "../../utils/apiFetchNoAuth";
+import apiFetch from "../../utils/apiFetch";
 
 // Movie information
 const initialState = {
@@ -19,6 +15,9 @@ const initialState = {
     synopsis: null,
   },
 
+  // schedule
+  schedules: [],
+
   // status
   isLoading: false,
   isSuccess: false,
@@ -30,32 +29,27 @@ const getMovieThunk = createAsyncThunk(
   "movie/get_data",
   async ({ movieId }, { rejectWithValue }) => {
     try {
-      // const urlMovie = `${import.meta.env.VITE_API_URL}/movie/${movieId}`;
-      // const urlCredits = `${import.meta.env.VITE_API_URL}/movie/${movieId}/credits`;
-
-      // console.log(`urlCredits : ${urlCredits}`);
-      console.log("movie id : ");
-      console.log(movieId);
-
-
-
       // Get Movie Details
-      // const movieData = await fetchWithAuth(urlMovie);
-      // const movieDetails = getDetails(movieData);
       const urlMovie = `${import.meta.env.VITE_BE_HOST}/api/v1/movies/${movieId}`;
-      console.log("url movie : ");
-      console.log(urlMovie);
-
       const movieData = await apiFetchNoAuth("GET", urlMovie);
- 
 
       return movieData.data;
     } catch (err) {
-      // const error = new Error(
-      //   `Error fetching movie details\n${err.status}: ${err.statusText}`,
-      // );
-      // throw error;
       return rejectWithValue(err);
+    }
+  },
+);
+
+const getSchedulesBasedOnMovieID = createAsyncThunk(
+  "schedules/get_data",
+  async ({ movieID }, { rejectWithValue }) => {
+    try {
+      // Get Schedules
+      const urlSchedules = `/api/v1/schedules?movie_id=${movieID}`;
+      const schedulesData = await apiFetch(urlSchedules, "GET");
+      return schedulesData;
+    } catch (error) {
+      return rejectWithValue(error);
     }
   },
 );
@@ -76,6 +70,7 @@ const movieSlice = createSlice({
 
   extraReducers: (builder) =>
     builder
+      // Get Movie Details
       .addCase(getMovieThunk.pending, (state) => {
         state.isLoading = true;
         state.isSuccess = false;
@@ -95,7 +90,32 @@ const movieSlice = createSlice({
 
         state.isLoading = false;
         state.isFailed = true;
-      }),
+      })
+
+      // Get Schedules
+      .addCase(getSchedulesBasedOnMovieID.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isFailed = false;
+        state.error = null;
+      })
+      .addCase(getSchedulesBasedOnMovieID.fulfilled, (state, { payload }) => {
+        state.schedules = payload;
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+      .addCase(
+        getSchedulesBasedOnMovieID.rejected,
+        (state, { payload, error }) => {
+          state.error = {
+            payload,
+            error,
+          };
+
+          state.isLoading = false;
+          state.isFailed = true;
+        },
+      ),
 });
 
 // Export reducer
@@ -105,4 +125,5 @@ export default movieSlice.reducer;
 export const movieActions = {
   ...movieSlice.actions,
   getMovieThunk,
+  getSchedulesBasedOnMovieID,
 };
