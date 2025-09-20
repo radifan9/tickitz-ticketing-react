@@ -3,23 +3,23 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router";
 import { convertDate } from "../../utils/convertDate";
 
-// --- External Libraries
+// External Libraries
 import { toast } from "sonner";
 import { addHistory } from "../../redux/slice/historySlice";
 
-// --- Constants
+// Constants
 const PAYMENT_METHODS = [
-  { id: "gpay", name: "GPay", image: "/gpay.png" },
-  { id: "visa", name: "Visa", image: "/logos_visa.png" },
-  { id: "gopay", name: "Gopay", image: "/gopay.png" },
-  { id: "paypal", name: "Paypal", image: "/paypal.png" },
-  { id: "dana", name: "Dana", image: "/dana.png" },
-  { id: "bca", name: "BCA", image: "/bca.png" },
-  { id: "bri", name: "BRI", image: "/bri.png" },
-  { id: "ovo", name: "OVO", image: "/ovo.png" },
+  { id: 1, name: "Google Pay", image: "google_pay.png" },
+  { id: 3, name: "Gopay", image: "gopay.png" },
+  { id: 4, name: "Paypal", image: "paypal.png" },
+  { id: 5, name: "Dana", image: "dana.png" },
+  { id: 6, name: "BCA", image: "bca.png" },
+  { id: 7, name: "BRI", image: "bri.png" },
+  { id: 8, name: "OVO", image: "ovo.png" },
+  { id: 2, name: "Visa", image: "visa.png" },
 ];
 
-// --- Validation regex patterns
+// Validation regex patterns
 // source of regex : https://medium.com/@lelianto.eko/indonesian-usefull-regex-formatter-function-41e3c541fcb3
 const VALIDATION_PATTERNS = {
   name: /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/,
@@ -30,9 +30,9 @@ const VALIDATION_PATTERNS = {
 // Collect error messages and show them sequentially
 let messages = [];
 
-// --- MAIN COMPONENT
+// MAIN COMPONENT
 function Payment() {
-  // --- --- Redux state
+  // Redux state
   const movieState = useSelector((state) => state.movie);
   const orderState = useSelector((state) => state.order);
   const historyState = useSelector((state) => state.history);
@@ -40,15 +40,15 @@ function Payment() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // --- --- Component State
+  // Component State
 
   // Payment information display data
   const [paymentInfo, setPaymentInfo] = useState([
     {
       title: "DATE & TIME",
-      text: `${convertDate(orderState.order.date)} at ${orderState.order.time}`,
+      text: `${convertDate(orderState.order.date)} at ${orderState.order.time.slice(0, 5)}`,
     },
-    { title: "MOVIE TITLE", text: `${movieState.movie.originalTitle}` },
+    { title: "MOVIE TITLE", text: `${movieState.movie.title}` },
     { title: "CINEMA NAME", text: `${orderState.order.cinema}` },
     {
       title: "NUMBER OF TICKETS",
@@ -62,16 +62,16 @@ function Payment() {
 
   // User personal information form data
   const [personalInfo, setPersonalInfo] = useState({
-    fullName: "",
-    email: loggedInState.email || "", // Fallback if there's no loggedIn
-    phoneNumber: "",
+    fullName: loggedInState.first_name + " " + loggedInState.last_name || "",
+    email: loggedInState.email || "",
+    phoneNumber: loggedInState.phoneNumber || "",
   });
 
-  // --- --- Modal visibility states
+  // Modal visibility states
   const [showModal, setShowModal] = useState(false);
   const [isMaskVisible, setIsMaskVisible] = useState(false);
 
-  // --- --- Form validation error states
+  // Form validation error states
   // Initialize with error assumption (true), validate to false
   const [errorInput, setErrorInput] = useState({
     incorrectFullName: true,
@@ -79,7 +79,7 @@ function Payment() {
     incorrectPhoneNum: true,
   });
 
-  // --- --- Event Handlers
+  // Event Handlers
   /**
    * Handles payment method selection
    * @param {string} paymentId - The ID of the selected payment method
@@ -107,6 +107,10 @@ function Payment() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submit Button Clicked!");
+
+    console.log(personalInfo.fullName);
+    console.log(personalInfo.email);
+    console.log(personalInfo.phoneNumber);
 
     if (errorInput.incorrectFullName)
       messages.push("Incorrect  Full Name is Inputted");
@@ -228,7 +232,7 @@ function Payment() {
     navigate("/");
   };
 
-  // --- --- Utility functions
+  // Utility functions
 
   /**
    * Formats a future date (1 day from now) for payment deadline
@@ -244,7 +248,7 @@ function Payment() {
     });
   };
 
-  // --- --- Effects
+  // Effects
 
   // Initialize validation on component mount
   useEffect(() => {
@@ -254,6 +258,16 @@ function Payment() {
       incorrectEmail: !VALIDATION_PATTERNS.email.test(personalInfo.email),
     }));
   }, []);
+
+  useEffect(() => {
+    setErrorInput({
+      incorrectFullName: !VALIDATION_PATTERNS.name.test(personalInfo.fullName),
+      incorrectEmail: !VALIDATION_PATTERNS.email.test(personalInfo.email),
+      incorrectPhoneNum: !VALIDATION_PATTERNS.phone.test(
+        personalInfo.phoneNumber,
+      ),
+    });
+  }, [personalInfo.fullName, personalInfo.email, personalInfo.phoneNumber]);
 
   return (
     <div className="relative md:mx-auto">
@@ -280,7 +294,7 @@ function Payment() {
                   )}
                 </div>
               </div>
-              {index < paymentInfo.length - 1 && (
+              {index < paymentInfo.length && (
                 <div className="my-2 w-full border-b border-[#DEDEDE]"></div>
               )}
             </Fragment>
@@ -300,6 +314,7 @@ function Payment() {
               placeholder="Enter your name"
               name="fullName"
               value={personalInfo.fullName}
+              disabled={!!personalInfo.fullName}
               onChange={(e) => {
                 const value = e.target.value;
                 setPersonalInfo((now) => ({ ...now, fullName: value }));
@@ -321,6 +336,7 @@ function Payment() {
               placeholder="Enter your email"
               name="email"
               value={personalInfo.email}
+              disabled={!!personalInfo.email}
               onChange={(e) => {
                 handleCheckEmail(e.target.value);
               }}
@@ -336,6 +352,7 @@ function Payment() {
               placeholder="+62 | Enter Your Phone Number"
               name="phoneNumber"
               value={personalInfo.phoneNumber}
+              disabled={!!personalInfo.phoneNumber}
               onChange={(e) => {
                 const value = e.target.value;
                 setPersonalInfo((now) => ({ ...now, phoneNumber: value }));
@@ -383,7 +400,7 @@ function Payment() {
           onClick={() => {
             if (!selectedPayment) {
               // toast.warning("Please select a payment method");
-              messages.push("Please select a 💳 payment method");
+              messages.push("Please select a ðŸ'³ payment method");
             }
           }}
         >
@@ -407,7 +424,7 @@ function Payment() {
         <div className="mb-6 flex items-center">
           <span className="text-sm text-[#8692A6]">No. Rekening Virtual :</span>
           <span className="ml-auto font-bold">
-            {parseInt(Math.random() * 100000000000000)}
+            {"8277" + personalInfo.phoneNumber}
           </span>
           <button className="ml-2 rounded border border-[#1D4ED8] px-3 py-1 text-sm text-[#1D4ED8]">
             Copy

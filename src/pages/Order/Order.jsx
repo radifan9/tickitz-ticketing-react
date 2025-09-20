@@ -179,7 +179,7 @@ function Order() {
     dispatch(addTotalPayment({ totalPayment }));
 
     // Navigate to payment page
-    // navigate("/payment");
+    navigate("/payment");
   }
 
   // Effects

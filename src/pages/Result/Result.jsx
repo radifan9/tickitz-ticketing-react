@@ -2,9 +2,9 @@ import React from "react";
 import QRCode from "react-qr-code";
 import { useSelector } from "react-redux";
 
-// --- MAIN COMPONENTS
+//  MAIN COMPONENTS
 function Result() {
-  // --- --- Hooks
+  // Hooks
   const historyState = useSelector((state) => state.history);
   console.log("History State");
   console.log(historyState);
@@ -64,7 +64,7 @@ function Result() {
               </span>
               <span className="text-sm font-semibold text-[#14142b]">
                 {/* Spider-Man: .. */}
-                {historyState[historyState.length - 1].originalTitle}
+                {historyState[historyState.length - 1].title}
               </span>
             </div>
 
