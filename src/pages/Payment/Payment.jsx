@@ -6,6 +6,7 @@ import { convertDate } from "../../utils/convertDate";
 // External Libraries
 import { toast } from "sonner";
 import { addHistory } from "../../redux/slice/historySlice";
+import apiFetchJSON from "../../utils/apiFetchJSON";
 
 // Constants
 const PAYMENT_METHODS = [
@@ -100,6 +101,9 @@ function Payment() {
     }));
   }
 
+  // Add this import at the top of your file with other imports:
+  // import apiFetchJSON from "../../utils/apiFetchJSON";
+
   /**
    * Handles form submission with validation
    * @param {Event} e - Form submit event
@@ -129,16 +133,72 @@ function Payment() {
       messages = [];
     }
 
-    // If theres no error
+    // If there's no error
     if (
       !errorInput.incorrectFullName &&
       !errorInput.incorrectEmail &&
       !errorInput.incorrectPhoneNum
     ) {
       console.log("Validasi betul semua");
-      if (selectedPayment) {
-        setShowModal(true);
-        setIsMaskVisible(true);
+
+      // Create transaction in database
+      try {
+        // Prepare the request body according to your specification
+        const requestBody = {
+          payment_id: selectedPayment,
+          total_payment: orderState.order.totalPayment,
+          full_name: personalInfo.fullName,
+          email: personalInfo.email,
+          phone_number: personalInfo.phoneNumber,
+          schedule_id: orderState.order.scheduleId || 1, // You might need to add this to orderState
+          seats: orderState.order.seats,
+        };
+
+        console.log("Request body:", requestBody);
+
+        // Get token from loggedInState (assuming you have it there)
+        const token = loggedInState.token || loggedInState.accessToken || "";
+
+        // Make the API call
+        const data = await apiFetchJSON(
+          `/api/v1/orders`,
+          "POST",
+          token,
+          requestBody,
+        );
+
+        console.log("Order created successfully:", data);
+
+        // Show success message
+        toast.success("Order created successfully!", { duration: 2000 });
+
+        // Show modal if payment method is selected
+        if (selectedPayment) {
+          setShowModal(true);
+          setIsMaskVisible(true);
+        }
+      } catch (error) {
+        console.log(`error : ${error}`);
+
+        // Handle different error scenarios
+        if (error.status === 401) {
+          toast.error("Session expired. Please login again.", {
+            duration: 3000,
+          });
+          navigate("/signin");
+        } else if (error.status === 400) {
+          toast.error("Invalid request. Please check your information.", {
+            duration: 3000,
+          });
+        } else if (error.status === 500) {
+          toast.error("Server error. Please try again later.", {
+            duration: 3000,
+          });
+        } else {
+          toast.error("An error occurred while processing your order.", {
+            duration: 3000,
+          });
+        }
       }
     }
   };
@@ -154,8 +214,7 @@ function Payment() {
    */
   function handleCheckPayment() {
     const { movieId, originalTitle, cat = "PG-13" } = movieState.movie;
-    const { date, time, cityLocation, cinema, seats, totalPayment } =
-      orderState.order;
+    const { date, time, cinema, seats, totalPayment } = orderState.order;
 
     // Find largest ID in the history, then +1 from that ID for the next ID
     let largestId = 0;
@@ -167,26 +226,27 @@ function Payment() {
 
     const obj = {};
     Object.assign(obj, {
-      // orderId: Math.floor(Math.random() * 1000) + 1,
+      payment_id: selectedPayment,
+      totalPayment,
+      full_name: personalInfo.fullName,
       email: personalInfo.email,
-      orderId: largestId + 1,
-      movieId,
+      phone_number: personalInfo.phoneNumber,
       originalTitle,
       cat,
       date,
       time,
-      cityLocation,
       cinema,
       seats,
-      totalPayment,
       ticketStatus: {
         isActive: true,
         isPaid: true,
       },
+      movieId,
     });
 
-    // Add to history and navigate to results
+    // Add to history
     dispatch(addHistory(obj));
+
     navigate("/result");
   }
 
@@ -195,7 +255,7 @@ function Payment() {
    * Similar to handle check but, make the isPaid to false
    */
   const handlePayLater = () => {
-    const { movieId, originalTitle, cat = "PG-13" } = movieState.movie;
+    const { movieId, title, cat = "PG-13" } = movieState.movie;
     const { date, time, cityLocation, cinema, seats, totalPayment } =
       orderState.order;
 
@@ -213,12 +273,10 @@ function Payment() {
       email: personalInfo.email,
       orderId: largestId + 1,
       movieId,
-      originalTitle,
+      title,
       cat,
       date,
       time,
-      cityLocation,
-      cinema,
       seats,
       totalPayment,
       ticketStatus: {
@@ -399,8 +457,7 @@ function Payment() {
           className="cursor-pointer rounded-md bg-[#1D4ED8] py-[18px] font-bold text-[#F7F7FC] transition-all hover:bg-[#1d4fd8e3] hover:shadow-md"
           onClick={() => {
             if (!selectedPayment) {
-              // toast.warning("Please select a payment method");
-              messages.push("Please select a ðŸ'³ payment method");
+              messages.push("Please select a 💳 payment method");
             }
           }}
         >

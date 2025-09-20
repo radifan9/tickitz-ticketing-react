@@ -143,7 +143,7 @@ export default function MovieList() {
             title: movie.title,
             // genres: getGenreNameFromID(movie.genres, genresNamed),
             genres: movie.genres,
-            src: `${import.meta.env.VITE_POSTER_PATH}${movie.poster_img}`,
+            src: `${import.meta.env.VITE_POSTER_PATH}/${movie.poster_img}`,
           };
         });
 

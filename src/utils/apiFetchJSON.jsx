@@ -1,0 +1,23 @@
+async function apiFetchJSON(url, method, token, body) {
+  const request = new Request(`${import.meta.env.VITE_BE_HOST}${url}`, {
+    method: method,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+
+  const response = await fetch(request);
+
+  if (!response.ok) {
+    const error = new Error("Request failed");
+    error.status = response.status;
+    throw error;
+  }
+
+  const data = await response.json();
+  return data.data;
+}
+
+export default apiFetchJSON;
