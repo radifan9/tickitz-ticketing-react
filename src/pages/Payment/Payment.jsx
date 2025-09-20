@@ -326,6 +326,16 @@ function Payment() {
       ...prev,
       incorrectEmail: !VALIDATION_PATTERNS.email.test(personalInfo.email),
     }));
+
+    // Check if first_name, last_name, email, and phoneNumber
+    if (
+      loggedInState.first_name == null ||
+      loggedInState.last_name == null ||
+      loggedInState.phoneNumber == null
+    ) {
+      toast.warning("You need to fill all your information first!");
+      navigate("/profile");
+    }
   }, []);
 
   useEffect(() => {

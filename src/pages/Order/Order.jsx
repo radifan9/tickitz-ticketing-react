@@ -139,7 +139,7 @@ function Order() {
     setPaymentInfo((prevInfo) => {
       return prevInfo.map((item) =>
         item[0] === "Movie selected"
-          ? ["Movie selected", movieState.movie.originalTitle]
+          ? ["Movie selected", movieState.movie.title]
           : item,
       );
     });
@@ -191,7 +191,7 @@ function Order() {
 
     setPaymentInfo((prev) =>
       prev.map((item, idx) =>
-        idx === 1 ? [formattedDate, orderState?.order?.time] : item,
+        idx === 1 ? [formattedDate, orderState?.order?.time.slice(0, 5)] : item,
       ),
     );
 
