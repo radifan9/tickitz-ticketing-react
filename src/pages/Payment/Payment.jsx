@@ -7,6 +7,7 @@ import { convertDate } from "../../utils/convertDate";
 import { toast } from "sonner";
 import { addHistory } from "../../redux/slice/historySlice";
 import apiFetchJSON from "../../utils/apiFetchJSON";
+import apiFetch from "../../utils/apiFetch";
 
 // Constants
 const PAYMENT_METHODS = [
@@ -42,9 +43,10 @@ function Payment() {
   const navigate = useNavigate();
 
   // Component State
+  const [transactionID, setTransactionID] = useState("");
 
   // Payment information display data
-  const [paymentInfo, setPaymentInfo] = useState([
+  const [paymentInfo, _] = useState([
     {
       title: "DATE & TIME",
       text: `${convertDate(orderState.order.date)} at ${orderState.order.time.slice(0, 5)}`,
@@ -112,10 +114,6 @@ function Payment() {
     e.preventDefault();
     console.log("Submit Button Clicked!");
 
-    console.log(personalInfo.fullName);
-    console.log(personalInfo.email);
-    console.log(personalInfo.phoneNumber);
-
     if (errorInput.incorrectFullName)
       messages.push("Incorrect  Full Name is Inputted");
     if (errorInput.incorrectEmail)
@@ -154,10 +152,8 @@ function Payment() {
           seats: orderState.order.seats,
         };
 
-        console.log("Request body:", requestBody);
-
-        // Get token from loggedInState (assuming you have it there)
-        const token = loggedInState.token || loggedInState.accessToken || "";
+        // Get token from loggedInState
+        const token = loggedInState.token || "";
 
         // Make the API call
         const data = await apiFetchJSON(
@@ -166,8 +162,7 @@ function Payment() {
           token,
           requestBody,
         );
-
-        console.log("Order created successfully:", data);
+        setTransactionID(data.id);
 
         // Show success message
         toast.success("Order created successfully!", { duration: 2000 });
@@ -212,7 +207,7 @@ function Payment() {
   /**
    * Processes payment confirmation and adds to history
    */
-  function handleCheckPayment() {
+  async function handleCheckPayment() {
     const { movieId, originalTitle, cat = "PG-13" } = movieState.movie;
     const { date, time, cinema, seats, totalPayment } = orderState.order;
 
@@ -246,6 +241,22 @@ function Payment() {
 
     // Add to history
     dispatch(addHistory(obj));
+
+    const token = loggedInState.token || "";
+
+    // PATCH transaction
+
+    try {
+      await apiFetch(
+        `/api/v1/orders/transactions/${transactionID}`,
+        "PATCH",
+        token,
+      );
+
+      toast.success("Transaksi berhasil di bayar!", { duration: 2000 });
+    } catch (error) {
+      console.log(`error : ${error}`);
+    }
 
     navigate("/result");
   }
