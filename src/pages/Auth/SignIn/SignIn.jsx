@@ -120,6 +120,10 @@ export default function SignIn() {
 
     // Dispatch login action
     dispatch(loggedInActions.loginThunk({ email, password }));
+
+    // Access the error state
+    console.log("Error state : ");
+    console.log(error);
   };
 
   // Effects

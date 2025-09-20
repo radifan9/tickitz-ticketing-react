@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 // Component
@@ -17,11 +17,6 @@ const regexMin8 = /^.{8,}$/;
 const regexMinSmall = /[a-z]/;
 const regexMinLarge = /[A-Z]/;
 const regexMinSpecialChar = /[!@#$%^&*/()]/;
-
-// Helper function to hash password (In production change to real hash)
-// const hashPassword = (password) => {
-//   return password;
-// };
 
 // MAIN COMPONENT
 export default function SignUp() {
@@ -94,42 +89,6 @@ export default function SignUp() {
    * Checks if email exists and registers new user if not
    * @returns {Promise<boolean>} - Success status of registration
    */
-  // const checkEmailAndRegister = async () => {
-  //   try {
-  //     setIsLoading(true);
-
-  //     // Check if email already exists using context helper
-  //     const existingUser = findUserByEmail(email);
-
-  //     if (existingUser) {
-  //       toast.error("Email sudah terdaftar. Silakan gunakan email lain.");
-  //       setEmailError("Email sudah terdaftar");
-  //       return false;
-  //     }
-
-  //     // Create new user object
-  //     const newUser = {
-  //       email: email.toLowerCase(),
-  //       password: hashPassword(password), // Hash the password
-  //       role: "user",
-  //       full_name: "", // You can add a name field to the form if needed
-  //       phone_number: "",
-  //     };
-
-  //     // Add new user using context
-  //     addUser(newUser);
-
-  //     console.log("New user successfully added:", newUser);
-  //     toast.success("Registrasi berhasil! Silakan login.");
-  //     return true;
-  //   } catch (error) {
-  //     console.error("Error during registration:", error);
-  //     toast.error("Terjadi kesalahan saat registrasi. Silakan coba lagi.");
-  //     return false;
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
 
   const registerUser = async () => {
     try {
@@ -149,7 +108,7 @@ export default function SignUp() {
           },
         },
       );
-      
+
       const response = await fetch(request, {
         body: JSON.stringify(body),
       });
@@ -165,7 +124,7 @@ export default function SignUp() {
       if (error == "Error: 409") {
         // Email sudah terdaftar
         toast.error("Email sudah terdaftar.");
-        setEmailError("Email sudah terdaftar")
+        setEmailError("Email sudah terdaftar");
       }
     } finally {
       setIsLoading(false);

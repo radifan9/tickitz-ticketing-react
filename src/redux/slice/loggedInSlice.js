@@ -192,10 +192,6 @@ const loggedInSlice = createSlice({
         // Update UI states
         state.isLoading = false;
         state.isFailed = true;
-        // state.error = {
-        //   payload,
-        //   error,
-        // };
         state.error = action.payload;
       })
 
