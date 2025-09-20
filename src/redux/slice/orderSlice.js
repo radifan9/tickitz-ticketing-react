@@ -5,11 +5,18 @@ import { createSlice } from "@reduxjs/toolkit";
 // Usefull in order & payment
 const initialState = {
   order: {
+    // Data inserted at movie detail
+    scheduleID: null,
     movieId: null,
     date: null,
+    timeID: null,
     time: null,
+    cityLocationID: null,
     cityLocation: null,
+    cinemaID: null,
     cinema: null,
+
+    // Data inserted at order page
     seats: null,
     totalPayment: null,
   },

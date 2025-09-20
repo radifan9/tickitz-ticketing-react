@@ -57,7 +57,7 @@ function Home() {
           id: movie.id,
           title: movie.title,
           genres: movie.genres,
-          src: `${import.meta.env.VITE_BE_HOST}${movie.poster_img}`,
+          src: `${import.meta.env.VITE_BE_HOST}/${movie.poster_img}`,
         }));
 
         setExcitingMovies(excitingMovieList);
@@ -79,7 +79,7 @@ function Home() {
           title: movie.title,
           releaseDate: movie.release_date,
           genres: movie.genres,
-          src: `${import.meta.env.VITE_POSTER_PATH}${movie.poster_img}`,
+          src: `${import.meta.env.VITE_POSTER_PATH}/${movie.poster_img}`,
         }));
 
         setUpcomingMovies(upcomingMovieList);

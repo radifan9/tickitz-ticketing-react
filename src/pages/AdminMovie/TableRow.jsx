@@ -16,8 +16,8 @@ export const TableRow = ({
       <td className="px-5 py-2 text-center text-sm">{idx + 1}</td>
       <td className="px-5 py-2 text-center text-sm">
         <img
-          className="mx-auto h-10 w-10 rounded-xl object-cover"
-          src={`${import.meta.env.VITE_POSTER_PATH}${thumbnail}`}
+          className="mx-auto h-12 w-12 rounded-xl object-cover"
+          src={`${import.meta.env.VITE_POSTER_PATH}/${thumbnail}`}
           alt={movieName}
         />
       </td>

@@ -215,7 +215,7 @@ export const AdminAddMovie = () => {
             name="cat"
             id="cat"
             className="h-12 rounded-lg border-[1px] border-[#DEDEDE] px-8 text-sm"
-            placeholder="Action, Adventure, Sci-Fi"
+            placeholder="Action,Adventure,Sci-Fi"
           />
         </div>
 
@@ -310,7 +310,7 @@ export const AdminAddMovie = () => {
             name="cast"
             id="cast"
             className="h-12 rounded-lg border-[1px] border-[#DEDEDE] px-8 text-sm"
-            placeholder="Tom Holland, Michael Keaton .."
+            placeholder="Tom Holland,Michael Keaton .."
           />
         </div>
 
@@ -339,7 +339,7 @@ export const AdminAddMovie = () => {
             name="loc"
             id="loc"
             className="h-12 rounded-lg border-[1px] border-[#DEDEDE] px-8 py-6 text-sm"
-            placeholder="Jakarta, Bogor, .."
+            placeholder="1=Jakarta,2=Bogor,3=Depok,4=Tangerang,5=Bekasi"
           />
         </div>
 

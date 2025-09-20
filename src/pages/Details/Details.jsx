@@ -28,34 +28,6 @@ const orderInputted = {
 // Collect error messages and show them sequentially
 let messages = [];
 
-// Constants
-// const CINEMA_LIST = [
-//   {
-//     name: "ebv",
-//     src: "/ebv-id.png",
-//   },
-//   {
-//     name: "hiflix",
-//     src: "/hiflix-red.png",
-//   },
-//   {
-//     name: "CineOne21",
-//     src: "/CineOne21-fitted.png",
-//   },
-//   {
-//     name: "Cinepolis",
-//     src: "/cinepolis.png",
-//   },
-// ];
-// const TIME_OPTIONS = ["13:00", "15:00", "18:30", "21:00"];
-// const LOCATION_OPTIONS = [
-//   { value: "jakarta", label: "Jakarta" },
-//   { value: "bogor", label: "Bogor" },
-//   { value: "depok", label: "Depok" },
-//   { value: "tangerang", label: "Tangerang" },
-//   { value: "bekasi", label: "Bekasi" },
-// ];
-
 // MAIN COMPONENT
 function Details() {
   // State & Hooks
@@ -194,7 +166,7 @@ function Details() {
       try {
         const json = await apiFetchNoAuth(
           "GET",
-          "http://localhost:3000/api/v1/schedules/cinemas",
+          `${import.meta.env.VITE_BE_HOST}/api/v1/schedules/cinemas`,
         );
         if (json.success) {
           setCinemas(json.data);
@@ -289,16 +261,35 @@ function Details() {
       orderInputted.isLocChoosed === true &&
       orderInputted.isCinemaChoosed === true
     ) {
-      // Check orderInputed
-      console.log(orderInputted);
+      // Find the matching schedule to get the IDs
+      const matchingSchedule = schedules.find(
+        (schedule) =>
+          schedule.show_date === date &&
+          schedule.start_at === time &&
+          schedule.city_name.toLowerCase() === cityLocation &&
+          schedule.cinema_name === cinema,
+      );
+
+      // Find cinema ID from the cinemas array
+      const selectedCinemaObj = cinemas.find(
+        (c) => c.name.toLowerCase() === cinema.toLowerCase(),
+      );
+
+      console.log("Schedule data : ");
+      console.log(matchingSchedule);
 
       // Add form data to redux store
       dispatch(
         addOrder({
+          scheduleID: matchingSchedule?.schedule_id || null,
           movieId: id,
           date,
+          timeID: matchingSchedule?.show_time_id || null,
           time,
+          cityLocationID: matchingSchedule?.city_id || null,
           cityLocation,
+          cinemaID:
+            selectedCinemaObj?.id || matchingSchedule?.cinema_id || null,
           cinema,
         }),
       );
@@ -329,22 +320,22 @@ function Details() {
       {movieState?.isSuccess && (
         <>
           {/* Header image */}
-          <div className="relative w-full md:h-90">
+          <div className="relative h-110 w-full md:h-90">
             <img
               className="h-full w-full object-cover"
-              src={`${import.meta.env.VITE_BACKDROP_PATH}${movieState.movie.backdrop_img}`}
+              src={`${import.meta.env.VITE_BACKDROP_PATH}/${movieState.movie.backdrop_img}`}
               alt={movieState.movie?.title || "Movie backdrop"}
             />
             <div className="absolute inset-0 bg-black/50" />
           </div>
 
-          <section className="relative w-full mb-8 flex flex-col gap-8 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
+          <section className="relative mb-8 flex w-full flex-col gap-8 px-[var(--small-pad)] md:px-[var(--medium-pad)]">
             {/* Movie Poster + Info */}
             <div className="-mt-80 flex flex-col items-center gap-4 md:-mt-80 md:flex-row">
               {/* Movie Image */}
               <img
                 className="rounded-lg object-cover md:w-[25%]"
-                src={`${import.meta.env.VITE_POSTER_PATH}${movieState.movie.poster_img}`}
+                src={`${import.meta.env.VITE_POSTER_PATH}/${movieState.movie.poster_img}`}
                 alt={`${movieState.title}`}
               />
 
@@ -494,13 +485,6 @@ function Details() {
                       <option disabled selected value="">
                         Select location
                       </option>
-                      {/* {LOCATION_OPTIONS.map((el, idx) => {
-                        return (
-                          <option key={idx} value={el.value}>
-                            {el.label}
-                          </option>
-                        );
-                      })} */}
                       {getAvailableLocations().map((location, idx) => (
                         <option key={idx} value={location.value}>
                           {location.label}
@@ -560,7 +544,7 @@ function Details() {
                           }`}
                         >
                           <img
-                            src={`${import.meta.env.VITE_CINEMAS_PATH}${el.img}`}
+                            src={`${import.meta.env.VITE_CINEMA_PATH}/${el.img}`}
                             alt={`Logo ${el.name}`}
                           />
                           {/* optional price */}

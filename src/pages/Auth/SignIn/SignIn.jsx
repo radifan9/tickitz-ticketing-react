@@ -133,17 +133,20 @@ export default function SignIn() {
 
       // Navigate based on user role
       if (authState.role === "admin") {
-        console.log("--- Logged In as admin");
         navigate("/admin/dashboard", { replace: true });
       } else {
         // For regular users, get profile data first
-        console.log("--- Logged In as user");
-        console.log(token);
         dispatch(loggedInActions.getProfileThunk({ token }));
         navigate(from, { replace: true });
       }
     }
   });
+
+  useEffect(() => {
+    if (isFailed && error) {
+      toast.error("Password atau email salah");
+    }
+  }, [isFailed, error]);
 
   // Render
   return (

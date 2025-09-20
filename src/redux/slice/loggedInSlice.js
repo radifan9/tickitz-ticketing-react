@@ -12,6 +12,7 @@ const initialState = {
   img: null, // Image path for avatar
   first_name: null,
   last_name: null,
+  points: null,
 
   // UI/Loading States
   isLoading: false,
@@ -66,7 +67,7 @@ const loginThunk = createAsyncThunk(
       return data;
     } catch (error) {
       // Return error for rejected case
-      return rejectWithValue(error);
+      return rejectWithValue(error.message);
     }
   },
 );
@@ -103,13 +104,11 @@ const getProfileThunk = createAsyncThunk(
 
       // Parse and return successful response
       const data = await response.json();
-      console.log("--- profile data : ");
-      console.log(data);
 
       return data;
     } catch (error) {
       // Return error for rejected case
-      return rejectWithValue(error);
+      return rejectWithValue(error.message);
     }
   },
 );
@@ -180,7 +179,7 @@ const loggedInSlice = createSlice({
         state.isSuccess = true;
       })
 
-      .addCase(loginThunk.rejected, (state, { payload, error }) => {
+      .addCase(loginThunk.rejected, (state, action) => {
         // Clear user data on failed login
         state.token = null;
         state.email = null;
@@ -193,10 +192,11 @@ const loggedInSlice = createSlice({
         // Update UI states
         state.isLoading = false;
         state.isFailed = true;
-        state.error = {
-          payload,
-          error,
-        };
+        // state.error = {
+        //   payload,
+        //   error,
+        // };
+        state.error = action.payload;
       })
 
       // Get profile thunk cases
@@ -209,10 +209,12 @@ const loggedInSlice = createSlice({
 
       .addCase(getProfileThunk.fulfilled, (state, { payload }) => {
         // Store profile data
+        state.email = payload.data.email;
         state.first_name = payload.data.first_name;
         state.last_name = payload.data.last_name;
         state.img = payload.data.img;
         state.phoneNumber = payload.data.phone_number;
+        state.points = payload.data.points;
 
         // Update UI states
         state.isLoading = false;

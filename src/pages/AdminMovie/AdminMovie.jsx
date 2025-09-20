@@ -65,7 +65,7 @@ export const AdminMovie = () => {
           </select>
         </span>
         <button
-          className="h-14 w-fit cursor-pointer rounded-md bg-[#1D4ED8] px-8 text-base text-white"
+          className="h-14 w-fit cursor-pointer justify-self-end rounded-md bg-[#1D4ED8] px-8 text-base text-white"
           onClick={() => navigate("/admin/add")}
         >
           + Add

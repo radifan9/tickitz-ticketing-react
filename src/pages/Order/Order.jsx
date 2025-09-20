@@ -5,14 +5,16 @@ import { useNavigate } from "react-router";
 // Utils
 import { convertDate } from "../../utils/convertDate";
 
-// --- Components
+// Components
 import Genres from "../../components/Genres";
+import Loader from "../../components/Loader.jsx";
 
-// --- Redux actions
+// Redux actions
 import { addSeats, addTotalPayment } from "../../redux/slice/orderSlice";
 import { toast } from "sonner";
+import apiFetch from "../../utils/apiFetch";
 
-// --- CONSTANTS
+// CONSTANTS
 const TICKET_PRICE = 10;
 
 const SEATING_KEY = [
@@ -26,24 +28,24 @@ const SEAT_ROWS = ["A", "B", "C", "D", "E", "F", "G"];
 
 const CINEMA_LIST = [
   {
-    name: "ebv",
-    src: "/ebv-id.png",
+    name: "ebv.id",
+    src: "ebv_id.png",
   },
   {
     name: "hiflix",
-    src: "/hiflix-red.png",
+    src: "hiflix.png",
   },
   {
     name: "CineOne21",
-    src: "/CineOne21-fitted.png",
+    src: "CineOne21-fitted.png",
   },
   {
     name: "Cinepolis",
-    src: "/cinepolis.png",
+    src: "cinepolis.png",
   },
 ];
 
-// --- Utility functions
+// Utility functions
 
 /**
  * Convert seat ID to readable seat notation ("seat-0" -> "A1")
@@ -70,7 +72,7 @@ function seatConverter(id) {
   return `${row}${col}`;
 }
 
-// --- Components
+// Components
 
 /**
  * Individual seat component with selection functionality
@@ -80,30 +82,36 @@ function seatConverter(id) {
  * @param {string[]} props.selectedSeats - Array of currently selected seats
  * @param {Function} props.onChange - Callback function when seat selection changes
  */
-function Seat({ id, name, selectedSeats, onChange }) {
+function Seat({ id, name, selectedSeats, onChange, isSold }) {
   return (
     <div className="h-8 w-8">
       <label
         htmlFor={id}
-        className={`block h-full ${
-          selectedSeats.includes(name) ? "bg-[#1D4ED8]" : "bg-[#D6D8E7]"
-        } cursor-pointer rounded-md`}
-      ></label>
+        className={`block h-full cursor-pointer rounded-md ${
+          isSold
+            ? "cursor-not-allowed bg-[#6E7191]"
+            : selectedSeats.includes(name)
+              ? "bg-[#1D4ED8]"
+              : "bg-[#D6D8E7]"
+        }`}
+      />
       <input
         type="checkbox"
         name={name}
         id={id}
         onChange={onChange}
+        disabled={isSold}
         className="hidden"
       />
     </div>
   );
 }
 
-// --- MAIN COMPONENTS
+// MAIN COMPONENTS
 function Order() {
-  // --- --- State
-  const genres = ["Drama", "Thriller"];
+  // State
+  const [isLoading, setIsLoading] = useState(true);
+  const [soldSeats, setSoldSeats] = useState([]);
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [paymentInfo, setPaymentInfo] = useState([
     ["Movie selected", ""],
@@ -113,13 +121,16 @@ function Order() {
   ]);
   const [totalPayment, setTotalPayment] = useState("0");
 
-  // --- --- Hooks
+  // Hooks
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // --- --- Redux state
+  //  Redux state
+  const authState = useSelector((state) => state.loggedIn);
+  const { token } = authState;
   const movieState = useSelector((state) => state.movie);
   const orderState = useSelector((state) => state.order);
+  const { scheduleID } = orderState.order;
 
   /*
    *  Update movie information in payment details
@@ -148,8 +159,7 @@ function Order() {
     });
   }
 
-  // --- --- Event Handlers
-
+  // Event Handlers
   /**
    * Handle form submission for checkout
    * @param {Event} event - Form submit event
@@ -175,9 +185,11 @@ function Order() {
     navigate("/payment");
   }
 
-  // --- --- Effects
+  // Effects
+
   // Effect when component is loaded
   useEffect(() => {
+    setIsLoading(true);
     const formattedDate = convertDate(orderState.order.date);
 
     setPaymentInfo((prev) =>
@@ -185,6 +197,25 @@ function Order() {
         idx === 1 ? [formattedDate, orderState?.order?.time] : item,
       ),
     );
+
+    // Get sold seat
+    (async () => {
+      try {
+        const data = await apiFetch(
+          `/api/v1/schedules/${scheduleID}/sold-seats`,
+          "GET",
+          token,
+        );
+        setSoldSeats(data);
+      } catch (error) {
+        console.log(`error : ${error}`);
+        if (error == "Error: 401") {
+          navigate("/signin");
+        }
+      } finally {
+        setIsLoading(false);
+      }
+    })();
   }, []);
 
   // Effect when selectedSeats changed
@@ -194,9 +225,18 @@ function Order() {
 
     // Update total price
     setTotalPayment(() => {
-      return selectedSeats.length * 10;
+      return selectedSeats.length * TICKET_PRICE;
     });
   }, [selectedSeats]);
+
+  // Show loader while loading
+  if (isLoading) {
+    return (
+      <div className="my-12 flex justify-center">
+        <Loader />
+      </div>
+    );
+  }
 
   return (
     <main>
@@ -232,16 +272,18 @@ function Order() {
             {/*  Movie Poster  */}
             <img
               className="aspect-[2/1.5] w-full rounded-lg object-cover object-center md:aspect-[1/1.25]"
-              src={`https://image.tmdb.org/t/p/w500/${movieState.movie.posterPath}`}
+              src={`${import.meta.env.VITE_POSTER_PATH}/${movieState.movie.poster_img}`}
               alt=""
             />
             {/*  Information  */}
             <span className="flex flex-col items-center gap-4 md:items-start">
               <div className="text-xl font-semibold">
-                {movieState.movie.originalTitle}
+                {movieState.movie.title}
               </div>
               {/*  Genres  */}
-              <ul className="flex gap-2.5">{<Genres genres={genres} />}</ul>
+              <ul className="flex gap-2.5">
+                {<Genres genres={movieState.movie.genres} />}
+              </ul>
 
               <div className="font-normal text-[#121212]">
                 Regular - {orderState.order.time}
@@ -272,15 +314,7 @@ function Order() {
                   {(function () {
                     const result = [];
                     const SEAT_ROWS = ["A", "B", "C", "D", "E", "F", "G"];
-                    const SEAT_COLUMNS = [
-                      "1",
-                      "2",
-                      "3",
-                      "4",
-                      "5",
-                      "6",
-                      "7",
-                    ];
+                    const SEAT_COLUMNS = ["1", "2", "3", "4", "5", "6", "7"];
 
                     for (let row = 0; row < 7; row++) {
                       // Add row label
@@ -296,23 +330,24 @@ function Order() {
                       // Add seats for this row
                       for (let col = 0; col < 7; col++) {
                         const seatIndex = row * 7 + col;
+
+                        const seatName = `seat-${seatIndex}`;
+                        const converted = seatConverter(seatName);
+                        const isSold = soldSeats.includes(converted);
+
                         result.push(
                           <Seat
-                            key={`seat-${seatIndex}`}
-                            id={`seat-${seatIndex}`}
-                            name={`seat-${seatIndex}`}
+                            key={seatName}
+                            id={seatName}
+                            name={seatName}
                             selectedSeats={selectedSeats}
+                            isSold={isSold}
                             onChange={(e) => {
-                              setSelectedSeats((selectedSeats) => {
-                                // Check if selectedSeat is already selected
-                                if (selectedSeats.includes(e.target.name)) {
-                                  return selectedSeats.filter(
-                                    (seat) => seat !== e.target.name,
-                                  );
-                                }
-                                return [...selectedSeats, e.target.name];
-                              });
-                              updateSeatInfo();
+                              setSelectedSeats((prev) =>
+                                prev.includes(e.target.name)
+                                  ? prev.filter((s) => s !== e.target.name)
+                                  : [...prev, e.target.name],
+                              );
                             }}
                           />,
                         );
@@ -327,22 +362,22 @@ function Order() {
                   {(function () {
                     const result = [];
                     for (let i = 49; i < 98; i++) {
+                      const seatName = `seat-${i}`;
+                      const converted = seatConverter(seatName);
+                      const isSold = soldSeats.includes(converted);
                       result.push(
                         <Seat
-                          key={i}
-                          id={i}
-                          name={`seat-${i}`}
+                          key={seatName}
+                          id={seatName}
+                          name={seatName}
                           selectedSeats={selectedSeats}
+                          isSold={isSold}
                           onChange={(e) => {
-                            setSelectedSeats((selectedSeats) => {
-                              // Check if selectedSeat is already selected
-                              if (selectedSeats.includes(e.target.name)) {
-                                return selectedSeats.filter(
-                                  (seat) => seat !== e.target.name,
-                                );
-                              }
-                              return [...selectedSeats, e.target.name];
-                            });
+                            setSelectedSeats((prev) =>
+                              prev.includes(e.target.name)
+                                ? prev.filter((s) => s !== e.target.name)
+                                : [...prev, e.target.name],
+                            );
                           }}
                         />,
                       );
@@ -388,13 +423,13 @@ function Order() {
           <div className="flex w-full flex-col gap-3 rounded-md bg-white p-6 shadow-md">
             <img
               className="self-center"
-              src={
+              src={`${import.meta.env.VITE_CINEMA_PATH}/${
                 CINEMA_LIST.find(
                   (el) =>
                     el.name.toLowerCase() ===
                     String(orderState.order.cinema).toLowerCase(),
                 )?.src
-              }
+              }`}
               alt=""
             />
             <h2 className="self-center text-2xl font-medium text-[#14142B]">
