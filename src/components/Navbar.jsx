@@ -32,17 +32,13 @@ function Navbar() {
     token,
     isAuthenticated,
     role,
+    img,
   } = authState;
   const activeUser = token !== null;
 
   // Effects
   // Check localStorage for active user (for debugging/sync purposes)
   useEffect(() => {
-    // const userFromStorage = window.localStorage.getItem("activeUser");
-    // const isUserActive = userFromStorage !== null && userFromStorage !== "";
-
-    // console.log("From localStorage:", userFromStorage);
-    // console.log("Is user active?", isUserActive);
     console.log("Redux loggedIn state:", activeUser);
   }, [activeUser]);
 
@@ -114,10 +110,15 @@ function Navbar() {
                 className="focus:outline-none"
                 aria-label="Profile menu"
               >
-                <img
+                {/* <img
                   src="/profile-pic-small.png"
                   alt="Small Profile Picture"
                   className="cursor-pointer transition-opacity hover:opacity-80"
+                /> */}
+                <img
+                  className="h-12 w-12 rounded-full object-cover"
+                  src={`${import.meta.env.VITE_PROFILE_PATH}/${img}`}
+                  alt=""
                 />
               </button>
 
@@ -235,10 +236,15 @@ function Navbar() {
                       className="h-6 w-6"
                     />
                     <Link to="/profile">
-                      <img
+                      {/* <img
                         src="/profile-pic-small.png"
                         alt="Small Profile Picture"
                         className="h-8 w-8"
+                      /> */}
+                      <img
+                        className="h-8 w-8 rounded-full object-cover"
+                        src={`${import.meta.env.VITE_PROFILE_PATH}/${img}`}
+                        alt=""
                       />
                     </Link>
                   </div>

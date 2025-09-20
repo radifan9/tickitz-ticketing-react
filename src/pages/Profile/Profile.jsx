@@ -1,8 +1,12 @@
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { ProfileHeader } from "../../components/ProfileHeader";
 import { UserProfile } from "../../components/UserProfile";
 
 export default function Profile() {
+  // Get data from Redux store
+  const { email, first_name, last_name, phoneNumber } = useSelector(state => state.loggedIn);
+
   // Password control
   const [passwordEye, setPasswordEye] = useState("closed");
   const [passwordEyeConfirm, setPasswordEyeConfirm] = useState("closed");
@@ -56,20 +60,22 @@ export default function Profile() {
                 name="full-name"
                 id="full-name"
                 placeholder="Jonas El Rodriguez"
+                value={first_name && last_name ? `${first_name} ${last_name}` : ""}
               />
             </div>
 
             {/* <!-- E-mail --> */}
             <div className="flex flex-col gap-3">
-              <label className="text-base text-gray-600" htmlFor="email">
+              <label className="text-base text-gray-600" htmlFor="user-email">
                 E-mail
               </label>
               <input
                 className="rounded-xl border border-neutral-200 px-8 py-3"
                 type="text"
-                name="email"
-                id="email"
+                name="user-email"
+                id="user-email"
                 placeholder="jonasrodrigu123@gmail.com"
+                value={email || ""}
               />
             </div>
 
@@ -90,6 +96,7 @@ export default function Profile() {
                   type="text"
                   name="phone-number"
                   placeholder="Your phone number"
+                  value={phoneNumber || ""}
                 />
               </div>
             </div>
@@ -104,16 +111,16 @@ export default function Profile() {
 
             {/* <!-- New Password --> */}
             <div className="flex flex-col gap-3">
-              <label className="text-base text-gray-600" htmlFor="new-password">
+              <label className="text-base text-gray-600" htmlFor="user-new-password">
                 New Password
               </label>
               <div className="pwd-input-new flex items-center rounded-xl border border-neutral-200">
                 <input
                   className="w-full border-0 px-8 py-3 focus:outline-none"
-                  name="new-password"
-                  id="new-password"
+                  name="user-new-password"
+                  id="user-new-password"
                   placeholder="Input new password"
-                  type={passwordEye === "closed" ? "password" : "text"}
+                  type={passwordEye === "closed" ? "text" : "text"}
                 />
 
                 {/* <!-- Eye opened --> */}
@@ -160,16 +167,16 @@ export default function Profile() {
 
             {/* <!-- Confirm Password --> */}
             <div className="flex flex-col gap-3">
-              <label className="text-base text-gray-600" htmlFor="new-password">
+              <label className="text-base text-gray-600" htmlFor="user-confirm-password">
                 Confirm
               </label>
               <div className="pwd-input-new flex items-center rounded-xl border border-neutral-200">
                 <input
                   className="w-full border-0 px-8 py-3 focus:outline-none"
-                  name="new-password"
-                  id="new-password"
+                  name="user-confirm-password"
+                  id="user-confirm-password"
                   placeholder="Confirm new password"
-                  type={passwordEyeConfirm === "closed" ? "password" : "text"}
+                  type={passwordEyeConfirm === "closed" ? "text" : "text"}
                 />
 
                 {/* <!-- Eye opened --> */}
