@@ -16,7 +16,7 @@ import { formatMovieReleaseDate } from "../../utils/formatMovieReleaseDate";
 
 // External lib
 import { toast } from "sonner";
-import apiFetchNoAuth from "../../utils/apiFetchNoAuth";
+import apiFetch from "../../utils/apiFetch";
 
 // Variables
 const orderInputted = {
@@ -47,9 +47,7 @@ function Details() {
     if (activeUser == false) {
       // There's no active user, navigate to SignIn
       console.log("⚠️ No logged in user");
-
       toast.error("You must logged in first 🙏🏻");
-
       setTimeout(() => {
         navigate("/signin");
       }, 700);
@@ -145,10 +143,6 @@ function Details() {
         (schedules) => schedules.city_name.toLowerCase() === selectedLocation,
       );
     }
-    console.log(`Date : ${selectedDate}`);
-    console.log(`Time : ${selectedTime}`);
-    console.log(`Location : ${selectedLocation}`);
-    console.log(filteredCinemas);
 
     return [
       ...new Set(filteredCinemas.map((schedule) => schedule.cinema_name)),
@@ -159,20 +153,27 @@ function Details() {
   // Fetch movie data when component mounts
   useEffect(() => {
     dispatch(movieActions.getMovieThunk({ movieId: id }));
-    dispatch(movieActions.getSchedulesBasedOnMovieID({ movieID: id }));
+    dispatch(
+      movieActions.getSchedulesBasedOnMovieID({
+        movieID: id,
+        token: loggedInState.token,
+      }),
+    );
 
     // Fetch cinema list
     (async () => {
       try {
-        const json = await apiFetchNoAuth(
+        const json = await apiFetch(
+          `/api/v1/schedules/cinemas`,
           "GET",
-          `${import.meta.env.VITE_BE_HOST}/api/v1/schedules/cinemas`,
+          loggedInState.token,
         );
-        if (json.success) {
-          setCinemas(json.data);
-        }
+        setCinemas(json);
       } catch (err) {
         console.error("Error fetching cinemas", err);
+        if (err.status == "401") {
+          navigate("/signin");
+        }
       }
     })();
   }, []);
@@ -274,9 +275,6 @@ function Details() {
       const selectedCinemaObj = cinemas.find(
         (c) => c.name.toLowerCase() === cinema.toLowerCase(),
       );
-
-      console.log("Schedule data : ");
-      console.log(matchingSchedule);
 
       // Add form data to redux store
       dispatch(
@@ -501,7 +499,6 @@ function Details() {
                     className="w-full gap-3 rounded-md bg-[#1D4ED8] px-4 py-3 text-[#F8FAFC]"
                     type="button"
                     onClick={() => {
-                      // getAvailableCinemas();
                       checkIsLoggedIn();
                       setShowCinemas(true);
                     }}
@@ -512,6 +509,12 @@ function Details() {
               </div>
 
               {/* <!-- Choose Cinema --> */}
+              <div className="self-start">
+                <h3 className="text-xl font-medium">Choose Cinema</h3>
+
+                {/* <span className="font-semibold text-[#8692A6]">39 Result</span> */}
+              </div>
+
               <div className="mb-3 grid grid-cols-2 items-center gap-8 md:grid-cols-4">
                 {showCinemas &&
                   cinemas
@@ -553,12 +556,14 @@ function Details() {
                     ))}
               </div>
 
-              <button
-                className="w-1/4 cursor-pointer rounded-sm bg-[#1D4ED8] py-4 text-[#F8FAFC]"
-                type="submit"
-              >
-                Book Now
-              </button>
+              {showCinemas && (
+                <button
+                  className="w-1/4 cursor-pointer rounded-sm bg-[#1D4ED8] py-4 text-[#F8FAFC]"
+                  type="submit"
+                >
+                  Book Now
+                </button>
+              )}
             </form>
           </section>
         </>

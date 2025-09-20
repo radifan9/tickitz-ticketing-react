@@ -178,11 +178,8 @@ function Order() {
     dispatch(addSeats({ seats: convertedSeats }));
     dispatch(addTotalPayment({ totalPayment }));
 
-    console.log("--- Order State di Order");
-    console.log(orderState);
-
     // Navigate to payment page
-    navigate("/payment");
+    // navigate("/payment");
   }
 
   // Effects

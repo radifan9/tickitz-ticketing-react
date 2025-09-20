@@ -42,14 +42,17 @@ const getMovieThunk = createAsyncThunk(
 
 const getSchedulesBasedOnMovieID = createAsyncThunk(
   "schedules/get_data",
-  async ({ movieID }, { rejectWithValue }) => {
+  async ({ movieID, token }, { rejectWithValue }) => {
     try {
       // Get Schedules
       const urlSchedules = `/api/v1/schedules?movie_id=${movieID}`;
-      const schedulesData = await apiFetch(urlSchedules, "GET");
+      const schedulesData = await apiFetch(urlSchedules, "GET", token);
       return schedulesData;
-    } catch (error) {
-      return rejectWithValue(error);
+    } catch (err) {
+      return rejectWithValue({
+        status: err.status || 500,
+        message: err.message || "Unknown error",
+      });
     }
   },
 );

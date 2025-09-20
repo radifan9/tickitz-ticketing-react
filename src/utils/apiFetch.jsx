@@ -9,7 +9,9 @@ async function apiFetch(url, method, token) {
   const response = await fetch(request);
 
   if (!response.ok) {
-    throw new Error(response.status);
+    const error = new Error("Request failed");
+    error.status = response.status;
+    throw error;
   }
 
   const data = await response.json();

@@ -6,7 +6,9 @@ async function apiFetchNoAuth(method, url) {
     },
   });
   if (!response.ok) {
-    throw new Error(response.status);
+    const error = new Error("Request failed");
+    error.status = response.status;
+    throw error;
   }
   return response.json();
 }
