@@ -36,12 +36,6 @@ function Navbar() {
   } = authState;
   const activeUser = token !== null;
 
-  // Effects
-  // Check localStorage for active user (for debugging/sync purposes)
-  useEffect(() => {
-    console.log("Redux loggedIn state:", activeUser);
-  }, [activeUser]);
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {

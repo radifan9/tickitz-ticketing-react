@@ -1,9 +1,17 @@
 import { Navigate } from "react-router";
 import { useSelector } from "react-redux";
+import { toast } from "sonner";
+import { useEffect } from "react";
 
 function PrivateRoute({ redirectTo, authorizeRole = [], children }) {
   const authState = useSelector((state) => state.loggedIn);
   const { token, role } = authState;
+
+  useEffect(() => {
+    if (!token) {
+      toast.warning("You have to login first!");
+    }
+  }, [token]);
 
   // If no token, redirect to the specified route
   if (!token) {
