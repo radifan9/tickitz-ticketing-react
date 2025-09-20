@@ -37,7 +37,7 @@ const CINEMA_LIST = [
   },
   {
     name: "CineOne21",
-    src: "CineOne21-fitted.png",
+    src: "cineone21.png",
   },
   {
     name: "Cinepolis",
@@ -283,12 +283,18 @@ function Order() {
               </ul>
 
               <div className="font-normal text-[#121212]">
-                Regular - {orderState.order.time}
+                Regular - {orderState.order.time.slice(0, 5)}
               </div>
             </span>
 
             {/* <!-- Change Button --> */}
-            <button className="rounded-md bg-[#1D4ED8] px-6 py-1 text-white md:w-fit md:self-end">
+            <button
+              className="rounded-md bg-[#1D4ED8] px-6 py-1 text-white md:w-fit md:self-end"
+              type="button"
+              onClick={() => {
+                navigate(`/details/?id=${movieState.movie.id}`);
+              }}
+            >
               Change
             </button>
           </div>
