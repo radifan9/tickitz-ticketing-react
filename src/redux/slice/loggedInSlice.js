@@ -115,7 +115,7 @@ const getProfileThunk = createAsyncThunk(
 
 const logoutThunk = createAsyncThunk(
   "auth/logout",
-  async ({ token }, { rejectWithValue }) => {
+  async ({ token }, { _ }) => {
     try {
       const request = new Request(
         `${import.meta.env.VITE_BE_HOST}/api/v1/auth/logout`,
@@ -137,6 +137,68 @@ const logoutThunk = createAsyncThunk(
       return data;
     } catch (error) {
       console.log(error);
+    }
+  },
+);
+
+const updateProfileThunk = createAsyncThunk(
+  "user/update",
+  async ({ token, changedData, originalData }, { rejectWithValue }) => {
+    try {
+      // Create form data dynamically
+      const formdata = new FormData();
+      let hasChanged = false;
+
+      // full_name
+      if (changedData.full_name !== originalData.full_name) {
+        // Split full name into first_name and last_name
+        const nameParts = changedData.full_name.trim().split(" ");
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(" ") || "";
+
+        formdata.append("first_name", firstName);
+        formdata.append("last_name", lastName);
+        hasChanged = true;
+      }
+
+      // email
+      if (changedData.email !== originalData.email) {
+        formdata.append("email", changedData.email);
+        hasChanged = true;
+      }
+
+      // phone_number
+      if (changedData.phone_number !== originalData.phone_number) {
+        formdata.append(`phone_number`, changedData.phone_number);
+        hasChanged = true;
+      }
+
+      // If no changes detected, return early
+      if (!hasChanged) {
+        throw new Error("No changes detected");
+      }
+
+      // Prepare request body
+      const response = await fetch(
+        `${import.meta.env.VITE_BE_HOST}/api/v1/users/profile`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formdata,
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
   },
 );
@@ -264,6 +326,36 @@ const loggedInSlice = createSlice({
           payload,
           error,
         };
+      })
+
+      // Update profile thunk cases
+      .addCase(updateProfileThunk.pending, (state) => {
+        state.isLoading = true;
+        state.isSuccess = false;
+        state.isFailed = false;
+        state.error = null;
+      })
+
+      .addCase(updateProfileThunk.fulfilled, (state, { payload }) => {
+        // Update profile data with new values
+        if (payload.data.email) state.email = payload.data.email;
+        if (payload.data.first_name) state.first_name = payload.data.first_name;
+        if (payload.data.last_name) state.last_name = payload.data.last_name;
+        if (payload.data.phone_number)
+          state.phoneNumber = payload.data.phone_number;
+        if (payload.data.img) state.img = payload.data.img;
+        if (payload.data.points) state.points = payload.data.points;
+
+        // Update UI states
+        state.isLoading = false;
+        state.isSuccess = true;
+      })
+
+      .addCase(updateProfileThunk.rejected, (state, { payload }) => {
+        // Update UI states
+        state.isLoading = false;
+        state.isFailed = true;
+        state.error = payload;
       }),
 });
 
@@ -278,4 +370,5 @@ export const loggedInActions = {
   loginThunk,
   getProfileThunk,
   logoutThunk,
+  updateProfileThunk,
 };

@@ -1,11 +1,26 @@
-import React, { useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { ProfileHeader } from "../../components/ProfileHeader";
 import { UserProfile } from "../../components/UserProfile";
+import { toast } from "sonner";
+import { loggedInActions } from "../../redux/slice/loggedInSlice";
 
 export default function Profile() {
+  const dispatch = useDispatch();
+
   // Get data from Redux store
-  const { email, first_name, last_name, phoneNumber } = useSelector(state => state.loggedIn);
+  const { email, first_name, last_name, phoneNumber, token } = useSelector(
+    (state) => state.loggedIn,
+  );
+
+  // State
+  const [originalData, setOriginalData] = useState({
+    full_name: first_name + " " + last_name,
+    email: email,
+    phone_number: phoneNumber,
+  });
+
+  const [changedData, setChangedData] = useState(originalData);
 
   // Password control
   const [passwordEye, setPasswordEye] = useState("closed");
@@ -30,6 +45,44 @@ export default function Profile() {
     });
   };
 
+  const hasDataChanged = () => {
+    return (
+      changedData.full_name !== originalData.full_name ||
+      changedData.email !== originalData.email ||
+      changedData.phone_number !== originalData.phone_number
+    );
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    if (!hasDataChanged()) {
+      toast.warning("No changes detected!");
+    }
+
+    dispatch(
+      loggedInActions.updateProfileThunk({
+        token,
+        changedData,
+        originalData,
+      }),
+    );
+
+    // Successful changed
+    setOriginalData({ ...changedData });
+    toast.success("Profile updated successfully!");
+  };
+
+  // Effects
+
+  useEffect(() => {
+    console.log("Original data : ");
+    console.log(originalData);
+
+    console.log("Changed data : ");
+    console.log(changedData);
+  }, [changedData]);
+
   return (
     <>
       <div className="mx-auto grid gap-y-4 md:grid md:grid-cols-[1fr_3fr] md:gap-x-8 md:py-8">
@@ -38,8 +91,11 @@ export default function Profile() {
         {/* User Profile */}
         <UserProfile />
 
-        {/* <!-- Account Setting --> */}
-        <div className={`mb-10 rounded-2xl bg-white p-10 md:mx-0`}>
+        {/* Account Setting */}
+        <form
+          className={`mb-10 rounded-2xl bg-white p-10 md:mx-0`}
+          onSubmit={handleSubmit}
+        >
           <h2 className="mb-8 text-2xl font-medium">Account Settings</h2>
 
           {/* <!-- Details Information --> */}
@@ -60,7 +116,13 @@ export default function Profile() {
                 name="full-name"
                 id="full-name"
                 placeholder="Jonas El Rodriguez"
-                value={first_name && last_name ? `${first_name} ${last_name}` : ""}
+                value={changedData.full_name ? changedData.full_name : ""}
+                onChange={(e) => {
+                  setChangedData({
+                    ...changedData,
+                    full_name: e.target.value,
+                  });
+                }}
               />
             </div>
 
@@ -75,7 +137,13 @@ export default function Profile() {
                 name="user-email"
                 id="user-email"
                 placeholder="jonasrodrigu123@gmail.com"
-                value={email || ""}
+                value={changedData.email ? changedData.email : ""}
+                onChange={(e) => {
+                  setChangedData({
+                    ...changedData,
+                    email: e.target.value,
+                  });
+                }}
               />
             </div>
 
@@ -86,17 +154,19 @@ export default function Profile() {
               </label>
               <div className="flex rounded-xl border border-neutral-200">
                 <input
-                  className="w-1/5 rounded-xl border border-transparent py-3 pl-8 focus:outline-none"
-                  type="text"
-                  name="country-code"
-                  placeholder="Code"
-                />
-                <input
                   className="w-full rounded-xl border border-transparent px-8 py-3 focus:outline-none"
                   type="text"
                   name="phone-number"
                   placeholder="Your phone number"
-                  value={phoneNumber || ""}
+                  value={
+                    changedData.phone_number ? changedData.phone_number : ""
+                  }
+                  onChange={(e) => {
+                    setChangedData({
+                      ...changedData,
+                      phone_number: e.target.value,
+                    });
+                  }}
                 />
               </div>
             </div>
@@ -111,7 +181,10 @@ export default function Profile() {
 
             {/* <!-- New Password --> */}
             <div className="flex flex-col gap-3">
-              <label className="text-base text-gray-600" htmlFor="user-new-password">
+              <label
+                className="text-base text-gray-600"
+                htmlFor="user-new-password"
+              >
                 New Password
               </label>
               <div className="pwd-input-new flex items-center rounded-xl border border-neutral-200">
@@ -167,7 +240,10 @@ export default function Profile() {
 
             {/* <!-- Confirm Password --> */}
             <div className="flex flex-col gap-3">
-              <label className="text-base text-gray-600" htmlFor="user-confirm-password">
+              <label
+                className="text-base text-gray-600"
+                htmlFor="user-confirm-password"
+              >
                 Confirm
               </label>
               <div className="pwd-input-new flex items-center rounded-xl border border-neutral-200">
@@ -225,7 +301,7 @@ export default function Profile() {
           <button className="w-full rounded-lg bg-blue-700 py-2 text-sm font-semibold text-white">
             Update changes
           </button>
-        </div>
+        </form>
       </div>
     </>
   );

@@ -58,7 +58,7 @@ export const UserProfile = () => {
       <div className="flex flex-col items-center">
         <img 
           className="w-24 h-24 rounded-full object-cover"
-          src={`${import.meta.env.VITE_PROFILE_PATH}/${loggedInState.img}`} alt="" />
+          src={`${import.meta.env.VITE_PROFILE_PATH}/${loggedInState.img ? loggedInState.img : "profile-pic.png"}`} alt="" />
         <div className="text-2xl">
           {/* Jonas El Rodriguez */}
           {loggedInState.first_name
