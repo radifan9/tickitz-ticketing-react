@@ -15,7 +15,7 @@ export default function Profile() {
 
   // State
   const [originalData, setOriginalData] = useState({
-    full_name: first_name + " " + last_name,
+    full_name: first_name && last_name ? first_name + " " + last_name : "",
     email: email,
     phone_number: phoneNumber,
   });

@@ -10,7 +10,7 @@ export default function History() {
   const [passwordEyeConfirm, setPasswordEyeConfirm] = useState("closed");
 
   const loggedInState = useSelector((state) => state.loggedIn);
-  const historyState = useSelector((state) => state.history);
+  const historyState = useSelector((state) => state.history.history);
   const ticketHistory = historyState.filter(
     (el) => el.email == loggedInState.email,
   );

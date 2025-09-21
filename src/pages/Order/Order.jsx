@@ -213,6 +213,10 @@ function Order() {
         setIsLoading(false);
       }
     })();
+
+    // Debug
+    console.log("Schedule ID : ");
+    console.log(scheduleID);
   }, []);
 
   // Effect when selectedSeats changed

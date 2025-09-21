@@ -5,7 +5,7 @@ import { convertDate } from "../../utils/convertDate";
 
 // External Libraries
 import { toast } from "sonner";
-import { addHistory } from "../../redux/slice/historySlice";
+// import { addHistory } from "../../redux/slice/historySlice";
 import apiFetchJSON from "../../utils/apiFetchJSON";
 import apiFetch from "../../utils/apiFetch";
 
@@ -148,7 +148,7 @@ function Payment() {
           full_name: personalInfo.fullName,
           email: personalInfo.email,
           phone_number: personalInfo.phoneNumber,
-          schedule_id: orderState.order.scheduleId || 1, // You might need to add this to orderState
+          schedule_id: orderState.order.scheduleID || 1, // You might need to add this to orderState
           seats: orderState.order.seats,
         };
 
@@ -212,40 +212,39 @@ function Payment() {
     const { date, time, cinema, seats, totalPayment } = orderState.order;
 
     // Find largest ID in the history, then +1 from that ID for the next ID
-    let largestId = 0;
-    historyState.forEach((el) => {
-      if (el.orderId > largestId) {
-        largestId = el.orderId;
-      }
-    });
+    // let largestId = 0;
+    // historyState.forEach((el) => {
+    //   if (el.orderId > largestId) {
+    //     largestId = el.orderId;
+    //   }
+    // });
 
-    const obj = {};
-    Object.assign(obj, {
-      payment_id: selectedPayment,
-      totalPayment,
-      full_name: personalInfo.fullName,
-      email: personalInfo.email,
-      phone_number: personalInfo.phoneNumber,
-      originalTitle,
-      cat,
-      date,
-      time,
-      cinema,
-      seats,
-      ticketStatus: {
-        isActive: true,
-        isPaid: true,
-      },
-      movieId,
-    });
+    // const obj = {};
+    // Object.assign(obj, {
+    //   payment_id: selectedPayment,
+    //   totalPayment,
+    //   full_name: personalInfo.fullName,
+    //   email: personalInfo.email,
+    //   phone_number: personalInfo.phoneNumber,
+    //   originalTitle,
+    //   cat,
+    //   date,
+    //   time,
+    //   cinema,
+    //   seats,
+    //   ticketStatus: {
+    //     isActive: true,
+    //     isPaid: true,
+    //   },
+    //   movieId,
+    // });
 
     // Add to history
-    dispatch(addHistory(obj));
+    // dispatch(addHistory(obj));
 
     const token = loggedInState.token || "";
 
     // PATCH transaction
-
     try {
       await apiFetch(
         `/api/v1/orders/transactions/${transactionID}`,
@@ -297,7 +296,7 @@ function Payment() {
     });
 
     // Add to history and navigate to results
-    dispatch(addHistory(obj));
+    // dispatch(addHistory(obj));
     navigate("/");
   };
 

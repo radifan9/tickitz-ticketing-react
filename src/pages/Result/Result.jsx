@@ -1,13 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import QRCode from "react-qr-code";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { historyActions } from "../../redux/slice/historySlice";
+
+// Component
+import Loader from "../../components/Loader.jsx";
 
 //  MAIN COMPONENTS
 function Result() {
+  const [ticketHistory, setTicketHistory] = useState([]);
+  const lastTicket = ticketHistory[ticketHistory.length - 1];
+
   // Hooks
-  const historyState = useSelector((state) => state.history);
+  const dispatch = useDispatch();
+
+  // LoggedIn
+  const { token } = useSelector((state) => state.loggedIn);
+
+  const { isLoading} = useSelector(
+    (state) => state.history,
+  );
+  const historyState = useSelector((state) => state.history.history);
   console.log("History State");
   console.log(historyState);
+
+  useEffect(() => {
+    // Get user transaction history
+    dispatch(historyActions.getHistoriesThunk({ token }));
+
+    console.log("History State :");
+    console.log(historyState);
+  }, []);
+
+  // Update ticketHistory when historyState changes
+  useEffect(() => {
+    if (historyState && historyState.length > 0) {
+      setTicketHistory(historyState);
+    }
+  }, [historyState]);
+
+  if (isLoading) return <Loader />;
+  if (!lastTicket) return <div>No ticket found</div>;
 
   return (
     <div className="flex flex-col justify-between bg-[#f5f5f5] md:flex-row">
@@ -44,7 +77,7 @@ function Result() {
 
           <QRCode
             className="p-10"
-            value={`orderId:${historyState[historyState.length - 1].orderId}`}
+            value={`orderId:${lastTicket.id}`}
           />
 
           {/* Horizontal line and circles */}
@@ -63,8 +96,7 @@ function Result() {
                 Movie
               </span>
               <span className="text-sm font-semibold text-[#14142b]">
-                {/* Spider-Man: .. */}
-                {historyState[historyState.length - 1].title}
+                {lastTicket.title}
               </span>
             </div>
 
@@ -74,7 +106,7 @@ function Result() {
                 Category
               </span>
               <span className="text-sm font-semibold text-[#14142b]">
-                {historyState[historyState.length - 1].cat}
+                {lastTicket.age_rating}
               </span>
             </div>
 
@@ -82,8 +114,10 @@ function Result() {
             <div className="flex flex-col gap-1">
               <span className="text-xs font-semibold text-[#aaaaaa]">Date</span>
               <span className="text-sm font-semibold text-[#14142b]">
-                {/* 07 Jul */}
-                {historyState[historyState.length - 1].date}
+                {new Date(lastTicket.show_date).toLocaleDateString('en-US', { 
+                  day: '2-digit', 
+                  month: 'short' 
+                })}
               </span>
             </div>
 
@@ -91,8 +125,7 @@ function Result() {
             <div className="flex flex-col gap-1">
               <span className="text-xs font-semibold text-[#aaaaaa]">Time</span>
               <span className="text-sm font-semibold text-[#14142b]">
-                {/* 2:00pm */}
-                {historyState[historyState.length - 1].time}
+                {lastTicket.start_at.slice(0, 5)}
               </span>
             </div>
 
@@ -102,8 +135,7 @@ function Result() {
                 Count
               </span>
               <span className="text-sm font-semibold text-[#14142b]">
-                {/* 3 pcs */}
-                {historyState[historyState.length - 1].seats.length} pcs
+                {lastTicket.seats.length} pcs
               </span>
             </div>
 
@@ -113,17 +145,7 @@ function Result() {
                 Seats
               </span>
               <span className="text-sm font-semibold text-[#14142b]">
-                {/* Get the latest history, then map the seats */}
-                {historyState[historyState.length - 1].seats.map((el, idx) => {
-                  if (
-                    idx !==
-                    historyState[historyState.length - 1].seats.length - 1
-                  ) {
-                    return `${el}, `;
-                  } else {
-                    return `${el}`;
-                  }
-                })}
+                {lastTicket.seats.join(', ')}
               </span>
             </div>
           </div>
@@ -131,7 +153,9 @@ function Result() {
           {/* Total Payment */}
           <div className="mb-8 flex w-4/5 justify-between rounded border border-[#dedede] px-[18px] py-3">
             <div>Total</div>
-            <div>${historyState[historyState.length - 1].totalPayment}.00</div>
+            <div>
+              ${lastTicket.total_payment}.00
+            </div>
           </div>
         </div>
 

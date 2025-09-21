@@ -69,7 +69,17 @@ function Details() {
   // Helper functions to get filtered options
   const getAvailableDates = () => {
     if (!schedules || schedules.length === 0) return [];
-    return [...new Set(schedules.map((schedule) => schedule.show_date))].sort();
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // normalize to start of today
+
+    return [...new Set(schedules.map((schedule) => schedule.show_date))]
+      .filter((dateStr) => {
+        const date = new Date(dateStr);
+        date.setHours(0, 0, 0, 0); // normalize to start of date
+        return date >= today; // keep only today or future
+      })
+      .sort((a, b) => new Date(a) - new Date(b));
   };
 
   const getAvailableTimes = () => {
@@ -515,7 +525,7 @@ function Details() {
                 {/* <span className="font-semibold text-[#8692A6]">39 Result</span> */}
               </div>
 
-              <div className="mb-3 grid grid-cols-2 items-center gap-8 md:grid-cols-4">
+              <div className="w-full mb-3 grid grid-cols-2 items-center gap-8 md:grid-cols-4">
                 {showCinemas &&
                   cinemas
                     .filter((cinema) =>

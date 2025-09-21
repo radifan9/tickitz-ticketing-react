@@ -32,10 +32,10 @@ function getProgress(points) {
 
 export const UserProfile = () => {
   const loggedInState = useSelector((state) => state.loggedIn);
-  const historyState = useSelector((state) => state.history);
-  const ticketHistory = historyState.filter(
-    (el) => el.email == loggedInState.email,
-  );
+  // const historyState = useSelector((state) => state.history);
+  // const ticketHistory = historyState.filter(
+  //   (el) => el.email == loggedInState.email,
+  // );
 
   const points = loggedInState.points || 0;
   const currentTier = getTier(points);
