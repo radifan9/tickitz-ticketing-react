@@ -265,35 +265,35 @@ function Payment() {
    * Similar to handle check but, make the isPaid to false
    */
   const handlePayLater = () => {
-    const { movieId, title, cat = "PG-13" } = movieState.movie;
-    const { date, time, cityLocation, cinema, seats, totalPayment } =
-      orderState.order;
+    // const { movieId, title, cat = "PG-13" } = movieState.movie;
+    // const { date, time, cityLocation, cinema, seats, totalPayment } =
+    //   orderState.order;
 
-    // Find largest ID in the history, then +1 from that ID for the next ID
-    let largestId = 0;
-    historyState.forEach((el) => {
-      if (el.orderId > largestId) {
-        largestId = el.orderId;
-      }
-    });
+    // // Find largest ID in the history, then +1 from that ID for the next ID
+    // let largestId = 0;
+    // historyState.forEach((el) => {
+    //   if (el.orderId > largestId) {
+    //     largestId = el.orderId;
+    //   }
+    // });
 
-    const obj = {};
-    Object.assign(obj, {
-      // orderId: Math.floor(Math.random() * 1000) + 1,
-      email: personalInfo.email,
-      orderId: largestId + 1,
-      movieId,
-      title,
-      cat,
-      date,
-      time,
-      seats,
-      totalPayment,
-      ticketStatus: {
-        isActive: true,
-        isPaid: false,
-      },
-    });
+    // const obj = {};
+    // Object.assign(obj, {
+    //   // orderId: Math.floor(Math.random() * 1000) + 1,
+    //   email: personalInfo.email,
+    //   orderId: largestId + 1,
+    //   movieId,
+    //   title,
+    //   cat,
+    //   date,
+    //   time,
+    //   seats,
+    //   totalPayment,
+    //   ticketStatus: {
+    //     isActive: true,
+    //     isPaid: false,
+    //   },
+    // });
 
     // Add to history and navigate to results
     // dispatch(addHistory(obj));

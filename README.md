@@ -1,95 +1,80 @@
-# 🎬 Tickitz - Cinema Ticket Booking App
+# Tickitz - Cinema Ticket Booking Frontend
 
-Tickitz is a **cinema ticket booking web application** built with **React + Vite**.  
-It allows users to browse movies, book seats, make payments, and view their tickets — all in one place.  
+## 📖 Project Overview
 
----
+**Tickitz** is a modern cinema ticket booking web application that provides a seamless movie booking experience from browsing to ticket generation.
 
-## 🚀 Features
+**Technologies Used:**
+- React + Vite (Frontend framework & bundler)
+- Context API & Redux (State management)
+- Sonner (Toast notifications)
+- NGINX (Deployment)
 
-- **Authentication**
-  - Sign Up, Sign In, Forget Password
-- **Home Page**
-  - Landing page with highlights
-- **Movie List**
-  - Popular and upcoming movies
-- **Movie Details**
-  - Detailed view when clicking on a movie
-- **Order**
-  - Seat selection interface
-- **Payment**
-  - Choose payment methods
-- **Result**
-  - Display e-ticket after payment
+**Key Features:**
+- 🔐 **Authentication** - Sign Up, Sign In, Forget Password
+- 🏠 **Home Page** - Landing page with movie highlights
+- 🎬 **Movie Catalog** - Browse popular and upcoming movies
+- 📄 **Movie Details** - Detailed movie information and showtimes
+- 🎫 **Seat Selection** - Interactive seat booking interface
+- 💳 **Payment System** - Multiple payment method options
+- 🎟️ **E-Ticket** - Digital ticket generation after payment
 
----
+## 🚀 Instructions
 
-## 🛠️ Tech Stack
+**Environment Requirements:**
+- Node.js 18+ 
+- npm or yarn
 
-- [React](https://react.dev/) + [Vite](https://vitejs.dev/) (Frontend framework & bundler)
-- [Context API](https://react.dev/learn/scaling-up-with-reducer-and-context) (State management)
-- [Redux](https://redux.js.org/) (Global state management)
-- [Sonner](https://sonner.emilkowal.ski/) (Toast notifications)
-- [NGINX](https://nginx.org/) (Frontend deployment)
-
----
-
-## 📂 Project Structure
-
-```
-tickitz/
-├── src/               # React application source code
-├── public/            # Static files
-├── Document/          # Documentation
-│   └── Weekly Task - 7.md   # Basic DevOps notes
-└── ...
-```
-
-### Folder Structure
-
-- **components** : shared components (if a component is unique to a page, it doesn't belong here), general small components  
-- **contexts** : React context for global state management  
-- **redux** : Redux slices for state management  
-- **pages** : Each individual page (Auth, Home, MovieList, Details, Order, Payment, Result)  
-- **data** : JSON data and constant variables that don’t change  
-- **hooks** : Custom React hooks  
-- **utils** : Utility functions, pure functions (same input → same output)  
-
----
-
-
-
-## ⚡ Getting Started
-
-### 1️⃣ Clone the repository
+**Installation & Usage:**
 ```bash
-git clone https://github.com/your-username/tickitz.git
-cd tickitz
-```
+# Clone repository
+git clone https://github.com/radifan9/tickitz-ticketing-react.git
+cd tickitz-ticketing-react
 
-### 2️⃣ Install dependencies
-```bash
+# Install dependencies
 npm install
-```
 
-### 3️⃣ Run the development server
-```bash
+# Start development server
 npm run dev
-```
 
-### 4️⃣ Build for production
-```bash
+# Build for production
 npm run build
 ```
 
----
+## 📱 Screenshots
 
-## 📝 Documentation
+### Home Page
+![Home Page](./public/screenshots/home.png)
 
-This repository also includes **Basic DevOps documentation** in:  
+### Movie Selection
+![Movie List](./public/screenshots/movies.png)
 
+### Seat Selection
+![Seat Selection](./public/screenshots/seats.png)
+
+### Payment Process
+![Payment](./public/screenshots/payment.png)
+
+*Note: Add actual screenshots to `/public/screenshots/` directory*
+
+## ℹ️ Other Information
+
+**License:** MIT
+
+**Contact:** 
+- GitHub: [@radifan9](https://github.com/radifan9)
+
+**Related Project:**
+- [Tickitz Backend](https://github.com/radifan9/tickitz-ticketing-backend) - API server for this application
+
+**Project Structure:**
 ```
-Document/Week-7/
+src/
+├── components/     # Reusable components
+├── contexts/       # React Context providers
+├── redux/          # Redux state management
+├── pages/          # Application pages
+├── data/           # Static data and constants
+├── hooks/          # Custom React hooks
+└── utils/          # Utility functions
 ```
-
----
