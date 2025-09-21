@@ -24,6 +24,9 @@ dist-ssr
 *.sw?
 .env
 
+eslint.config.js
+tmp
+
 # key
 document/Week-7/radif_ecdsa
 document/Week-7/radif_ecdsa.pub
