@@ -9,7 +9,7 @@ import Loader from "../../components/Loader.jsx";
 //  MAIN COMPONENTS
 function Result() {
   const [ticketHistory, setTicketHistory] = useState([]);
-  const lastTicket = ticketHistory[ticketHistory.length - 1];
+  const lastTicket = ticketHistory[0]; // Get the first item after sorting (most recent)
 
   // Hooks
   const dispatch = useDispatch();
@@ -17,25 +17,24 @@ function Result() {
   // LoggedIn
   const { token } = useSelector((state) => state.loggedIn);
 
-  const { isLoading} = useSelector(
+  const { isLoading, isSuccess, isFailed } = useSelector(
     (state) => state.history,
   );
   const historyState = useSelector((state) => state.history.history);
-  console.log("History State");
-  console.log(historyState);
 
   useEffect(() => {
     // Get user transaction history
     dispatch(historyActions.getHistoriesThunk({ token }));
-
-    console.log("History State :");
-    console.log(historyState);
   }, []);
 
   // Update ticketHistory when historyState changes
   useEffect(() => {
     if (historyState && historyState.length > 0) {
-      setTicketHistory(historyState);
+      // Sort by paid_at date in descending order to get the latest first
+      const sortedHistory = [...historyState].sort(
+        (a, b) => new Date(b.paid_at) - new Date(a.paid_at),
+      );
+      setTicketHistory(sortedHistory);
     }
   }, [historyState]);
 
@@ -75,10 +74,7 @@ function Result() {
         <div className="flex w-[295px] flex-col items-center rounded-lg bg-white">
           {/* QR */}
 
-          <QRCode
-            className="p-10"
-            value={`orderId:${lastTicket.id}`}
-          />
+          <QRCode className="p-10" value={`orderId:${lastTicket.id}`} />
 
           {/* Horizontal line and circles */}
           <div className="relative mb-6 w-full border-b border-[#dedede]">
@@ -114,9 +110,9 @@ function Result() {
             <div className="flex flex-col gap-1">
               <span className="text-xs font-semibold text-[#aaaaaa]">Date</span>
               <span className="text-sm font-semibold text-[#14142b]">
-                {new Date(lastTicket.show_date).toLocaleDateString('en-US', { 
-                  day: '2-digit', 
-                  month: 'short' 
+                {new Date(lastTicket.show_date).toLocaleDateString("en-US", {
+                  day: "2-digit",
+                  month: "short",
                 })}
               </span>
             </div>
@@ -145,7 +141,7 @@ function Result() {
                 Seats
               </span>
               <span className="text-sm font-semibold text-[#14142b]">
-                {lastTicket.seats.join(', ')}
+                {lastTicket.seats.join(", ")}
               </span>
             </div>
           </div>
@@ -153,9 +149,7 @@ function Result() {
           {/* Total Payment */}
           <div className="mb-8 flex w-4/5 justify-between rounded border border-[#dedede] px-[18px] py-3">
             <div>Total</div>
-            <div>
-              ${lastTicket.total_payment}.00
-            </div>
+            <div>${lastTicket.total_payment}.00</div>
           </div>
         </div>
 
