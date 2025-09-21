@@ -52,10 +52,10 @@ npm run build
 ### Seat Selection
 ![Seat Selection](./public/screenshots/seats.png)
 
-### Payment Process
-![Payment](./public/screenshots/payment.png)
+<!-- ### Payment Process
+![Payment](./public/screenshots/payment.png) -->
 
-*Note: Add actual screenshots to `/public/screenshots/` directory*
+
 
 ## ℹ️ Other Information
 
