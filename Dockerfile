@@ -13,11 +13,11 @@ RUN npm ci
 # Copy sisanya
 COPY . .
 
-ENV VITE_BE_HOST=backend
-ENV VITE_POSTER_PATH=backend/api/v1/img/posters
-ENV VITE_BACKDROP_PATH=backend/api/v1/img/backdrops
-ENV VITE_CINEMA_PATH=backend/api/v1/img/cinemas
-ENV VITE_PROFILE_PATH=backend/api/v1/img/profile_pics
+ENV VITE_BE_HOST=http://localhost:3000
+ENV VITE_POSTER_PATH=http://localhost:3000/api/v1/img/posters
+ENV VITE_BACKDROP_PATH=http://localhost:3000/api/v1/img/backdrops
+ENV VITE_CINEMA_PATH=http://localhost:3000/api/v1/img/cinemas
+ENV VITE_PROFILE_PATH=http://localhost:3000/api/v1/img/profile_pics
 
 # Build dengan command vite build
 RUN npm run build
