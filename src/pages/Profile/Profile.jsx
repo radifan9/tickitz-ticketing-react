@@ -136,6 +136,7 @@ export default function Profile() {
                 type="text"
                 name="user-email"
                 id="user-email"
+                disabled
                 placeholder="jonasrodrigu123@gmail.com"
                 value={changedData.email ? changedData.email : ""}
                 onChange={(e) => {

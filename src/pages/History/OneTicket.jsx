@@ -1,6 +1,9 @@
 import { useState } from "react";
 import QRCode from "react-qr-code";
 import { useSelector } from "react-redux";
+import apiFetch from "../../utils/apiFetch";
+import { toast } from "sonner";
+import { useNavigate } from "react-router";
 
 // --- Constants
 const CINEMA_LIST = [
@@ -24,8 +27,8 @@ const CINEMA_LIST = [
 
 export const OneTicket = ({ ticket }) => {
   const [isShowDetails, setIsShowDetails] = useState(false);
-
   const loggedInState = useSelector((state) => state.loggedIn);
+  const navigate = useNavigate();
 
   // Format date for display
   const formatDate = (dateString) => {
@@ -46,12 +49,40 @@ export const OneTicket = ({ ticket }) => {
   const isPaid = ticket.paid_at !== null && ticket.paid_at !== undefined;
 
   // For demo purposes, assuming active tickets are those with show_date in the future
-  const isActive = new Date(ticket.show_date) > new Date();
+  // const isActive = new Date(ticket.show_date) > new Date();
+  // Combine show_date (date part only) and start_at (HH:mm:ss) for accurate comparison
+  const showDate = new Date(ticket.show_date);
+  const showDateStr = showDate.toISOString().slice(0, 10); // "YYYY-MM-DD"
+  const startTimeStr = ticket.start_at.slice(0, 8); // "HH:MM:SS"
+  const showDateTime = new Date(`${showDateStr}T${startTimeStr}`); // local time
+  const isActive = showDateTime > new Date();
 
   // Find cinema info
   const cinemaInfo = CINEMA_LIST.find(
     (cinema) => cinema.name.toLowerCase() === ticket.cinema.toLowerCase(),
   );
+
+  async function handleCheckPayment() {
+    const token = loggedInState.token || "";
+
+    console.log("Transaction data: ");
+    console.log(ticket);
+
+    // PATCH transaction
+    try {
+      await apiFetch(
+        `/api/v1/orders/transactions/${ticket.id}`,
+        "PATCH",
+        token,
+      );
+
+      toast.success("Transaksi berhasil di bayar!", { duration: 2000 });
+    } catch (error) {
+      console.log(`error : ${error}`);
+    }
+
+    navigate("/result");
+  }
 
   return (
     <div
@@ -231,7 +262,12 @@ export const OneTicket = ({ ticket }) => {
               </div>
 
               {/* Button */}
-              <button className="h-12 w-full rounded-lg bg-[#1D4ED8] text-white">
+              <button
+                className="h-12 w-full rounded-lg bg-[#1D4ED8] text-white"
+                onClick={() => {
+                  handleCheckPayment();
+                }}
+              >
                 Cek Pembayaran
               </button>
             </div>

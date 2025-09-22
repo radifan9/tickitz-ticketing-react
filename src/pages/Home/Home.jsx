@@ -72,7 +72,8 @@ function Home() {
       try {
         const urlMovies = `${import.meta.env.VITE_BE_HOST}/api/v1/movies/upcoming`;
         const moviesData = await fetchBEWithoutAuth("GET", urlMovies);
-        const results = moviesData.data;
+        // const results = moviesData.data;
+        const results = Array.isArray(moviesData?.data) ? moviesData.data : [];
 
         const upcomingMovieList = results.map((movie) => ({
           id: movie.id,
@@ -110,7 +111,7 @@ function Home() {
         </div>
 
         <section className="grid h-96 grid-cols-2 grid-rows-3 gap-2 px-[var(--small-pad)] md:w-2/4">
-          {!isLoading && moviesHero && (
+          {!isLoading && moviesHero && moviesHero.length >= 4 && (
             <>
               <img
                 className="col-span-1 row-span-1 h-full w-full rounded-t-4xl object-cover object-center"
