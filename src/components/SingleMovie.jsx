@@ -51,7 +51,9 @@ function SingleMovie({ movie }) {
       </div>
 
       {/* Movie Information */}
-      <h3 className="font-semibold text-[#14142B]">{movie.title}</h3>
+      <Link to={`/details/?id=${movie.id}`}>
+        <h3 className="font-semibold text-[#14142B]">{movie.title}</h3>
+      </Link>
       {movie.releaseDate && (
         <div className="text-lg font-semibold text-[#1D4ED8]">
           {formatReleaseDate(movie.releaseDate)}
