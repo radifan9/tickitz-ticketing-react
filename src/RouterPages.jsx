@@ -25,6 +25,7 @@ import History from "./pages/History/History.jsx";
 import { AdminDashboard } from "./pages/AdminDashboard/AdminDashboard.jsx";
 import { AdminMovie } from "./pages/AdminMovie/AdminMovie.jsx";
 import { AdminAddMovie } from "./pages/AdminAddMovie/AdminAddMovie.jsx";
+import NotFound from "./pages/NotFound/NotFound.jsx";
 
 // Lib
 
@@ -81,6 +82,10 @@ function RouterPages() {
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="movie" element={<AdminMovie />} />
             <Route path="add" element={<AdminAddMovie />} />
+          </Route>
+
+          <Route path="*" element={<RouteHomeLayout />}>
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Route>
       </Routes>
