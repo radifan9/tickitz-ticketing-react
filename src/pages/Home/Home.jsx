@@ -57,7 +57,7 @@ function Home() {
           id: movie.id,
           title: movie.title,
           genres: movie.genres,
-          src: `${import.meta.env.VITE_BE_HOST}/${import.meta.env.VITE_POSTER_PATH}/${movie.poster_img}`,
+          src: `${import.meta.env.VITE_BE_HOST}/api/v1/img/posters/${movie.poster_img}`,
         }));
 
         setExcitingMovies(excitingMovieList);
@@ -80,7 +80,7 @@ function Home() {
           title: movie.title,
           releaseDate: movie.release_date,
           genres: movie.genres,
-          src: `${import.meta.env.VITE_BE_HOST}/${import.meta.env.VITE_POSTER_PATH}/${movie.poster_img}`,
+          src: `${import.meta.env.VITE_BE_HOST}/api/v1/img/posters/${movie.poster_img}`,
         }));
 
         setUpcomingMovies(upcomingMovieList);
@@ -115,22 +115,22 @@ function Home() {
             <>
               <img
                 className="col-span-1 row-span-1 h-full w-full rounded-t-4xl object-cover object-center"
-                src={`${import.meta.env.VITE_BE_HOST}/${import.meta.env.VITE_POSTER_PATH}/${moviesHero[0].poster_img}`}
+                src={`${import.meta.env.VITE_BE_HOST}/api/v1/img/posters/${moviesHero[0].poster_img}`}
                 alt={moviesHero[0]?.title}
               />
               <img
                 className="col-span-1 col-start-2 row-span-2 row-start-1 row-end-3 h-full w-full rounded-t-4xl object-cover object-top"
-                src={`${import.meta.env.VITE_BE_HOST}/${import.meta.env.VITE_POSTER_PATH}/${moviesHero[1].poster_img}`}
+                src={`${import.meta.env.VITE_BE_HOST}/api/v1/img/posters/${moviesHero[1].poster_img}`}
                 alt={moviesHero[1]?.title}
               />
               <img
                 className="col-span-1 col-start-1 row-span-2 row-start-2 h-full w-full rounded-b-4xl object-cover object-top"
-                src={`${import.meta.env.VITE_BE_HOST}/${import.meta.env.VITE_POSTER_PATH}/${moviesHero[2].poster_img}`}
+                src={`${import.meta.env.VITE_BE_HOST}/api/v1/img/posters/${moviesHero[2].poster_img}`}
                 alt={moviesHero[2]?.title}
               />
               <img
                 className="col-span-1 col-start-2 row-span-1 row-start-3 h-full w-full rounded-b-4xl object-cover object-center"
-                src={`${import.meta.env.VITE_BE_HOST}/${import.meta.env.VITE_POSTER_PATH}/${moviesHero[3].poster_img}`}
+                src={`${import.meta.env.VITE_BE_HOST}/api/v1/img/posters/${moviesHero[3].poster_img}`}
                 alt={moviesHero[3]?.title}
               />
             </>

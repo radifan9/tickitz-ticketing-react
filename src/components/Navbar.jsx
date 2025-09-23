@@ -110,7 +110,7 @@ function Navbar() {
               >
                 <img
                   className="h-12 w-12 rounded-full object-cover"
-                  src={`${import.meta.env.VITE_PROFILE_PATH}/${img ? img : "profile-pic.png"}`}
+                  src={`${import.meta.env.VITE_BE_HOST}/api/v1/img/profile_pics/${img ? img : "profile-pic.png"}`}
                   alt=""
                 />
               </button>
@@ -253,7 +253,7 @@ function Navbar() {
                     <Link to="/profile">
                       <img
                         className="h-8 w-8 rounded-full object-cover"
-                        src={`${import.meta.env.VITE_PROFILE_PATH}/${img ? img : "profile-pic.png"}`}
+                        src={`${import.meta.env.VITE_BE_HOST}/api/v1/img/profile_pics/${img ? img : "profile-pic.png"}`}
                         alt=""
                       />
                     </Link>

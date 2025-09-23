@@ -331,7 +331,7 @@ function Details() {
           <div className="relative h-110 w-full md:h-90">
             <img
               className="h-full w-full object-cover"
-              src={`${import.meta.env.VITE_BACKDROP_PATH}/${movieState.movie.backdrop_img}`}
+              src={`${import.meta.env.VITE_BE_HOST}/api/v1/img/backdrops/${movieState.movie.backdrop_img}`}
               alt={movieState.movie?.title || "Movie backdrop"}
             />
             <div className="absolute inset-0 bg-black/50" />
@@ -343,7 +343,7 @@ function Details() {
               {/* Movie Image */}
               <img
                 className="rounded-lg object-cover md:w-[25%]"
-                src={`${import.meta.env.VITE_BE_HOST}/${import.meta.env.VITE_POSTER_PATH}/${movieState.movie.poster_img}`}
+                src={`${import.meta.env.VITE_BE_HOST}/api/v1/img/posters/${movieState.movie.poster_img}`}
                 alt={`${movieState.title}`}
               />
 
@@ -557,7 +557,7 @@ function Details() {
                           }`}
                         >
                           <img
-                            src={`${import.meta.env.VITE_CINEMA_PATH}/${el.img}`}
+                            src={`${import.meta.env.VITE_BE_HOST}/api/v1/img/cinemas/${el.img}`}
                             alt={`Logo ${el.name}`}
                           />
                           {/* optional price */}
