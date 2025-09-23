@@ -13,6 +13,4 @@ jobs:
           image_name: ${{ github.repository }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
           image_tag: 1.2-macbre
-          dockerfile: ./Dockerfile
-          context: .
           extra_args: "--build-arg VITE_HOST=http://backend:3000"
