@@ -15,4 +15,4 @@ jobs:
           image_tag: 1.2-macbre
           dockerfile: ./Dockerfile
           context: .
-          extra_args: "--build-args VITE_HOST=http://backend:3000"
+          extra_args: "--build-arg VITE_HOST=http://backend:3000"
