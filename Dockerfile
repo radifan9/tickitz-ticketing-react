@@ -13,7 +13,6 @@ RUN npm ci
 # Copy sisanya
 COPY . .
 
-
 # Insert argument to environment during building image
 ARG VITE_HOST
 ENV VITE_BE_HOST=$VITE_HOST

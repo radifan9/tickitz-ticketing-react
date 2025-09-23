@@ -12,5 +12,4 @@ jobs:
         with:
           image_name: ${{ github.repository }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          image_tag: 1.2-macbre
           extra_args: "--build-arg VITE_HOST=http://backend:3000"
