@@ -49,7 +49,6 @@ export const OneTicket = ({ ticket }) => {
   const isPaid = ticket.paid_at !== null && ticket.paid_at !== undefined;
 
   // For demo purposes, assuming active tickets are those with show_date in the future
-  // const isActive = new Date(ticket.show_date) > new Date();
   // Combine show_date (date part only) and start_at (HH:mm:ss) for accurate comparison
   const showDate = new Date(ticket.show_date);
   const showDateStr = showDate.toISOString().slice(0, 10); // "YYYY-MM-DD"

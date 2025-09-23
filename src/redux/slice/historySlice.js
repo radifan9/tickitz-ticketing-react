@@ -23,10 +23,6 @@ const initialState = {
       virtualAccount: null,
       paymentDue: null, // June 23 2024
       totalPayment: null,
-      ticketStatus: {
-        isActive: null,
-        isPaid: null,
-      },
     },
   ],
 
@@ -98,7 +94,7 @@ const historySlice = createSlice({
 
       .addCase(getHistoriesThunk.rejected, (state, action) => {
         // Clear history data
-        state.history = null;
+        state.history = [];
 
         // Update UI states
         state.isLoading = false;

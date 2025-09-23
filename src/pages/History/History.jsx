@@ -17,7 +17,12 @@ export default function History() {
   // Redux state
   const loggedInState = useSelector((state) => state.loggedIn);
   const { token, email } = loggedInState;
-  const { isLoading, isSuccess, isFailed, history: historyState } = useSelector((state) => state.history);
+  const {
+    isLoading,
+    isSuccess,
+    isFailed,
+    history: historyState,
+  } = useSelector((state) => state.history);
 
   // Fetch history data on component mount
   useEffect(() => {
@@ -61,7 +66,7 @@ export default function History() {
 
         {/* Show message if no tickets found */}
         {!historyState || historyState.length === 0 ? (
-          <div className="md:col-start-2 flex justify-center py-8">
+          <div className="flex justify-center py-8 md:col-start-2">
             <p className="text-gray-500">No ticket history found.</p>
           </div>
         ) : (
