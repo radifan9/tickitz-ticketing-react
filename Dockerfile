@@ -13,11 +13,6 @@ RUN npm ci
 # Copy sisanya
 COPY . .
 
-# ENV VITE_BE_HOST=http://192.168.100.232:3000
-# ENV VITE_POSTER_PATH=http://192.168.100.232:3000/api/v1/img/posters
-# ENV VITE_BACKDROP_PATH=http://192.168.100.232:3000/api/v1/img/backdrops
-# ENV VITE_CINEMA_PATH=http://192.168.100.232:3000/api/v1/img/cinemas
-# ENV VITE_PROFILE_PATH=http://192.168.100.232:3000/api/v1/img/profile_pics
 
 # Insert argument to environment during building image
 ARG VITE_HOST
