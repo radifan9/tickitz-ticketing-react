@@ -343,7 +343,7 @@ function Details() {
               {/* Movie Image */}
               <img
                 className="rounded-lg object-cover md:w-[25%]"
-                src={`${import.meta.env.VITE_POSTER_PATH}/${movieState.movie.poster_img}`}
+                src={`${import.meta.env.VITE_BE_HOST}/${import.meta.env.VITE_POSTER_PATH}/${movieState.movie.poster_img}`}
                 alt={`${movieState.title}`}
               />
 

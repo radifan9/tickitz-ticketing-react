@@ -273,7 +273,7 @@ function Order() {
             {/*  Movie Poster  */}
             <img
               className="aspect-[2/1.5] w-full rounded-lg object-cover object-center md:aspect-[1/1.25]"
-              src={`${import.meta.env.VITE_POSTER_PATH}/${movieState.movie.poster_img}`}
+              src={`${import.meta.env.VITE_BE_HOST}/${import.meta.env.VITE_POSTER_PATH}/${movieState.movie.poster_img}`}
               alt=""
             />
             {/*  Information  */}
