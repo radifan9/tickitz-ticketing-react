@@ -123,6 +123,7 @@ export default function SignIn() {
 
     // Access the error state
     console.log("Error state : ");
+    
     console.log(error);
   };
 
