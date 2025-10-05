@@ -418,7 +418,7 @@ export const AdminAddMovie = () => {
           </div>
 
           {/* ADD SHOW TIME */}
-          <div className="flex items-center gap-5">
+          {/* <div className="flex items-center gap-5">
             <button className="flex h-7 items-center rounded border-[1px] border-[#1D4ED8] px-4 text-3xl font-light text-[#1D4ED8]">
               +
             </button>
@@ -429,7 +429,7 @@ export const AdminAddMovie = () => {
               id=""
               placeholder="add custom time"
             />
-          </div>
+          </div> */}
         </div>
 
         {/* Submit Button */}

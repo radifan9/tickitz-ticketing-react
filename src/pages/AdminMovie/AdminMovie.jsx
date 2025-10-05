@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { TableRow } from "./TableRow";
 import { useNavigate } from "react-router";
 import apiFetch from "../../utils/apiFetch";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { loggedInActions } from "../../redux/slice/loggedInSlice";
 
 export const AdminMovie = () => {
   const [movies, setMovies] = useState([]);
   const [showConfirm, setShowConfirm] = useState(false);
   const [selectedMovie, setSelectedMovie] = useState(null); // { id, name }
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   const authState = useSelector((state) => state.loggedIn);
   const { token } = authState;
@@ -19,8 +21,9 @@ export const AdminMovie = () => {
       const data = await apiFetch("/api/v1/admin/movies", "GET", token);
       setMovies(data);
     } catch (error) {
-      console.log(`error : ${error}`);
-      if (error == "Error: 401") {
+      console.log(`error di admin movie : ${error}`);
+      if (error.status === 401) {
+        dispatch(loggedInActions.clearLoggedInStates)
         navigate("/signin");
       }
     }
@@ -66,7 +69,7 @@ export const AdminMovie = () => {
         </span>
         <button
           className="h-14 w-fit cursor-pointer justify-self-end rounded-md bg-[#1D4ED8] px-8 text-base text-white"
-          onClick={() => navigate("/admin/add")}
+          onClick={() => navigate("/admin/movie/add")}
         >
           + Add
         </button>

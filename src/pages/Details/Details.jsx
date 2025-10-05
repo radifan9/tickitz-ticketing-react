@@ -525,7 +525,7 @@ function Details() {
                 {/* <span className="font-semibold text-[#8692A6]">39 Result</span> */}
               </div>
 
-              <div className="w-full mb-3 grid grid-cols-2 items-center gap-8 md:grid-cols-4">
+              <div className="mb-3 grid w-full grid-cols-2 items-center gap-8 md:grid-cols-4">
                 {showCinemas &&
                   cinemas
                     .filter((cinema) =>

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router";
 import { toast } from "sonner";
 import apiFetchNoAuth from "../../utils/apiFetchNoAuth";
 
 // Components
 import Loader from "../../components/Loader";
+import { movieActions } from "../../redux/slice/movieSlice";
 
 // Constants
 const CINEMA_LIST = [
@@ -63,72 +64,89 @@ export const AdminEditMovie = () => {
   const [selectedShowTimes, setSelectedShowTimes] = useState([]);
   const [posterName, setPosterName] = useState("Upload Poster");
   const [backdropName, setBackdropName] = useState("Upload Backdrop");
-  const [movieData, setMovieData] = useState({});
+  const [movieData, setMovieData] = useState({
+    title: "",
+    genres: "",
+    age_rating_id: "",
+    release_date: "",
+    hours: "",
+    minutes: "",
+    director: "",
+    cast: [],
+    synopsis: "",
+    city_id: "",
+    show_date: "",
+  });
+
   const [isLoading, setIsLoading] = useState(false);
 
   // Hooks
+  const dispatch = useDispatch();
   const navigate = useNavigate();
   let params = useParams();
 
   // Redux
   const authState = useSelector((state) => state.loggedIn);
+  const schedules = useSelector((state) => state.movie.schedules);
+  const loggedInState = useSelector((state) => state.loggedIn);
   const { token } = authState;
 
   // Handler
   const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+
     try {
-      e.preventDefault();
-
-      const request = new Request(
-        `${import.meta.env.VITE_BE_HOST}/api/v1/admin/movies`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
-
       const formdata = new FormData();
+
       const posterFile = e.target.poster_img.files[0];
       const backdropFile = e.target.backdrop_img.files[0];
-      formdata.append("poster_img", posterFile);
-      formdata.append("backdrop_img", backdropFile);
+      if (posterFile) formdata.append("poster_img", posterFile);
+      if (backdropFile) formdata.append("backdrop_img", backdropFile);
+
+      // --- Movie information ---
       formdata.append("title", e.target.movieTitle.value);
       formdata.append("genres", e.target.cat.value);
       formdata.append("age_rating_id", e.target.age_rating_id.value);
       formdata.append("release_date", e.target.releaseDate.value);
       formdata.append(
         "duration_minutes",
-        parseInt(e.target.hour.value) * 60 + parseInt(e.target.minute.value),
+        parseInt(e.target.hour.value || 0) * 60 +
+          parseInt(e.target.minute.value || 0),
       );
       formdata.append("director", e.target.director.value);
       formdata.append("cast", e.target.cast.value);
       formdata.append("synopsis", e.target.synopsis.value);
       formdata.append("city_id", e.target.loc.value);
-      formdata.append("cinema_id", selectedCinemas);
+      formdata.append("cinema_id", selectedCinemas.join(","));
       formdata.append("show_date", e.target.date.value);
-      formdata.append("show_time_id", selectedShowTimes);
+      formdata.append("show_time_id", selectedShowTimes.join(","));
 
-      console.log("Form Data : ");
-      console.log(formdata);
-
-      const response = await fetch(request, {
-        body: formdata,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_BE_HOST}/api/v1/admin/movies/${params.id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: formdata,
+        },
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message);
+        throw new Error(errorData.message || "Failed to update movie");
       }
 
       const result = await response.json();
-      console.log(result);
-
-      toast.success(`Successfully added ${e.target.movieTitle.value}!`);
+      console.log("✅ Updated movie:", result);
+      toast.success(`Successfully updated ${e.target.movieTitle.value}!`);
       navigate("/admin/movie", { replace: true });
     } catch (error) {
-      console.log(error);
+      console.error("❌ Edit error:", error);
+      toast.error(error.message || "Failed to update movie");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -153,6 +171,7 @@ export const AdminEditMovie = () => {
   useEffect(() => {
     setIsLoading(true);
     (async () => {
+      // Get Movie Details
       const urlMovie = `${import.meta.env.VITE_BE_HOST}/api/v1/movies/${params.id}`;
       const result = await apiFetchNoAuth("GET", urlMovie);
       setMovieData(result.data);
@@ -161,9 +180,44 @@ export const AdminEditMovie = () => {
         hours: Math.floor(result.data.duration_minutes / 60),
         minutes: Math.floor(result.data.duration_minutes % 60),
       }));
+
+      // Get Schedule
+      dispatch(
+        movieActions.getSchedulesBasedOnMovieID({
+          movieID: params.id,
+          token: loggedInState.token,
+        }),
+      );
     })();
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (!schedules || schedules.length === 0) return;
+
+    // Get all unique cinema IDs from schedule
+    const cinemaSet = new Set(schedules.map((s) => s.cinema_id));
+
+    // Get all unique show time IDs
+    const showTimeSet = new Set(schedules.map((s) => s.show_time_id));
+
+    // Pick the city (assuming all 7-day schedules use same city)
+    const cityId = schedules[0]?.city_id || "";
+
+    // Get the earliest show date (first day of the 7-day schedule)
+    const earliestDate = schedules
+      .map((s) => s.show_date)
+      .sort((a, b) => new Date(a) - new Date(b))[0];
+
+    // Apply to state
+    setSelectedCinemas([...cinemaSet]);
+    setSelectedShowTimes([...showTimeSet]);
+    setMovieData((prev) => ({
+      ...prev,
+      city_id: cityId,
+      show_date: earliestDate,
+    }));
+  }, [schedules]);
 
   return (
     <div className="mt-8 mb-20 flex w-full flex-col rounded-2xl bg-white p-9">
@@ -422,7 +476,14 @@ export const AdminEditMovie = () => {
               cols="50"
               className="rounded-lg border-[1px] border-[#DEDEDE] px-8"
               placeholder=" Insert your synopsis here..."
-            ></textarea>
+              value={movieData.synopsis || ""}
+              onChange={(e) =>
+                setMovieData((prev) => ({
+                  ...prev,
+                  synopsis: e.target.value,
+                }))
+              }
+            />
           </div>
 
           {/* Add Location */}
@@ -436,6 +497,13 @@ export const AdminEditMovie = () => {
               id="loc"
               className="h-12 rounded-lg border-[1px] border-[#DEDEDE] px-8 py-6 text-sm"
               placeholder="1=Jakarta,2=Bogor,3=Depok,4=Tangerang,5=Bekasi"
+              value={movieData.city_id || ""}
+              onChange={(e) =>
+                setMovieData((prev) => ({
+                  ...prev,
+                  city_id: e.target.value,
+                }))
+              }
             />
           </div>
 
@@ -485,6 +553,13 @@ export const AdminEditMovie = () => {
                 type="date"
                 name="date"
                 id="date"
+                value={movieData.show_date || ""}
+                onChange={(e) =>
+                  setMovieData((prev) => ({
+                    ...prev,
+                    show_date: e.target.value,
+                  }))
+                }
               />
             </div>
 

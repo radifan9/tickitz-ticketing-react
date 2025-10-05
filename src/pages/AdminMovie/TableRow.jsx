@@ -1,3 +1,5 @@
+import { useNavigate } from "react-router";
+
 export const TableRow = ({
   idx,
   movieID,
@@ -10,6 +12,8 @@ export const TableRow = ({
 }) => {
   const hour = Math.floor(duration / 60);
   const minute = duration % 60;
+
+  const navigate = useNavigate();
 
   return (
     <tr>
@@ -34,7 +38,12 @@ export const TableRow = ({
       <td className="gap-1 px-5 py-2 text-center text-sm">
         <div className="flex items-center justify-center gap-1">
           <img src="/action-view.png" alt="view" />
-          <img src="/action-edit.png" alt="edit" />
+          <button 
+            onClick={() => navigate(`/admin/movie/${movieID}/edit`)}
+            className="flex flex-shrink-0"
+          >
+            <img src="/action-edit.png" alt="edit" />
+          </button>
           <button
             onClick={() => onDeleteRequest(movieID, movieName)}
             className="flex flex-shrink-0"
